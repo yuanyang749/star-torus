@@ -1160,10 +1160,13 @@
         const frameCenterY = (minY + maxY) / 2;
         const visualScale = fitScale * (1 + burstScale);
         const motionSpeed = Math.hypot(velocityX, velocityY);
-        const trailStrength = interactionEnabled
-          ? Math.min(0.78, motionSpeed * 10 + Math.abs(targetZoom - zoom) * 1.8 + (dragMoved ? 0.08 : 0))
+        const normalizedTrailSpeed = interactionEnabled
+          ? Math.min(1, Math.max(0, (motionSpeed - 0.014) / 0.065))
           : 0;
-        const dustTrailStrength = interactionEnabled ? Math.min(1, motionSpeed * 18) : 0;
+        const dustTrailStrength = normalizedTrailSpeed * normalizedTrailSpeed * (3 - normalizedTrailSpeed * 2);
+        const trailStrength = interactionEnabled
+          ? Math.min(0.42, dustTrailStrength * 0.32 + Math.abs(targetZoom - zoom) * 0.6)
+          : 0;
         const backgroundRgb = rgbChannels(renderedTheme.background);
         const starRgb = rgbChannels(renderedTheme.star);
         const glowRgb = rgbChannels(renderedTheme.glow);
@@ -1242,9 +1245,9 @@
           }
         }
 
-        if (hasPreviousFrame && dustTrailStrength > 0.04) {
-          context.strokeStyle = `rgba(${glowRgb}, ${0.1 + dustTrailStrength * 0.34})`;
-          context.lineWidth = 0.75 + dustTrailStrength * 1.1;
+        if (hasPreviousFrame && dustTrailStrength > 0.08) {
+          context.strokeStyle = `rgba(${glowRgb}, ${0.055 + dustTrailStrength * 0.285})`;
+          context.lineWidth = 0.58 + dustTrailStrength * 0.88;
           context.lineCap = "round";
           context.beginPath();
 
@@ -1255,8 +1258,8 @@
             if (distanceSquared < 0.05 || distanceSquared > 3600) continue;
 
             const distance = Math.sqrt(distanceSquared);
-            const maxLength = 18 + dustTrailStrength * 24;
-            const stretch = Math.min(1.2 + dustTrailStrength * 4.2, maxLength / distance);
+            const maxLength = 12 + dustTrailStrength * 24;
+            const stretch = Math.min(1.05 + dustTrailStrength * 3.5, maxLength / distance);
             context.moveTo(renderedX[i] - dx * stretch, renderedY[i] - dy * stretch);
             context.lineTo(renderedX[i], renderedY[i]);
           }
@@ -1342,7 +1345,7 @@
         } else if (interactionEnabled && !dragging) {
           rotationX += velocityX * deltaFrames;
           rotationY += velocityY * deltaFrames;
-          const damping = Math.pow(0.94, deltaFrames);
+          const damping = Math.pow(0.9, deltaFrames);
           velocityX *= damping;
           velocityY *= damping;
 
@@ -1538,15 +1541,15 @@
             continue;
           }
 
-          const deltaX = (sample.clientX - lastClientX) * Math.PI / bounds.width * 1.2;
-          const deltaY = (sample.clientY - lastClientY) * Math.PI / bounds.height * 1.2;
+          const deltaX = (sample.clientX - lastClientX) * Math.PI / bounds.width * 0.78;
+          const deltaY = (sample.clientY - lastClientY) * Math.PI / bounds.height * 0.78;
           const elapsed = Math.max(4, sample.timeStamp - lastPointerAt);
           const velocityScale = frameDuration / elapsed;
 
           rotationX += deltaY;
           rotationY += deltaX;
-          velocityX = velocityX * 0.55 + deltaY * velocityScale * 0.45;
-          velocityY = velocityY * 0.55 + deltaX * velocityScale * 0.45;
+          velocityX = velocityX * 0.68 + deltaY * velocityScale * 0.32;
+          velocityY = velocityY * 0.68 + deltaX * velocityScale * 0.32;
           lastClientX = sample.clientX;
           lastClientY = sample.clientY;
           lastPointerAt = sample.timeStamp;
