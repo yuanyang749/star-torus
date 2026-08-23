@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121713">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23121713'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23c64a32'/%3E%3Cpath d='M10 11h12M10 16h12M10 21h12M16 8v16' stroke='%23f0e7d7' stroke-width='1.5'/%3E%3C/svg%3E">
+  <title>十二灵章 · 生肖简笔画</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #121713;
+      --night-soft: #1a211b;
+      --paper: #f0e7d7;
+      --paper-light: #fff9ee;
+      --paper-deep: #dccbb2;
+      --ink: #20231e;
+      --ink-muted: rgba(32, 35, 30, 0.5);
+      --cinnabar: #c64a32;
+      --gold: #b69a66;
+      --line: rgba(55, 49, 39, 0.16);
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--night);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-width: 280px;
+      min-height: 100svh;
+      margin: 0;
+      overflow-x: hidden;
+      color: #f5ecdc;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 12% 2%, rgba(198, 74, 50, 0.2), transparent 26rem),
+        radial-gradient(circle at 88% 34%, rgba(182, 154, 102, 0.09), transparent 22rem),
+        linear-gradient(145deg, #182019 0%, #101410 55%, #171a15 100%);
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+      opacity: 0.2;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      position: relative;
+      width: min(100%, 480px);
+      min-height: 100svh;
+      margin: 0 auto;
+      overflow-x: clip;
+      padding:
+        calc(22px + env(safe-area-inset-top))
+        16px
+        calc(26px + env(safe-area-inset-bottom));
+      isolation: isolate;
+    }
+
+    .app::before {
+      position: absolute;
+      top: 70px;
+      right: -76px;
+      z-index: -1;
+      width: 210px;
+      aspect-ratio: 1;
+      content: "";
+      border: 1px solid rgba(198, 74, 50, 0.2);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 18px rgba(198, 74, 50, 0.025),
+        0 0 0 48px rgba(198, 74, 50, 0.018);
+    }
+
+    .folio {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      color: rgba(245, 236, 220, 0.52);
+      font-family: "Baskerville", "Times New Roman", serif;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: rise-in 700ms 80ms var(--ease-out) forwards;
+    }
+
+    .folio__mark {
+      display: inline-grid;
+      width: 22px;
+      height: 22px;
+      margin-right: 9px;
+      place-items: center;
+      border: 1px solid rgba(198, 74, 50, 0.82);
+      color: #e97a60;
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 12px;
+      letter-spacing: 0;
+      transform: rotate(-3deg);
+    }
+
+    .folio__left {
+      display: flex;
+      align-items: center;
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .hero__copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--gold);
+      font-family: "Baskerville", "Times New Roman", serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: rise-in 750ms 140ms var(--ease-out) forwards;
+    }
+
+    h1 {
+      margin: 0;
+      color: #f4ead8;
+      font-family: "Songti SC", "STSong", "SimSun", serif;
+      font-size: clamp(43px, 13vw, 62px);
+      font-weight: 500;
+      line-height: 0.96;
+      letter-spacing: -0.08em;
+      text-wrap: nowrap;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: title-in 850ms 180ms var(--ease-out) forwards;
+    }
+
+    h1 .accent {
+      position: relative;
+      color: #d55b43;
+    }
+
+    h1 .accent::after {
+      position: absolute;
+      right: -2px;
+      bottom: 2px;
+      width: 5px;
+      height: 5px;
+      content: "";
+      border-radius: 50%;
+      background: var(--cinnabar);
+      box-shadow: 0 0 18px rgba(198, 74, 50, 0.72);
+    }
+
+    .intro {
+      max-width: 19rem;
+      margin: 12px 0 0;
+      color: rgba(245, 236, 220, 0.56);
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 12px;
+      line-height: 1.75;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      animation: rise-in 750ms 280ms var(--ease-out) forwards;
+    }
+
+    .replay {
+      position: relative;
+      display: grid;
+      width: 54px;
+      height: 54px;
+      padding: 0;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(245, 236, 220, 0.2);
+      border-radius: 50%;
+      color: #f4ead8;
+      background: rgba(245, 236, 220, 0.04);
+      cursor: pointer;
+      opacity: 0;
+      animation: rise-in 750ms 340ms var(--ease-out) forwards;
+      transition:
+        border-color 240ms ease,
+        background-color 240ms ease,
+        transform 240ms var(--ease-out);
+    }
+
+    .replay::before {
+      position: absolute;
+      inset: 7px;
+      content: "";
+      border-radius: inherit;
+      background: var(--cinnabar);
+      transform: scale(0);
+      transition: transform 340ms var(--ease-out);
+    }
+
+    .replay:active {
+      transform: scale(0.94);
+    }
+
+    .replay:active::before,
+    .replay.is-running::before {
+      transform: scale(1);
+    }
+
+    .replay svg {
+      position: relative;
+      z-index: 1;
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.5;
+      transition: transform 500ms var(--ease-out);
+    }
+
+    .replay.is-running svg {
+      transform: rotate(-180deg);
+    }
+
+    .replay:focus-visible,
+    .zodiac-card:focus-visible {
+      outline: 2px solid #e97a60;
+      outline-offset: 3px;
+    }
+
+    .board-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 2px 9px;
+      color: rgba(245, 236, 220, 0.52);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      opacity: 0;
+      animation: rise-in 700ms 390ms var(--ease-out) forwards;
+    }
+
+    .board-meta__state {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .board-meta__state::before {
+      width: 5px;
+      height: 5px;
+      margin-right: 7px;
+      content: "";
+      border-radius: 50%;
+      background: var(--cinnabar);
+      box-shadow: 0 0 12px rgba(198, 74, 50, 0.7);
+    }
+
+    .art-shell {
+      position: relative;
+      padding: 7px;
+      border: 1px solid rgba(223, 205, 178, 0.5);
+      border-radius: 4px;
+      background:
+        linear-gradient(135deg, rgba(255, 249, 238, 0.86), rgba(220, 203, 178, 0.9)),
+        var(--paper);
+      box-shadow:
+        0 26px 76px rgba(0, 0, 0, 0.34),
+        0 4px 14px rgba(0, 0, 0, 0.22),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.38);
+      clip-path: inset(0 100% 0 0);
+      animation: scroll-open 950ms 430ms var(--ease-out) forwards;
+    }
+
+    .art-shell::before,
+    .art-shell::after {
+      position: absolute;
+      z-index: 2;
+      width: 13px;
+      height: 13px;
+      content: "";
+      pointer-events: none;
+    }
+
+    .art-shell::before {
+      top: 3px;
+      left: 3px;
+      border-top: 1px solid rgba(63, 54, 42, 0.58);
+      border-left: 1px solid rgba(63, 54, 42, 0.58);
+    }
+
+    .art-shell::after {
+      right: 3px;
+      bottom: 3px;
+      border-right: 1px solid rgba(63, 54, 42, 0.58);
+      border-bottom: 1px solid rgba(63, 54, 42, 0.58);
+    }
+
+    .zodiac-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(4, minmax(0, 1fr));
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      gap: 1px;
+      overflow: hidden;
+      background: rgba(55, 49, 39, 0.2);
+    }
+
+    .zodiac-grid::after {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      content: "";
+      pointer-events: none;
+      opacity: 0.15;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.58' numOctaves='4' seed='8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.38'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    .zodiac-card {
+      --wash: 0;
+      position: relative;
+      display: block;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 0;
+      color: var(--ink);
+      text-align: left;
+      background:
+        radial-gradient(circle at 51% 48%, rgba(255, 252, 245, 0.96), transparent 72%),
+        linear-gradient(145deg, rgba(255, 249, 238, 0.96), rgba(231, 218, 197, 0.98));
+      cursor: pointer;
+      touch-action: manipulation;
+      isolation: isolate;
+    }
+
+    .zodiac-card:nth-child(3n + 2),
+    .zodiac-card:nth-child(3n + 3) {
+      background:
+        radial-gradient(circle at 51% 48%, rgba(255, 252, 245, 0.92), transparent 70%),
+        linear-gradient(155deg, rgba(245, 236, 220, 0.98), rgba(224, 210, 188, 0.98));
+    }
+
+    .zodiac-card::before {
+      position: absolute;
+      inset: 19% 14% 16%;
+      z-index: -1;
+      content: "";
+      border-radius: 50%;
+      opacity: var(--wash);
+      background: radial-gradient(circle, rgba(44, 47, 40, 0.14), rgba(44, 47, 40, 0.04) 38%, transparent 72%);
+      filter: blur(5px);
+      transform: scale(calc(.7 + var(--wash) * .38));
+      transition:
+        opacity 260ms ease,
+        transform 420ms var(--ease-out);
+    }
+
+    .zodiac-card::after {
+      position: absolute;
+      inset: 4px;
+      z-index: 5;
+      content: "";
+      border: 1px solid rgba(61, 54, 42, 0);
+      pointer-events: none;
+      transition: border-color 220ms ease;
+    }
+
+    .zodiac-card:active,
+    .zodiac-card.is-drawing {
+      --wash: 1;
+    }
+
+    .zodiac-card:active::after,
+    .zodiac-card.is-drawing::after {
+      border-color: rgba(198, 74, 50, 0.23);
+    }
+
+    .zodiac-card canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .card-title {
+      position: absolute;
+      top: 8%;
+      left: 8%;
+      z-index: 3;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      pointer-events: none;
+    }
+
+    .card-title__branch {
+      color: var(--cinnabar);
+      font-family: "Songti SC", "STSong", serif;
+      font-size: clamp(9px, 2.7vw, 12px);
+    }
+
+    .card-title__name {
+      color: rgba(32, 35, 30, 0.82);
+      font-family: "Songti SC", "STSong", serif;
+      font-size: clamp(12px, 3.6vw, 16px);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .card-index {
+      position: absolute;
+      top: 9%;
+      right: 8%;
+      z-index: 3;
+      color: rgba(32, 35, 30, 0.34);
+      font-family: "Baskerville", "Times New Roman", serif;
+      font-size: clamp(7px, 2vw, 9px);
+      letter-spacing: 0.08em;
+      pointer-events: none;
+    }
+
+    .card-latin {
+      position: absolute;
+      bottom: 7%;
+      left: 8%;
+      z-index: 3;
+      color: rgba(32, 35, 30, 0.37);
+      font-family: "Baskerville", "Times New Roman", serif;
+      font-size: clamp(6px, 1.9vw, 8px);
+      letter-spacing: 0.18em;
+      pointer-events: none;
+    }
+
+    .card-seal {
+      position: absolute;
+      right: 8%;
+      bottom: 7%;
+      z-index: 3;
+      display: grid;
+      width: clamp(14px, 4.5vw, 20px);
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(198, 74, 50, 0.84);
+      color: rgba(198, 74, 50, 0.92);
+      font-family: "Songti SC", "STSong", serif;
+      font-size: clamp(7px, 2.1vw, 9px);
+      line-height: 1;
+      pointer-events: none;
+      opacity: 0;
+      transform: rotate(-7deg) scale(0.55);
+      transition:
+        opacity 150ms ease,
+        transform 460ms cubic-bezier(.2, 1.6, .3, 1);
+    }
+
+    .zodiac-card.is-complete .card-seal {
+      opacity: 1;
+      transform: rotate(-3deg) scale(1);
+    }
+
+    .progress {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      margin: 13px 2px 0;
+      opacity: 0;
+      animation: rise-in 700ms 560ms var(--ease-out) forwards;
+    }
+
+    .progress__track {
+      position: relative;
+      height: 1px;
+      overflow: hidden;
+      background: rgba(245, 236, 220, 0.14);
+    }
+
+    .progress__bar {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--cinnabar), #e18468);
+      box-shadow: 0 0 9px rgba(198, 74, 50, 0.72);
+      transform: scaleX(0);
+      transform-origin: left center;
+      will-change: transform;
+    }
+
+    .progress__label {
+      color: rgba(245, 236, 220, 0.44);
+      font-family: "Baskerville", "Times New Roman", serif;
+      font-size: 8px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 18px 0 0;
+      color: rgba(245, 236, 220, 0.56);
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 11px;
+      letter-spacing: 0.09em;
+      opacity: 0;
+      animation: rise-in 700ms 650ms var(--ease-out) forwards;
+    }
+
+    .hint::before,
+    .hint::after {
+      width: 18px;
+      height: 1px;
+      content: "";
+      background: rgba(182, 154, 102, 0.3);
+    }
+
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(9px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes title-in {
+      from {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scroll-open {
+      from {
+        clip-path: inset(0 100% 0 0);
+        filter: brightness(0.65);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+        filter: brightness(1);
+      }
+    }
+
+    @media (max-width: 340px) {
+      .app {
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      .folio {
+        margin-bottom: 18px;
+      }
+
+      .hero {
+        margin-bottom: 20px;
+      }
+
+      .intro {
+        font-size: 11px;
+      }
+
+      .replay {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="folio" aria-hidden="true">
+      <div class="folio__left"><span class="folio__mark">灵</span>TWELVE EARTHLY BRANCHES</div>
+      <span>NO. 01—12</span>
+    </div>
+
+    <header class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow">Zodiac in living ink</p>
+        <h1>十二灵<span class="accent">章</span></h1>
+        <p class="intro">一笔入灵，唤醒藏在十二时辰里的生灵。</p>
+      </div>
+      <button class="replay" id="replay" type="button" aria-label="重新绘制全部生肖">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 8a8 8 0 1 0 .7 7.2"/>
+          <path d="M19 3v5h-5"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="board-meta">
+      <span class="board-meta__state" id="state" aria-live="polite">宣纸已展 · 等待落笔</span>
+      <span id="counter">00 / 12</span>
+    </div>
+
+    <section class="art-shell" aria-label="十二生肖简笔画画卷">
+      <div class="zodiac-grid" id="zodiacGrid"></div>
+    </section>
+
+    <div class="progress" aria-hidden="true">
+      <div class="progress__track"><span class="progress__bar" id="progressBar"></span></div>
+      <span class="progress__label">INK / 12</span>
+    </div>
+
+    <p class="hint">轻触任一灵兽，可单独重绘</p>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const TAU = Math.PI * 2;
+      const INK = "#20231e";
+      const RED = "#c64a32";
+      const SOFT = "#666052";
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const point = (x, y) => ({ x, y });
+
+      function line(x0, y0, x1, y1, steps = 2) {
+        return Array.from({ length: steps }, (_, index) => {
+          const t = index / (steps - 1);
+          return point(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t);
+        });
+      }
+
+      function poly(...coords) {
+        const points = [];
+        for (let index = 0; index < coords.length; index += 2) {
+          points.push(point(coords[index], coords[index + 1]));
+        }
+        return points;
+      }
+
+      function quad(x0, y0, cx, cy, x1, y1, steps = 18) {
+        return Array.from({ length: steps }, (_, index) => {
+          const t = index / (steps - 1);
+          const m = 1 - t;
+          return point(
+            m * m * x0 + 2 * m * t * cx + t * t * x1,
+            m * m * y0 + 2 * m * t * cy + t * t * y1
+          );
+        });
+      }
+
+      function cubic(x0, y0, c1x, c1y, c2x, c2y, x1, y1, steps = 24) {
+        return Array.from({ length: steps }, (_, index) => {
+          const t = index / (steps - 1);
+          const m = 1 - t;
+          return point(
+            m * m * m * x0 + 3 * m * m * t * c1x + 3 * m * t * t * c2x + t * t * t * x1,
+            m * m * m * y0 + 3 * m * m * t * c1y + 3 * m * t * t * c2y + t * t * t * y1
+          );
+        });
+      }
+
+      function arc(cx, cy, rx, ry, start = 0, end = TAU, steps = 30, rotation = 0) {
+        const cosR = Math.cos(rotation);
+        const sinR = Math.sin(rotation);
+        return Array.from({ length: steps }, (_, index) => {
+          const t = start + (end - start) * index / (steps - 1);
+          const px = Math.cos(t) * rx;
+          const py = Math.sin(t) * ry;
+          return point(cx + px * cosR - py * sinR, cy + px * sinR + py * cosR);
+        });
+      }
+
+      function join(...groups) {
+        const result = [];
+        groups.forEach((group) => {
+          group.forEach((item, index) => {
+            if (!result.length || index || item.x !== result[result.length - 1].x || item.y !== result[result.length - 1].y) {
+              result.push(item);
+            }
+          });
+        });
+        return result;
+      }
+
+      function stroke(points, width = 1.7, tone = "ink") {
+        return { points, width, tone };
+      }
+
+      function dot(x, y, width = 3.1, tone = "ink") {
+        return stroke(line(x - 0.03, y, x + 0.03, y), width, tone);
+      }
+
+      const DRAWINGS = {
+        rat: () => [
+          stroke(join(
+            cubic(24, 58, 28, 39, 48, 34, 63, 43),
+            cubic(63, 43, 72, 47, 71, 62, 60, 68),
+            cubic(60, 68, 45, 75, 29, 69, 24, 58)
+          ), 2.15),
+          stroke(join(cubic(58, 43, 66, 35, 79, 40, 82, 50), quad(82, 50, 76, 61, 67, 60)), 1.9),
+          stroke(arc(67, 37, 5.4, 6.6, 0.25, TAU + 0.2, 22, -0.45), 1.55),
+          stroke(arc(75, 40, 4.2, 5.1, 0.1, TAU, 19, 0.2), 1.35, "soft"),
+          stroke(cubic(27, 56, 8, 48, 13, 75, 31, 72), 1.55),
+          stroke(join(quad(36, 68, 36, 75, 43, 75), line(43, 75, 47, 75)), 1.45),
+          stroke(join(quad(56, 68, 57, 74, 63, 73), line(63, 73, 67, 73)), 1.45),
+          dot(74, 47, 2.7),
+          dot(82, 51, 3.1, "red"),
+          stroke(line(79, 53, 91, 49), 0.9, "soft"),
+          stroke(line(79, 55, 92, 56), 0.9, "soft")
+        ],
+
+        ox: () => [
+          stroke(cubic(39, 37, 28, 23, 18, 27, 25, 43), 2.15),
+          stroke(cubic(61, 37, 72, 23, 82, 27, 75, 43), 2.15),
+          stroke(join(
+            cubic(38, 34, 29, 43, 31, 66, 42, 75),
+            quad(42, 75, 50, 81, 58, 75),
+            cubic(58, 75, 69, 66, 71, 43, 62, 34)
+          ), 2.2),
+          stroke(join(quad(34, 43, 24, 39, 21, 47), quad(21, 47, 28, 51, 34, 48)), 1.55),
+          stroke(join(quad(66, 43, 76, 39, 79, 47), quad(79, 47, 72, 51, 66, 48)), 1.55),
+          stroke(arc(50, 67, 15, 9.5, 0, TAU, 28), 1.65),
+          stroke(quad(50, 36, 47, 50, 50, 57), 1.05, "soft"),
+          stroke(line(36, 52, 43, 52), 1.35),
+          stroke(line(57, 52, 64, 52), 1.35),
+          dot(42, 66, 2.6),
+          dot(58, 66, 2.6),
+          stroke(arc(50, 69, 7, 4, 0.15, Math.PI - 0.15, 15), 1.15, "red")
+        ],
+
+        tiger: () => [
+          stroke(join(poly(36, 38, 31, 27, 43, 32), cubic(43, 32, 48, 29, 55, 32, 58, 34)), 1.95),
+          stroke(join(poly(58, 34, 69, 27, 66, 41), cubic(66, 41, 73, 50, 70, 66, 61, 73)), 1.95),
+          stroke(join(cubic(61, 73, 55, 78, 45, 78, 38, 72), cubic(38, 72, 27, 65, 27, 48, 36, 38)), 2.15),
+          stroke(join(cubic(35, 57, 38, 48, 47, 49, 50, 57), cubic(50, 57, 53, 49, 62, 48, 65, 57)), 1.4, "soft"),
+          stroke(poly(46, 60, 50, 63, 54, 60), 1.45),
+          stroke(quad(50, 63, 47, 69, 42, 68), 1.2),
+          stroke(quad(50, 63, 53, 69, 58, 68), 1.2),
+          stroke(line(45, 37, 55, 37), 1.25, "red"),
+          stroke(line(47, 41, 53, 41), 1.2, "red"),
+          stroke(line(46, 45, 54, 45), 1.2, "red"),
+          stroke(line(50, 37, 50, 45), 1.15, "red"),
+          stroke(line(35, 47, 41, 50), 1.35, "red"),
+          stroke(line(65, 47, 59, 50), 1.35, "red"),
+          stroke(line(34, 60, 41, 61), 1.1, "red"),
+          stroke(line(66, 60, 59, 61), 1.1, "red")
+        ],
+
+        rabbit: () => [
+          stroke(arc(44, 61, 23, 15, 0.1, TAU + 0.1, 30, 0.08), 2.05),
+          stroke(arc(65, 50, 13, 12, 0, TAU, 26, -0.12), 1.95),
+          stroke(arc(60, 34, 5.2, 15, 0, TAU, 26, -0.24), 1.75),
+          stroke(arc(69, 33, 4.8, 15, 0, TAU, 26, 0.18), 1.65),
+          stroke(arc(60, 34, 1.7, 10.5, 0.15, Math.PI * 1.8, 18, -0.24), 1.05, "red"),
+          stroke(arc(69, 33, 1.5, 10.5, 0.15, Math.PI * 1.8, 18, 0.18), 1.05, "red"),
+          stroke(arc(21, 58, 6.5, 6.5, 0, TAU, 20), 1.55),
+          stroke(join(quad(44, 67, 43, 76, 57, 75), line(57, 75, 64, 75)), 1.55),
+          stroke(join(quad(57, 64, 61, 72, 69, 71), line(69, 71, 74, 71)), 1.35),
+          dot(70, 48, 2.7),
+          dot(78, 55, 2.6, "red")
+        ],
+
+        dragon: () => [
+          stroke(join(
+            cubic(22, 73, 15, 61, 30, 51, 41, 60),
+            cubic(41, 60, 51, 70, 69, 67, 62, 55),
+            cubic(62, 55, 58, 47, 67, 42, 73, 47)
+          ), 2.35),
+          stroke(join(
+            cubic(25, 77, 20, 68, 31, 58, 39, 65),
+            cubic(39, 65, 51, 76, 76, 70, 68, 55)
+          ), 1.55, "soft"),
+          stroke(join(poly(66, 49, 61, 42, 68, 38, 79, 40, 84, 46), quad(84, 46, 79, 53, 70, 52)), 1.85),
+          stroke(join(cubic(67, 39, 62, 31, 65, 25, 69, 31), cubic(72, 39, 76, 29, 81, 28, 79, 36)), 1.5),
+          stroke(cubic(79, 49, 90, 48, 90, 57, 81, 60), 1.05, "soft"),
+          stroke(cubic(75, 51, 82, 59, 91, 62, 94, 57), 1.05, "soft"),
+          stroke(join(poly(47, 62, 43, 55, 39, 58, 43, 64), line(43, 64, 39, 68)), 1.35),
+          stroke(join(poly(61, 67, 65, 61, 69, 64, 66, 69), line(66, 69, 70, 72)), 1.35),
+          dot(76, 44, 2.5),
+          stroke(arc(54, 66, 3.7, 2.2, Math.PI, TAU, 11), 1.1, "red"),
+          stroke(arc(35, 61, 3.4, 2.1, Math.PI, TAU, 11), 1.1, "red")
+        ],
+
+        snake: () => [
+          stroke(arc(48, 71, 27, 9, 0.1, TAU + 0.1, 36, -0.04), 2.1),
+          stroke(arc(48, 70, 16, 5.2, 0.2, TAU - 0.15, 28, -0.05), 1.35, "soft"),
+          stroke(join(
+            cubic(51, 68, 69, 58, 36, 51, 50, 39),
+            cubic(50, 39, 56, 34, 66, 38, 67, 47)
+          ), 2.2),
+          stroke(join(cubic(57, 38, 62, 31, 72, 33, 76, 40), quad(76, 40, 71, 49, 64, 47)), 1.9),
+          stroke(cubic(57, 44, 52, 51, 64, 58, 55, 65), 1.2, "soft"),
+          dot(68, 39, 2.6),
+          stroke(join(line(76, 42, 84, 43), poly(84, 43, 89, 40, 84, 43, 88, 47)), 1.05, "red"),
+          stroke(arc(37, 70, 4.3, 2, Math.PI, TAU, 12), 1.0, "red"),
+          stroke(arc(55, 70, 4.3, 2, Math.PI, TAU, 12), 1.0, "red")
+        ],
+
+        horse: () => [
+          stroke(join(
+            poly(43, 34, 40, 25, 49, 31, 58, 27, 56, 38),
+            cubic(56, 38, 68, 43, 76, 57, 67, 64),
+            quad(67, 64, 56, 67, 52, 60)
+          ), 2.05),
+          stroke(join(cubic(52, 60, 50, 70, 58, 76, 62, 79), cubic(62, 79, 48, 80, 36, 71, 37, 56)), 2.15),
+          stroke(join(poly(42, 34, 36, 38, 39, 43, 33, 47, 38, 51, 32, 56), cubic(32, 56, 31, 63, 35, 69, 39, 72)), 1.65, "red"),
+          stroke(quad(57, 43, 63, 47, 68, 53), 1.15, "soft"),
+          dot(59, 45, 2.7),
+          dot(70, 58, 2.3),
+          stroke(line(64, 61, 71, 60), 1.0),
+          stroke(cubic(40, 66, 43, 74, 47, 77, 51, 78), 1.1, "soft"),
+          stroke(poly(49, 31, 52, 23, 57, 29), 1.45)
+        ],
+
+        goat: () => [
+          stroke(cubic(39, 39, 24, 31, 24, 49, 36, 51), 2.0),
+          stroke(cubic(61, 39, 76, 31, 76, 49, 64, 51), 2.0),
+          stroke(arc(34, 41, 10, 12, -0.4, Math.PI * 1.55, 25, -0.3), 1.25, "red"),
+          stroke(arc(66, 41, 10, 12, Math.PI * 1.4, Math.PI * 3.35, 25, 0.3), 1.25, "red"),
+          stroke(join(
+            cubic(39, 38, 33, 49, 35, 66, 46, 73),
+            quad(46, 73, 50, 76, 54, 73),
+            cubic(54, 73, 65, 66, 67, 49, 61, 38)
+          ), 2.05),
+          stroke(quad(36, 46, 28, 43, 26, 49), 1.3, "soft"),
+          stroke(quad(64, 46, 72, 43, 74, 49), 1.3, "soft"),
+          stroke(line(38, 55, 45, 55), 1.3),
+          stroke(line(55, 55, 62, 55), 1.3),
+          stroke(poly(47, 64, 50, 67, 53, 64), 1.25),
+          stroke(join(line(46, 74, 50, 82), line(50, 82, 54, 74)), 1.45),
+          stroke(line(50, 40, 50, 48), 1.05, "soft")
+        ],
+
+        monkey: () => [
+          stroke(arc(50, 47, 19, 17, 0, TAU, 30), 2.0),
+          stroke(arc(30, 48, 8, 9, 0.2, TAU - 0.2, 20), 1.65),
+          stroke(arc(70, 48, 8, 9, 0.2, TAU - 0.2, 20), 1.65),
+          stroke(join(
+            cubic(48, 38, 38, 34, 35, 45, 42, 50),
+            cubic(42, 50, 34, 60, 45, 66, 50, 59),
+            cubic(50, 59, 55, 66, 66, 60, 58, 50),
+            cubic(58, 50, 65, 45, 62, 34, 52, 38)
+          ), 1.35, "soft"),
+          stroke(join(cubic(38, 62, 29, 67, 31, 78, 42, 77), quad(42, 77, 50, 82, 58, 77)), 1.85),
+          stroke(cubic(61, 64, 80, 61, 81, 79, 69, 79), 1.6),
+          stroke(cubic(35, 65, 26, 68, 25, 74, 30, 77), 1.4),
+          dot(44, 47, 2.5),
+          dot(56, 47, 2.5),
+          stroke(arc(50, 54, 7, 4, 0.15, Math.PI - 0.15, 14), 1.2, "red"),
+          stroke(arc(29, 48, 3.2, 4.2, 0.2, TAU - 0.2, 14), 0.95, "red")
+        ],
+
+        rooster: () => [
+          stroke(join(
+            cubic(36, 48, 46, 42, 62, 46, 65, 59),
+            cubic(65, 59, 68, 73, 53, 78, 41, 70),
+            cubic(41, 70, 35, 66, 33, 56, 36, 48)
+          ), 2.05),
+          stroke(arc(65, 43, 10, 10, -0.4, TAU - 0.35, 24), 1.85),
+          stroke(poly(74, 42, 85, 46, 75, 49), 1.65),
+          stroke(join(
+            cubic(60, 34, 58, 27, 64, 27, 66, 34),
+            cubic(66, 34, 66, 25, 72, 27, 71, 36),
+            cubic(71, 36, 75, 29, 78, 34, 73, 40)
+          ), 1.6, "red"),
+          stroke(cubic(37, 51, 20, 39, 18, 55, 33, 62), 1.7),
+          stroke(cubic(35, 56, 16, 52, 20, 70, 39, 67), 1.6),
+          stroke(cubic(37, 61, 22, 70, 33, 78, 43, 69), 1.45, "soft"),
+          stroke(arc(51, 59, 11, 8, 0.2, Math.PI * 1.65, 20, 0.5), 1.05, "red"),
+          stroke(join(line(49, 75, 47, 84), poly(47, 84, 42, 86, 47, 84, 51, 86)), 1.35),
+          stroke(join(line(58, 75, 59, 84), poly(59, 84, 55, 87, 59, 84, 64, 86)), 1.35),
+          dot(68, 41, 2.5)
+        ],
+
+        dog: () => [
+          stroke(join(
+            cubic(36, 39, 39, 29, 57, 29, 63, 40),
+            cubic(63, 40, 70, 52, 63, 65, 51, 66),
+            cubic(51, 66, 37, 67, 29, 56, 36, 39)
+          ), 2.05),
+          stroke(join(cubic(37, 38, 27, 34, 23, 43, 28, 55), quad(28, 55, 35, 53, 38, 45)), 1.85),
+          stroke(join(cubic(61, 38, 70, 33, 78, 42, 72, 55), quad(72, 55, 65, 53, 62, 45)), 1.85),
+          stroke(arc(50, 55, 12, 9, 0, TAU, 23), 1.4, "soft"),
+          stroke(join(cubic(38, 64, 29, 69, 30, 81, 43, 79), quad(43, 79, 50, 83, 57, 79)), 1.85),
+          stroke(cubic(62, 65, 79, 64, 82, 75, 73, 80), 1.6),
+          dot(43, 46, 2.7),
+          dot(57, 46, 2.7),
+          dot(50, 54, 3.2),
+          stroke(arc(50, 58, 7, 4, 0.1, Math.PI - 0.1, 14), 1.1),
+          stroke(quad(34, 67, 50, 73, 66, 67), 1.25, "red")
+        ],
+
+        pig: () => [
+          stroke(arc(47, 60, 27, 17, 0.05, TAU + 0.05, 34), 2.1),
+          stroke(arc(67, 54, 15, 14, 0.05, TAU + 0.05, 27), 1.9),
+          stroke(poly(59, 43, 62, 33, 71, 41), 1.65),
+          stroke(poly(71, 42, 80, 35, 79, 49), 1.55),
+          stroke(arc(77, 57, 9.5, 6.6, 0, TAU, 22), 1.45, "red"),
+          dot(74, 57, 2.15, "red"),
+          dot(80, 57, 2.15, "red"),
+          dot(69, 49, 2.6),
+          stroke(cubic(22, 56, 10, 50, 14, 68, 22, 61), 1.45),
+          stroke(join(quad(33, 73, 32, 80, 39, 81), line(39, 81, 44, 81)), 1.45),
+          stroke(join(quad(59, 73, 60, 80, 67, 80), line(67, 80, 72, 80)), 1.45),
+          stroke(quad(68, 65, 75, 68, 81, 64), 1.05, "soft")
+        ]
+      };
+
+      const ZODIACS = [
+        { key: "rat", branch: "子", name: "鼠", latin: "RAT" },
+        { key: "ox", branch: "丑", name: "牛", latin: "OX" },
+        { key: "tiger", branch: "寅", name: "虎", latin: "TIGER" },
+        { key: "rabbit", branch: "卯", name: "兔", latin: "RABBIT" },
+        { key: "dragon", branch: "辰", name: "龙", latin: "DRAGON" },
+        { key: "snake", branch: "巳", name: "蛇", latin: "SNAKE" },
+        { key: "horse", branch: "午", name: "马", latin: "HORSE" },
+        { key: "goat", branch: "未", name: "羊", latin: "GOAT" },
+        { key: "monkey", branch: "申", name: "猴", latin: "MONKEY" },
+        { key: "rooster", branch: "酉", name: "鸡", latin: "ROOSTER" },
+        { key: "dog", branch: "戌", name: "狗", latin: "DOG" },
+        { key: "pig", branch: "亥", name: "猪", latin: "PIG" }
+      ];
+
+      function seededNoise(seed) {
+        const value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+        return value - Math.floor(value);
+      }
+
+      function compileStrokes(strokes, animalIndex) {
+        const compiled = strokes.map((item, strokeIndex) => {
+          const roughened = item.points.map((p, pointIndex, source) => {
+            if (pointIndex === 0 || pointIndex === source.length - 1) return { ...p };
+            const previous = source[pointIndex - 1];
+            const next = source[pointIndex + 1];
+            const dx = next.x - previous.x;
+            const dy = next.y - previous.y;
+            const magnitude = Math.hypot(dx, dy) || 1;
+            const wobble = (seededNoise(animalIndex * 101 + strokeIndex * 29 + pointIndex * 7) - 0.5) * 0.32;
+            return point(p.x - dy / magnitude * wobble, p.y + dx / magnitude * wobble);
+          });
+
+          const cumulative = [0];
+          for (let index = 1; index < roughened.length; index += 1) {
+            const distance = Math.hypot(
+              roughened[index].x - roughened[index - 1].x,
+              roughened[index].y - roughened[index - 1].y
+            );
+            cumulative.push(cumulative[index - 1] + distance);
+          }
+
+          const length = cumulative[cumulative.length - 1];
+          return { ...item, points: roughened, cumulative, length };
+        });
+
+        let totalLength = 0;
+        compiled.forEach((item, index) => {
+          item.drawWeight = item.length < 1 ? 6 : item.length;
+          item.liftWeight = 0;
+          item.lift = null;
+
+          const next = compiled[index + 1];
+          if (next) {
+            const from = item.points[item.points.length - 1];
+            const to = next.points[0];
+            const dx = to.x - from.x;
+            const dy = to.y - from.y;
+            const distance = Math.hypot(dx, dy);
+            const direction = seededNoise(animalIndex * 137 + index * 41) > 0.5 ? 1 : -1;
+            const bend = Math.min(4.5, distance * 0.16) * direction;
+            const magnitude = distance || 1;
+            item.liftWeight = Math.min(16, Math.max(5, distance * 0.38));
+            item.lift = {
+              from,
+              to,
+              control: point(
+                (from.x + to.x) / 2 - dy / magnitude * bend,
+                (from.y + to.y) / 2 + dx / magnitude * bend
+              )
+            };
+          }
+
+          totalLength += item.drawWeight + item.liftWeight;
+        });
+
+        return { strokes: compiled, totalLength };
+      }
+
+      function toneColor(tone) {
+        if (tone === "red") return RED;
+        if (tone === "soft") return SOFT;
+        return INK;
+      }
+
+      function tracePartial(ctx, item, visibleLength) {
+        const points = item.points;
+        const cumulative = item.cumulative;
+        const target = Math.max(0, Math.min(visibleLength, item.length));
+        let index = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+
+        while (index < points.length && cumulative[index] <= target) {
+          ctx.lineTo(points[index].x, points[index].y);
+          index += 1;
+        }
+
+        let tip = points[Math.max(0, index - 1)];
+        let angle = 0;
+        if (index < points.length) {
+          const previous = points[index - 1];
+          const next = points[index];
+          const segmentLength = cumulative[index] - cumulative[index - 1] || 1;
+          const t = (target - cumulative[index - 1]) / segmentLength;
+          tip = point(
+            previous.x + (next.x - previous.x) * t,
+            previous.y + (next.y - previous.y) * t
+          );
+          ctx.lineTo(tip.x, tip.y);
+          angle = Math.atan2(next.y - previous.y, next.x - previous.x);
+        } else if (points.length > 1) {
+          const previous = points[points.length - 2];
+          angle = Math.atan2(tip.y - previous.y, tip.x - previous.x);
+        }
+
+        const color = toneColor(item.tone);
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = item.tone === "soft" ? 0.11 : 0.1;
+        ctx.lineWidth = item.width + 1.15;
+        ctx.stroke();
+        ctx.globalAlpha = item.tone === "soft" ? 0.62 : 0.94;
+        ctx.lineWidth = item.width;
+        ctx.stroke();
+        ctx.restore();
+
+        return { point: tip, angle, tone: item.tone };
+      }
+
+      function drawBrush(ctx, tip, time) {
+        if (!tip) return;
+        const color = toneColor(tip.tone);
+        const pulse = 0.88 + Math.sin(time * 0.018) * 0.07;
+        const opacity = tip.lift ? 0.52 : 1;
+
+        ctx.save();
+        ctx.translate(tip.point.x, tip.point.y);
+        ctx.rotate(tip.angle);
+
+        ctx.beginPath();
+        ctx.globalAlpha = 0.3 * opacity;
+        ctx.strokeStyle = tip.tone === "red" ? "#8f2e21" : RED;
+        ctx.lineWidth = 0.65;
+        ctx.arc(0, 0, 3.55 + Math.sin(time * 0.012) * 0.45, 0, TAU);
+        ctx.stroke();
+
+        for (let index = 1; index <= 4; index += 1) {
+          ctx.beginPath();
+          ctx.globalAlpha = 0.22 / index * opacity;
+          ctx.fillStyle = color;
+          ctx.arc(-index * 2.1, Math.sin(index * 2.4) * 0.55, 0.72 + index * 0.08, 0, TAU);
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 0.96 * opacity;
+        ctx.shadowColor = "rgba(20, 17, 12, .26)";
+        ctx.shadowBlur = 1.8;
+        ctx.strokeStyle = "#7d5b35";
+        ctx.lineWidth = 1.65;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-21.5, -0.25);
+        ctx.lineTo(-4.2, -0.1);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 0.55 * opacity;
+        ctx.strokeStyle = "#e4ce9d";
+        ctx.lineWidth = 0.42;
+        ctx.beginPath();
+        ctx.moveTo(-21.1, -0.65);
+        ctx.lineTo(-5.1, -0.48);
+        ctx.stroke();
+
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = RED;
+        ctx.fillRect(-7.2, -1.65, 3.7, 3.2);
+
+        ctx.scale(pulse, pulse);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(1, 0);
+        ctx.quadraticCurveTo(-2.1, -2.75, -5.2, -1.95);
+        ctx.quadraticCurveTo(-6.25, 0, -5.2, 1.95);
+        ctx.quadraticCurveTo(-2.1, 2.75, 1, 0);
+        ctx.fill();
+
+        ctx.globalAlpha = 0.24 * opacity;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(0, 0, 3.2 + Math.sin(time * 0.012) * 0.5, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      class ZodiacCard {
+        constructor(zodiac, index, element, canvas) {
+          this.zodiac = zodiac;
+          this.index = index;
+          this.element = element;
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.compiled = compileStrokes(DRAWINGS[zodiac.key](), index);
+          this.width = 0;
+          this.height = 0;
+          this.dpr = 1;
+          this.progress = 0;
+          this.startAt = Number.POSITIVE_INFINITY;
+          this.duration = 780;
+          this.complete = false;
+        }
+
+        resize() {
+          const rect = this.element.getBoundingClientRect();
+          if (!rect.width || !rect.height) return;
+          const nextDpr = Math.min(window.devicePixelRatio || 1, 2.2);
+          const pixelWidth = Math.round(rect.width * nextDpr);
+          const pixelHeight = Math.round(rect.height * nextDpr);
+          if (
+            this.canvas.width !== pixelWidth ||
+            this.canvas.height !== pixelHeight ||
+            Math.abs(this.width - rect.width) > 0.01 ||
+            Math.abs(this.height - rect.height) > 0.01 ||
+            this.dpr !== nextDpr
+          ) {
+            this.width = rect.width;
+            this.height = rect.height;
+            this.dpr = nextDpr;
+            this.canvas.width = pixelWidth;
+            this.canvas.height = pixelHeight;
+            this.draw(performance.now(), false);
+          }
+        }
+
+        replay(delay = 0, duration = 780) {
+          this.duration = duration;
+          this.startAt = performance.now() + delay;
+          this.progress = 0;
+          this.complete = false;
+          this.element.classList.remove("is-complete");
+          this.element.classList.toggle("is-drawing", delay <= 0);
+          this.draw(performance.now(), false);
+        }
+
+        update(now) {
+          if (!Number.isFinite(this.startAt)) return false;
+          if (now < this.startAt) {
+            return true;
+          }
+
+          const raw = Math.min(1, Math.max(0, (now - this.startAt) / this.duration));
+          this.element.classList.add("is-drawing");
+          this.progress = raw < 1 ? 1 - Math.pow(1 - raw, 1.8) : 1;
+          this.draw(now, raw < 1);
+
+          if (raw >= 1 && !this.complete) {
+            this.complete = true;
+            this.startAt = Number.POSITIVE_INFINITY;
+            this.element.classList.remove("is-drawing");
+            this.element.classList.add("is-complete");
+          }
+          return raw < 1;
+        }
+
+        draw(now, showBrush) {
+          if (!this.width || !this.height) return;
+          const ctx = this.ctx;
+          const scale = Math.min(this.width, this.height) / 100;
+          const offsetX = (this.width - scale * 100) / 2;
+          const offsetY = (this.height - scale * 100) / 2;
+
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          if (this.progress <= 0) return;
+          ctx.setTransform(
+            this.dpr * scale, 0, 0, this.dpr * scale,
+            this.dpr * offsetX, this.dpr * offsetY
+          );
+          ctx.globalCompositeOperation = "multiply";
+
+          let remaining = this.compiled.totalLength * this.progress;
+          let brushTip = null;
+
+          for (const item of this.compiled.strokes) {
+            if (remaining < 0) break;
+            const drawRatio = Math.min(1, remaining / item.drawWeight);
+            const visible = item.length * drawRatio;
+            const result = tracePartial(ctx, item, visible);
+            brushTip = result;
+            if (drawRatio < 1) {
+              break;
+            }
+            remaining -= item.drawWeight;
+
+            if (item.lift && item.liftWeight) {
+              if (remaining <= item.liftWeight) {
+                const t = Math.max(0, remaining / item.liftWeight);
+                const m = 1 - t;
+                const { from, to, control } = item.lift;
+                const liftPoint = point(
+                  m * m * from.x + 2 * m * t * control.x + t * t * to.x,
+                  m * m * from.y + 2 * m * t * control.y + t * t * to.y
+                );
+                const tangentX = 2 * m * (control.x - from.x) + 2 * t * (to.x - control.x);
+                const tangentY = 2 * m * (control.y - from.y) + 2 * t * (to.y - control.y);
+                brushTip = {
+                  point: liftPoint,
+                  angle: Math.atan2(tangentY, tangentX),
+                  tone: item.tone,
+                  lift: true
+                };
+                break;
+              }
+              remaining -= item.liftWeight;
+            }
+          }
+
+          if (showBrush && this.progress > 0.006 && brushTip) {
+            ctx.globalCompositeOperation = "source-over";
+            drawBrush(ctx, brushTip, now);
+          }
+          ctx.globalCompositeOperation = "source-over";
+        }
+      }
+
+      const grid = document.getElementById("zodiacGrid");
+      const state = document.getElementById("state");
+      const counter = document.getElementById("counter");
+      const progressBar = document.getElementById("progressBar");
+      const replayButton = document.getElementById("replay");
+      const cards = [];
+      let animationFrame = 0;
+      let hasStarted = false;
+      let revealTimer = 0;
+
+      ZODIACS.forEach((zodiac, index) => {
+        const element = document.createElement("button");
+        element.className = "zodiac-card";
+        element.type = "button";
+        element.setAttribute("aria-label", `重绘${zodiac.branch}${zodiac.name}`);
+        element.innerHTML = `
+          <span class="card-title">
+            <span class="card-title__branch">${zodiac.branch}</span>
+            <span class="card-title__name">${zodiac.name}</span>
+          </span>
+          <span class="card-index">${String(index + 1).padStart(2, "0")}</span>
+          <canvas aria-hidden="true"></canvas>
+          <span class="card-latin">${zodiac.latin}</span>
+          <span class="card-seal" aria-hidden="true">${zodiac.branch}</span>
+        `;
+        grid.appendChild(element);
+
+        const card = new ZodiacCard(zodiac, index, element, element.querySelector("canvas"));
+        cards.push(card);
+
+        element.addEventListener("click", () => {
+          if (revealTimer) {
+            window.clearTimeout(revealTimer);
+            revealTimer = 0;
+            completeAllInstantly();
+          }
+          card.replay(0, 920);
+          state.textContent = `${zodiac.branch}${zodiac.name} · 重新落笔`;
+          startAnimator();
+        });
+      });
+
+      function updateProgress() {
+        const completed = cards.filter((card) => card.complete).length;
+        const average = cards.reduce((sum, card) => sum + card.progress, 0) / cards.length;
+        counter.textContent = `${String(completed).padStart(2, "0")} / 12`;
+        progressBar.style.transform = `scaleX(${average.toFixed(4)})`;
+        return completed;
+      }
+
+      function completeAllInstantly() {
+        cards.forEach((card) => {
+          card.progress = 1;
+          card.complete = true;
+          card.startAt = Number.POSITIVE_INFINITY;
+          card.element.classList.remove("is-drawing");
+          card.element.classList.add("is-complete");
+          card.draw(performance.now(), false);
+        });
+        updateProgress();
+      }
+
+      function tick(now) {
+        let stillRunning = false;
+        cards.forEach((card) => {
+          stillRunning = card.update(now) || stillRunning;
+        });
+
+        const completed = updateProgress();
+        if (stillRunning) {
+          animationFrame = requestAnimationFrame(tick);
+        } else {
+          animationFrame = 0;
+          replayButton.classList.remove("is-running");
+          if (completed === 12) state.textContent = "十二灵章 · 已落款成卷";
+        }
+      }
+
+      function startAnimator() {
+        if (!animationFrame) animationFrame = requestAnimationFrame(tick);
+      }
+
+      function replayAll() {
+        replayButton.classList.add("is-running");
+        state.textContent = "一笔入灵 · 正在游墨";
+        cards.forEach((card, index) => card.replay(index * 400, 440));
+        updateProgress();
+        startAnimator();
+      }
+
+      replayButton.addEventListener("click", () => {
+        if (revealTimer) {
+          window.clearTimeout(revealTimer);
+          revealTimer = 0;
+        }
+        replayAll();
+      });
+
+      if ("ResizeObserver" in window) {
+        const resizeObserver = new ResizeObserver((entries) => {
+          entries.forEach((entry) => {
+            const index = Number(entry.target.dataset.index);
+            if (Number.isInteger(index) && cards[index]) cards[index].resize();
+          });
+        });
+
+        cards.forEach((card, index) => {
+          card.element.dataset.index = index;
+          resizeObserver.observe(card.element);
+        });
+      } else {
+        window.addEventListener("resize", () => cards.forEach((card) => card.resize()), { passive: true });
+      }
+
+      function reveal() {
+        if (hasStarted) return;
+        hasStarted = true;
+        cards.forEach((card) => card.resize());
+        if (reducedMotion) {
+          cards.forEach((card) => {
+            card.progress = 1;
+            card.complete = true;
+            card.startAt = Number.POSITIVE_INFINITY;
+            card.element.classList.add("is-complete");
+            card.draw(performance.now(), false);
+          });
+          updateProgress();
+          state.textContent = "十二灵章 · 已落款成卷";
+          return;
+        }
+        revealTimer = window.setTimeout(() => {
+          revealTimer = 0;
+          replayAll();
+        }, 620);
+      }
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            reveal();
+          }
+        }, { threshold: 0.18 });
+        observer.observe(grid);
+      } else {
+        reveal();
+      }
+
+      window.addEventListener("orientationchange", () => {
+        window.setTimeout(() => cards.forEach((card) => card.resize()), 120);
+      });
+    })();
+  </script>
+</body>
+</html>
