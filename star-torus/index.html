@@ -25,7 +25,7 @@
       <header class="panel-header">
         <div class="panel-orbit" aria-hidden="true"><span></span></div>
         <div>
-          <p class="panel-kicker">ORBITAL / COLOR LAB</p>
+          <p class="panel-kicker">ORBITAL / MOTION LAB</p>
           <h1 class="panel-title">星环控制台</h1>
         </div>
         <div class="panel-readout"><span class="panel-readout__dot"></span><span id="activeThemeName">MONO</span></div>
@@ -45,12 +45,33 @@
         </button>
         <p class="interaction-note">
           <span>Hover 打光（常驻）· 拖拽旋转 · 滚轮缩放</span>
-          <span>单击脉冲 · 长按吸附 · Shift 长按排斥</span>
+          <span id="interactionModeHint">单击脉冲 · 长按吸附 · Shift 长按排斥</span>
         </p>
       </section>
 
       <section class="panel-section">
-        <div class="section-heading"><span>02</span><h2>主题预设</h2></div>
+        <div class="section-heading"><span>02</span><h2>时空与形态</h2></div>
+        <div class="motion-controls">
+          <div class="motion-control">
+            <div class="motion-control__label"><span>HOLD</span><strong>长按行为</strong></div>
+            <div class="mode-segments mode-segments--two" role="group" aria-label="选择长按行为">
+              <button class="mode-segment" type="button" data-hold-mode="magnet" aria-pressed="true"><span class="mode-segment__signal"></span>磁力</button>
+              <button class="mode-segment" type="button" data-hold-mode="freeze" aria-pressed="false"><span class="mode-segment__signal"></span>冻结</button>
+            </div>
+          </div>
+          <div class="motion-control">
+            <div class="motion-control__label"><span>FORM</span><strong>几何形态</strong></div>
+            <div class="mode-segments mode-segments--three" role="group" aria-label="选择几何形态">
+              <button class="mode-segment shape-segment" type="button" data-shape="torus" aria-pressed="true"><span class="shape-mark shape-mark--torus"></span>星环</button>
+              <button class="mode-segment shape-segment" type="button" data-shape="sphere" aria-pressed="false"><span class="shape-mark shape-mark--sphere"></span>球体</button>
+              <button class="mode-segment shape-segment" type="button" data-shape="mobius" aria-pressed="false"><span class="shape-mark shape-mark--mobius"></span>莫比乌斯</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-heading"><span>03</span><h2>主题预设</h2></div>
         <div class="theme-grid" id="themeGrid">
           <button class="theme-preset" type="button" data-theme="mono" aria-pressed="true" style="--preset-bg:#000000;--preset-star:#FFFFFF"><span class="theme-preset__swatch"></span><span class="theme-preset__name">经典黑白</span></button>
           <button class="theme-preset" type="button" data-theme="deep" aria-pressed="false" style="--preset-bg:#050816;--preset-star:#7DD3FC"><span class="theme-preset__swatch"></span><span class="theme-preset__name">深空蓝</span></button>
@@ -62,7 +83,7 @@
       </section>
 
       <section class="panel-section">
-        <div class="section-heading"><span>03</span><h2>自定义颜色</h2></div>
+        <div class="section-heading"><span>04</span><h2>自定义颜色</h2></div>
         <div class="color-controls">
           <label class="color-control"><span class="color-control__name">背景色</span><output id="backgroundValue">#000000</output><input id="backgroundColor" type="color" value="#000000" aria-label="选择背景色"></label>
           <label class="color-control"><span class="color-control__name">星点色</span><output id="starValue">#FFFFFF</output><input id="starColor" type="color" value="#ffffff" aria-label="选择星点色"></label>

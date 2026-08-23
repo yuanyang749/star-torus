@@ -3,6 +3,9 @@
   const context = canvas.getContext("2d");
   const toggle = document.getElementById("interactionToggle");
   const toggleState = toggle.querySelector(".interaction-toggle__state");
+  const interactionModeHint = document.getElementById("interactionModeHint");
+  const holdModeButtons = [...document.querySelectorAll("[data-hold-mode]")];
+  const shapeButtons = [...document.querySelectorAll("[data-shape]")];
   const controlPanel = document.getElementById("controlPanel");
   const panelToggle = document.getElementById("panelToggle");
   const panelSurface = document.getElementById("panelSurface");
@@ -43,10 +46,24 @@
   const framePadding = 24;
   const defaultRotationX = 0.5;
   const defaultRotationY = -0.5;
+  const sphereGeometryRadius = 225;
+  const mobiusRingRadius = 176;
+  const mobiusHalfWidth = 88;
+  const shapeIds = Object.freeze(["torus", "sphere", "mobius"]);
+  const shapeLabels = Object.freeze({ torus: "三维星环", sphere: "三维球体", mobius: "莫比乌斯环" });
   const baseSinU = new Float32Array(columns);
   const baseCosU = new Float32Array(columns);
   const baseSinV = new Float32Array(rows);
   const baseCosV = new Float32Array(rows);
+  const frameSinU = new Float32Array(columns);
+  const frameCosU = new Float32Array(columns);
+  const frameSinHalfU = new Float32Array(columns);
+  const frameCosHalfU = new Float32Array(columns);
+  const frameSinV = new Float32Array(rows);
+  const frameCosV = new Float32Array(rows);
+  const sphereSinLatitude = new Float32Array(rows);
+  const sphereCosLatitude = new Float32Array(rows);
+  const mobiusStripOffset = new Float32Array(rows);
   const projectedX = new Float32Array(pointCount);
   const projectedY = new Float32Array(pointCount);
   const projectedRadius = new Float32Array(pointCount);
@@ -76,8 +93,10 @@
   const energyWaveRadius = new Float32Array(maxEnergyWaves);
   const energyWavePower = new Float32Array(maxEnergyWaves);
   const energyWaveActive = new Uint8Array(maxEnergyWaves);
+  const shapeWeights = new Float32Array([1, 0, 0]);
+  const shapeFromWeights = new Float32Array([1, 0, 0]);
+  const shapeTargetWeights = new Float32Array([1, 0, 0]);
 
-  let startedAt;
   let previousAt;
   let lastRenderedAt = -Infinity;
   let animationFrame = 0;
@@ -91,6 +110,11 @@
   let magnetStrength = 0;
   let magnetMode = 0;
   let magnetPolarity = 1;
+  let holdMode = "magnet";
+  let freezeEngaged = false;
+  let timeScale = 1;
+  let simulationFrame = 0;
+  let simulationTimeMs = 0;
   let pressCandidate = false;
   let dragMoved = false;
   let pressStartedAt = 0;
@@ -111,6 +135,8 @@
   let lastPointerAt = 0;
   let energyWaveCursor = 0;
   let hasPreviousFrame = false;
+  let activeShape = "torus";
+  let shapeTransitionStartedAt = 0;
   let renderedTheme = {
     background: hexToRgb(themePresets.mono.background),
     star: hexToRgb(themePresets.mono.star),
@@ -120,8 +146,11 @@
   let themeTarget = cloneThemeRgb(renderedTheme);
   let themeTransitionStartedAt = 0;
   const themeTransitionDuration = 320;
+  const shapeTransitionDuration = 1350;
   const themeStorageKey = "star-torus-theme-v1";
   const panelStorageKey = "star-torus-panel-v1";
+  const holdModeStorageKey = "star-torus-hold-mode-v1";
+  const shapeStorageKey = "star-torus-shape-v1";
 
   for (let x = 0; x < columns; x += 1) {
     baseSinU[x] = Math.sin(x * p);
@@ -131,6 +160,11 @@
   for (let y = 0; y < rows; y += 1) {
     baseSinV[y] = Math.sin(y * p * 2);
     baseCosV[y] = Math.cos(y * p * 2);
+    const normalizedRow = (y + 0.5) / rows;
+    const latitude = (normalizedRow - 0.5) * Math.PI;
+    sphereSinLatitude[y] = Math.sin(latitude);
+    sphereCosLatitude[y] = Math.cos(latitude);
+    mobiusStripOffset[y] = (normalizedRow * 2 - 1) * mobiusHalfWidth;
   }
 
   function normalizeHex(value, fallback = "#000000") {
@@ -282,6 +316,89 @@
     }
   }
 
+  function persistMotionPreference(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Keep the selected mode for the current session when storage is unavailable.
+    }
+  }
+
+  function setHoldMode(mode, { persist = true } = {}) {
+    const nextMode = mode === "freeze" ? "freeze" : "magnet";
+
+    if (dragging && activePointerId !== null) {
+      finishDrag({ pointerId: activePointerId }, true);
+    }
+
+    holdMode = nextMode;
+    setMagnetMode(0);
+    setFreezeEngaged(false);
+    holdModeButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.holdMode === holdMode));
+    });
+    interactionModeHint.textContent = holdMode === "freeze"
+      ? "单击脉冲 · 长按冻结 · 松开渐进恢复"
+      : "单击脉冲 · 长按吸附 · Shift 长按排斥";
+    updateInteractionReadout();
+    if (persist) persistMotionPreference(holdModeStorageKey, holdMode);
+  }
+
+  function setShape(shapeId, { animate = true, persist = true } = {}) {
+    const targetIndex = shapeIds.indexOf(shapeId);
+    if (targetIndex < 0) return;
+
+    shapeFromWeights.set(shapeWeights);
+    shapeTargetWeights.fill(0);
+    shapeTargetWeights[targetIndex] = 1;
+    activeShape = shapeId;
+
+    if (animate) {
+      shapeTransitionStartedAt = performance.now();
+    } else {
+      shapeWeights.set(shapeTargetWeights);
+      shapeFromWeights.set(shapeTargetWeights);
+      shapeTransitionStartedAt = 0;
+    }
+
+    shapeButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.shape === activeShape));
+    });
+    canvas.setAttribute("aria-label", `由星点组成并持续流动的${shapeLabels[activeShape]}`);
+    if (persist) persistMotionPreference(shapeStorageKey, activeShape);
+  }
+
+  function updateShapeTransition(now) {
+    if (!shapeTransitionStartedAt) return;
+    const progress = Math.min(1, (now - shapeTransitionStartedAt) / shapeTransitionDuration);
+    const eased = progress * progress * (3 - progress * 2);
+
+    for (let index = 0; index < shapeWeights.length; index += 1) {
+      shapeWeights[index] = shapeFromWeights[index]
+        + (shapeTargetWeights[index] - shapeFromWeights[index]) * eased;
+    }
+
+    if (progress === 1) {
+      shapeWeights.set(shapeTargetWeights);
+      shapeTransitionStartedAt = 0;
+    }
+  }
+
+  function initializeMotionControls() {
+    let storedHoldMode = "magnet";
+    let storedShape = "torus";
+
+    try {
+      storedHoldMode = localStorage.getItem(holdModeStorageKey) || storedHoldMode;
+      storedShape = localStorage.getItem(shapeStorageKey) || storedShape;
+    } catch {
+      // Use the default motion controls when storage is unavailable.
+    }
+
+    setHoldMode(storedHoldMode, { persist: false });
+    setShape(storedShape, { animate: false, persist: false });
+  }
+
   function setPanelCollapsed(collapsed, persist = true) {
     controlPanel.classList.toggle("is-collapsed", collapsed);
     panelToggle.setAttribute("aria-expanded", String(!collapsed));
@@ -353,6 +470,8 @@
   function updateInteractionReadout() {
     if (!interactionEnabled) {
       toggleState.textContent = "已关闭";
+    } else if (freezeEngaged) {
+      toggleState.textContent = "时空冻结";
     } else if (magnetMode > 0) {
       toggleState.textContent = "吸附中";
     } else if (magnetMode < 0) {
@@ -371,7 +490,15 @@
     updateInteractionReadout();
   }
 
-  function emitEnergyWave(x, y, now = performance.now()) {
+  function setFreezeEngaged(enabled) {
+    const nextState = Boolean(enabled);
+    if (freezeEngaged === nextState) return;
+    freezeEngaged = nextState;
+    canvas.classList.toggle("is-freezing", freezeEngaged);
+    updateInteractionReadout();
+  }
+
+  function emitEnergyWave(x, y, now = simulationTimeMs) {
     const slot = energyWaveCursor;
     energyWaveX[slot] = x;
     energyWaveY[slot] = y;
@@ -419,19 +546,58 @@
     let index = 0;
     let litCount = 0;
     const activeWaveCount = updateEnergyWaves(now);
+    const torusWeight = shapeWeights[0];
+    const sphereWeight = shapeWeights[1];
+    const mobiusWeight = shapeWeights[2];
+
+    for (let x = 0; x < columns; x += 1) {
+      frameSinU[x] = baseSinU[x] * cosUOffset + baseCosU[x] * sinUOffset;
+      frameCosU[x] = baseCosU[x] * cosUOffset - baseSinU[x] * sinUOffset;
+      const halfU = (x * p + uOffset) * 0.5;
+      frameSinHalfU[x] = Math.sin(halfU);
+      frameCosHalfU[x] = Math.cos(halfU);
+    }
+
+    for (let y = 0; y < rows; y += 1) {
+      frameSinV[y] = baseSinV[y] * cosVOffset + baseCosV[y] * sinVOffset;
+      frameCosV[y] = baseCosV[y] * cosVOffset - baseSinV[y] * sinVOffset;
+    }
 
     for (let y = rows; y--; ) {
-      const sinV = baseSinV[y] * cosVOffset + baseCosV[y] * sinVOffset;
-      const cosV = baseCosV[y] * cosVOffset - baseSinV[y] * sinVOffset;
-      const ringRadius = (2 + sinV) * r;
-      const pz = cosV * r;
-      const sphereRadius = Math.abs(cosV + 0.3);
+      const sinV = frameSinV[y];
+      const cosV = frameCosV[y];
+      const torusRingRadius = (2 + sinV) * r;
+      const torusZ = cosV * r;
+      const torusDotRadius = Math.abs(cosV + 0.3);
+      const sinLatitude = sphereSinLatitude[y];
+      const cosLatitude = sphereCosLatitude[y];
+      const sphereRadial = sphereGeometryRadius * cosLatitude;
+      const sphereZ = sphereGeometryRadius * sinLatitude;
+      const sphereDotRadius = 0.36 + Math.abs(cosLatitude) * 0.94;
+      const stripOffset = mobiusStripOffset[y];
+      const normalizedStrip = Math.abs(stripOffset) / mobiusHalfWidth;
 
       for (let x = columns; x--; ) {
-        const sinU = baseSinU[x] * cosUOffset + baseCosU[x] * sinUOffset;
-        const cosU = baseCosU[x] * cosUOffset - baseSinU[x] * sinUOffset;
-        const px = ringRadius * cosU;
-        const py = ringRadius * sinU;
+        const sinU = frameSinU[x];
+        const cosU = frameCosU[x];
+        const sinHalfU = frameSinHalfU[x];
+        const cosHalfU = frameCosHalfU[x];
+        const torusX = torusRingRadius * cosU;
+        const torusY = torusRingRadius * sinU;
+        const sphereX = sphereRadial * cosU;
+        const sphereY = sphereRadial * sinU;
+        const mobiusRadial = mobiusRingRadius + stripOffset * cosHalfU;
+        const mobiusX = mobiusRadial * cosU;
+        const mobiusY = mobiusRadial * sinU;
+        const mobiusZ = stripOffset * sinHalfU;
+        const mobiusDotRadius = 0.48
+          + (1 - normalizedStrip * 0.35) * (0.52 + Math.abs(cosHalfU) * 0.2);
+        const px = torusX * torusWeight + sphereX * sphereWeight + mobiusX * mobiusWeight;
+        const py = torusY * torusWeight + sphereY * sphereWeight + mobiusY * mobiusWeight;
+        const pz = torusZ * torusWeight + sphereZ * sphereWeight + mobiusZ * mobiusWeight;
+        const pointRadius = torusDotRadius * torusWeight
+          + sphereDotRadius * sphereWeight
+          + mobiusDotRadius * mobiusWeight;
 
         // 与 p5.js 的 rotateX(0.5)、rotateY(-0.5) 顺序一致。
         const rotatedX = px * cosY + pz * sinY;
@@ -441,7 +607,7 @@
         const perspective = cameraZ / (cameraZ - rotatedZ);
         const x2d = (center + rotatedX * perspective) * outputScale;
         const y2d = (center + rotatedY * perspective) * outputScale;
-        const radius2d = sphereRadius * perspective * outputScale;
+        const radius2d = pointRadius * perspective * outputScale;
 
         projectedX[index] = x2d;
         projectedY[index] = y2d;
@@ -623,11 +789,32 @@
   }
 
   function animate(now) {
-    if (startedAt === undefined) startedAt = now;
     if (previousAt === undefined) previousAt = now;
     updateThemeTransition(now);
+    updateShapeTransition(now);
     const deltaFrames = Math.min(3, Math.max(0.25, (now - previousAt) / frameDuration));
     previousAt = now;
+
+    if (
+      interactionEnabled
+      && dragging
+      && pressCandidate
+      && magnetMode === 0
+      && !freezeEngaged
+      && now - pressStartedAt >= longPressDelay
+    ) {
+      if (holdMode === "freeze") {
+        setFreezeEngaged(true);
+      } else {
+        setMagnetMode(magnetPolarity);
+      }
+    }
+
+    const timeScaleTarget = freezeEngaged ? 0 : 1;
+    const timeScaleEase = 1 - Math.pow(freezeEngaged ? 0.62 : 0.88, deltaFrames);
+    timeScale += (timeScaleTarget - timeScale) * timeScaleEase;
+    if (freezeEngaged && timeScale < 0.001) timeScale = 0;
+    if (!freezeEngaged && 1 - timeScale < 0.001) timeScale = 1;
 
     if (resetting) {
       const resetEase = 1 - Math.pow(0.8, deltaFrames);
@@ -644,24 +831,14 @@
         resetting = false;
       }
     } else if (interactionEnabled && !dragging) {
-      rotationX += velocityX * deltaFrames;
-      rotationY += velocityY * deltaFrames;
-      const damping = Math.pow(0.9, deltaFrames);
+      rotationX += velocityX * deltaFrames * timeScale;
+      rotationY += velocityY * deltaFrames * timeScale;
+      const damping = Math.pow(0.9, deltaFrames * timeScale);
       velocityX *= damping;
       velocityY *= damping;
 
       if (Math.abs(velocityX) < 0.00002) velocityX = 0;
       if (Math.abs(velocityY) < 0.00002) velocityY = 0;
-    }
-
-    if (
-      interactionEnabled
-      && dragging
-      && pressCandidate
-      && magnetMode === 0
-      && now - pressStartedAt >= longPressDelay
-    ) {
-      setMagnetMode(magnetPolarity);
     }
 
     const magnetTarget = interactionEnabled && dragging ? magnetMode : 0;
@@ -677,11 +854,12 @@
     zoom += (targetZoom - zoom) * zoomEase;
     if (Math.abs(targetZoom - zoom) < 0.0001) zoom = targetZoom;
 
-    const frame = Math.floor((now - startedAt) / frameDuration);
-    const t = (frame * 0.02) % 1;
+    simulationFrame += deltaFrames * timeScale;
+    simulationTimeMs += frameDuration * deltaFrames * timeScale;
+    const t = Math.floor(simulationFrame) * 0.02;
 
     if (now - lastRenderedAt >= frameDuration - 1) {
-      render(t, now);
+      render(t, simulationTimeMs);
       lastRenderedAt = now;
     }
 
@@ -695,14 +873,15 @@
     }
 
     const heldLongEnough = performance.now() - pressStartedAt >= longPressDelay;
-    const usedMagnet = magnetMode !== 0 || (pressCandidate && heldLongEnough);
-    const shouldPulse = !cancelled && pressCandidate && !dragMoved && !usedMagnet;
+    const usedHoldAction = magnetMode !== 0 || freezeEngaged || (pressCandidate && heldLongEnough);
+    const shouldPulse = !cancelled && pressCandidate && !dragMoved && !usedHoldAction;
     dragging = false;
     pressCandidate = false;
     dragMoved = false;
     pressStartedAt = 0;
     canvas.classList.remove("is-dragging");
     setMagnetMode(0);
+    setFreezeEngaged(false);
 
     if (shouldPulse) {
       emitEnergyWave(pointerX, pointerY);
@@ -735,6 +914,7 @@
       velocityX = 0;
       velocityY = 0;
       setMagnetMode(0);
+      setFreezeEngaged(false);
       canvas.classList.remove("is-dragging");
     }
 
@@ -743,6 +923,18 @@
 
   toggle.addEventListener("click", () => {
     setInteraction(!interactionEnabled);
+  });
+
+  holdModeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setHoldMode(button.dataset.holdMode);
+    });
+  });
+
+  shapeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setShape(button.dataset.shape);
+    });
   });
 
   panelToggle.addEventListener("click", () => {
@@ -816,7 +1008,7 @@
         magnetPolarity = sample.shiftKey ? -1 : 1;
       }
 
-      if (magnetMode !== 0) {
+      if (magnetMode !== 0 || freezeEngaged) {
         lastClientX = sample.clientX;
         lastClientY = sample.clientY;
         lastPointerAt = sample.timeStamp;
@@ -915,6 +1107,7 @@
   });
 
   initializeThemeAndPanel();
+  initializeMotionControls();
   setInteraction(false);
 
   if (!animationFrame) {
