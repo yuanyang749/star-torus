@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='black'/%3E%3Ccircle cx='16' cy='16' r='3' fill='white'/%3E%3C/svg%3E">
+  <title>星环</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="control-panel" id="controlPanel" aria-label="星环控制面板">
+    <button class="panel-toggle" id="panelToggle" type="button" aria-expanded="true" aria-controls="panelSurface" title="收起控制面板">
+      <svg class="panel-toggle__palette" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22a1 1 0 0 1 0-20a10 9 0 0 1 10 9a5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/>
+        <circle cx="13.5" cy="6.5" r=".7" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".7" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".7" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".7" fill="currentColor"/>
+      </svg>
+      <span class="panel-toggle__chevron" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/></svg>
+      </span>
+      <span class="sr-only">收起控制面板</span>
+    </button>
+
+    <div class="control-panel__surface" id="panelSurface">
+      <header class="panel-header">
+        <div class="panel-orbit" aria-hidden="true"><span></span></div>
+        <div>
+          <p class="panel-kicker">ORBITAL / COLOR LAB</p>
+          <h1 class="panel-title">星环控制台</h1>
+        </div>
+        <div class="panel-readout"><span class="panel-readout__dot"></span><span id="activeThemeName">MONO</span></div>
+      </header>
+
+      <section class="panel-section">
+        <div class="section-heading"><span>01</span><h2>交互模式</h2></div>
+        <button class="interaction-toggle" id="interactionToggle" type="button" aria-pressed="false" aria-label="开启星环交互">
+          <span class="setting-icon" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"/></svg>
+          </span>
+          <span class="interaction-toggle__copy">
+            <strong class="interaction-toggle__label">星环交互</strong>
+            <span class="interaction-toggle__state">已关闭</span>
+          </span>
+          <span class="switch-track" aria-hidden="true"></span>
+        </button>
+        <p class="interaction-note">
+          <span>Hover 打光（常驻）· 拖拽旋转 · 滚轮缩放</span>
+          <span>单击脉冲 · 长按吸附 · Shift 长按排斥</span>
+        </p>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-heading"><span>02</span><h2>主题预设</h2></div>
+        <div class="theme-grid" id="themeGrid">
+          <button class="theme-preset" type="button" data-theme="mono" aria-pressed="true" style="--preset-bg:#000000;--preset-star:#FFFFFF"><span class="theme-preset__swatch"></span><span class="theme-preset__name">经典黑白</span></button>
+          <button class="theme-preset" type="button" data-theme="deep" aria-pressed="false" style="--preset-bg:#050816;--preset-star:#7DD3FC"><span class="theme-preset__swatch"></span><span class="theme-preset__name">深空蓝</span></button>
+          <button class="theme-preset" type="button" data-theme="nebula" aria-pressed="false" style="--preset-bg:#0A0613;--preset-star:#C4B5FD"><span class="theme-preset__swatch"></span><span class="theme-preset__name">星云紫</span></button>
+          <button class="theme-preset" type="button" data-theme="ember" aria-pressed="false" style="--preset-bg:#120805;--preset-star:#FB923C"><span class="theme-preset__swatch"></span><span class="theme-preset__name">熔岩橙</span></button>
+          <button class="theme-preset" type="button" data-theme="aurora" aria-pressed="false" style="--preset-bg:#03120D;--preset-star:#6EE7B7"><span class="theme-preset__swatch"></span><span class="theme-preset__name">极光绿</span></button>
+          <button class="theme-preset" type="button" data-theme="pearl" aria-pressed="false" style="--preset-bg:#F3F0E8;--preset-star:#171717"><span class="theme-preset__swatch"></span><span class="theme-preset__name">月尘白</span></button>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-heading"><span>03</span><h2>自定义颜色</h2></div>
+        <div class="color-controls">
+          <label class="color-control"><span class="color-control__name">背景色</span><output id="backgroundValue">#000000</output><input id="backgroundColor" type="color" value="#000000" aria-label="选择背景色"></label>
+          <label class="color-control"><span class="color-control__name">星点色</span><output id="starValue">#FFFFFF</output><input id="starColor" type="color" value="#ffffff" aria-label="选择星点色"></label>
+          <label class="color-control"><span class="color-control__name">光照色</span><output id="glowValue">#FFFFFF</output><input id="glowColor" type="color" value="#ffffff" aria-label="选择光照色"></label>
+        </div>
+      </section>
+
+      <footer class="panel-footer">
+        <button class="panel-action" id="resetView" type="button">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+          复位视角
+        </button>
+        <button class="panel-action" id="resetTheme" type="button">恢复黑白</button>
+      </footer>
+    </div>
+  </aside>
+  <canvas width="720" height="720" role="img" aria-label="由白色星点组成并持续流动的三维环面"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
