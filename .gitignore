@@ -1,0 +1,17 @@
+.playwright-cli
+node_modules
+dist
+output
+*.tsbuildinfo
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.next
+out
+.vercel
+.now
