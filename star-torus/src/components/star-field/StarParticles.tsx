@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
+import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import type { StarFieldConfig } from "@/domain/star-field";
 import { DustTrailLayer, StarPointLayer } from "@/effects/RenderLayers";
 import { getGeometryDefinition } from "@/geometries/registry";
@@ -14,7 +17,7 @@ import { starFragmentShader, starVertexShader } from "@/components/star-field/st
 
 const FLOW_PHASE_PER_SECOND = Math.PI / 40 * 1.2;
 const BASE_SCENE_SCALE = 0.66;
-const TRAIL_POINT_STEP = 3;
+const TRAIL_POINT_STEP = 2;
 const TRAIL_SEGMENT_COUNT = Math.ceil(POINT_COUNT / TRAIL_POINT_STEP);
 
 interface StarParticlesProps {
@@ -24,7 +27,7 @@ interface StarParticlesProps {
 
 interface ParticleBuffers {
   geometry: THREE.BufferGeometry;
-  trailGeometry: THREE.BufferGeometry;
+  trailGeometry: LineSegmentsGeometry;
   positions: Float32Array;
   basePositions: Float32Array;
   sourcePositions: Float32Array;
@@ -42,7 +45,6 @@ interface ParticleBuffers {
 export function StarParticles({ config, runtime }: StarParticlesProps) {
   const { size, viewport } = useThree();
   const pointsRef = useRef<THREE.Points>(null);
-  const trailsRef = useRef<THREE.LineSegments>(null);
   const buffers = useMemo(() => createParticleBuffers(config.shape), []);
   const waveData = useMemo(() => new Float32Array(ENERGY_WAVE_COUNT * 4), []);
   const waveVectors = useMemo(
@@ -53,15 +55,23 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
   const glowTarget = useMemo(() => new THREE.Color(config.theme.glow), []);
   const material = useMemo(() => createStarMaterial(config, waveVectors), []);
   const trailMaterial = useMemo(
-    () => new THREE.LineBasicMaterial({
+    () => new LineMaterial({
       color: config.theme.glow,
       transparent: true,
       opacity: 0,
+      depthTest: false,
       depthWrite: false,
       blending: THREE.AdditiveBlending
     }),
     []
   );
+  const trailObject = useMemo(() => {
+    const object = new LineSegments2(buffers.trailGeometry, trailMaterial);
+    object.name = "star-trails";
+    object.frustumCulled = false;
+    object.renderOrder = 0;
+    return object;
+  }, [buffers.trailGeometry, trailMaterial]);
 
   useEffect(() => {
     starTarget.set(config.theme.star);
@@ -116,23 +126,21 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
     buffers.pointSizes.set(buffers.baseSizes);
     updateTrails(
       buffers,
-      runtime.rotationX,
-      runtime.rotationY,
-      runtime.velocityX,
-      runtime.velocityY,
       runtime.trailStrength
     );
 
     const positionAttribute = buffers.geometry.getAttribute("position") as THREE.BufferAttribute;
     const sizeAttribute = buffers.geometry.getAttribute("aPointSize") as THREE.BufferAttribute;
-    const trailAttribute = buffers.trailGeometry.getAttribute("position") as THREE.BufferAttribute;
+    const trailAttribute = buffers.trailGeometry.getAttribute(
+      "instanceStart"
+    ) as THREE.InterleavedBufferAttribute;
     positionAttribute.needsUpdate = true;
     sizeAttribute.needsUpdate = true;
-    trailAttribute.needsUpdate = runtime.trailStrength > 0.08;
+    trailAttribute.data.needsUpdate = runtime.trailStrength > 0.08;
 
     const sceneScale = BASE_SCENE_SCALE * runtime.zoom * (1 + runtime.burstScale);
     pointsRef.current?.scale.setScalar(sceneScale);
-    trailsRef.current?.scale.setScalar(sceneScale);
+    trailObject.scale.setScalar(sceneScale);
 
     const uniforms = material.uniforms;
     uniforms.uViewport.value.set(size.width, size.height);
@@ -157,16 +165,17 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
     }
 
     trailMaterial.opacity = runtime.trailStrength > 0.08
-      ? 0.025 + runtime.trailStrength * 0.26
+      ? 0.055 + runtime.trailStrength * 0.285
       : 0;
+    trailMaterial.uniforms.linewidth.value = (
+      0.58 + runtime.trailStrength * 0.88
+    ) * viewport.dpr;
   });
 
   return (
     <>
       <DustTrailLayer
-        objectRef={trailsRef}
-        geometry={buffers.trailGeometry}
-        material={trailMaterial}
+        object={trailObject}
       />
       <StarPointLayer
         objectRef={pointsRef}
@@ -206,8 +215,8 @@ function createParticleBuffers(initialShape: StarFieldConfig["shape"]): Particle
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("aPointSize", new THREE.BufferAttribute(pointSizes, 1));
 
-  const trailGeometry = new THREE.BufferGeometry();
-  trailGeometry.setAttribute("position", new THREE.BufferAttribute(trailPositions, 3));
+  const trailGeometry = new LineSegmentsGeometry();
+  trailGeometry.setPositions(trailPositions);
 
   return {
     geometry,
@@ -291,45 +300,40 @@ function rotatePositions(
 
 function updateTrails(
   buffers: ParticleBuffers,
-  rotationX: number,
-  rotationY: number,
-  velocityX: number,
-  velocityY: number,
   strength: number
 ): void {
-  if (strength <= 0.08) return;
+  if (strength > 0.08) {
+    const maxLength = (12 + strength * 24) / BASE_SCENE_SCALE;
+    const maxFrameDistance = 60 / BASE_SCENE_SCALE;
+    let segmentIndex = 0;
 
-  const rotationLag = 0.18 + strength * 0.42;
-  rotatePositions(
-    buffers.basePositions,
-    buffers.previousPositions,
-    rotationX - velocityX * rotationLag,
-    rotationY - velocityY * rotationLag
-  );
+    for (let pointIndex = 0; pointIndex < POINT_COUNT; pointIndex += TRAIL_POINT_STEP) {
+      const positionIndex = pointIndex * 3;
+      const trailIndex = segmentIndex * 6;
+      const currentX = buffers.positions[positionIndex];
+      const currentY = buffers.positions[positionIndex + 1];
+      const currentZ = buffers.positions[positionIndex + 2];
+      const deltaX = currentX - buffers.previousPositions[positionIndex];
+      const deltaY = currentY - buffers.previousPositions[positionIndex + 1];
+      const deltaZ = currentZ - buffers.previousPositions[positionIndex + 2];
+      const distance = Math.hypot(deltaX, deltaY, deltaZ);
+      const validDistance = distance >= 0.001 && distance <= maxFrameDistance;
+      const stretch = validDistance
+        ? Math.min(1.05 + strength * 3.5, maxLength / distance)
+        : 0;
 
-  let segmentIndex = 0;
-  for (let pointIndex = 0; pointIndex < POINT_COUNT; pointIndex += TRAIL_POINT_STEP) {
-    const positionIndex = pointIndex * 3;
-    const trailIndex = segmentIndex * 6;
-    const currentX = buffers.positions[positionIndex];
-    const currentY = buffers.positions[positionIndex + 1];
-    const currentZ = buffers.positions[positionIndex + 2];
-    const deltaX = currentX - buffers.previousPositions[positionIndex];
-    const deltaY = currentY - buffers.previousPositions[positionIndex + 1];
-    const deltaZ = currentZ - buffers.previousPositions[positionIndex + 2];
-    const distance = Math.hypot(deltaX, deltaY, deltaZ);
-    const maxLength = 7 + strength * 18;
-    const shownLength = Math.min(maxLength, distance * (1.05 + strength * 1.8));
-    const scale = distance > 0.001 ? shownLength / distance : 0;
-
-    buffers.trailPositions[trailIndex] = currentX - deltaX * scale;
-    buffers.trailPositions[trailIndex + 1] = currentY - deltaY * scale;
-    buffers.trailPositions[trailIndex + 2] = currentZ - deltaZ * scale;
-    buffers.trailPositions[trailIndex + 3] = currentX;
-    buffers.trailPositions[trailIndex + 4] = currentY;
-    buffers.trailPositions[trailIndex + 5] = currentZ;
-    segmentIndex += 1;
+      buffers.trailPositions[trailIndex] = currentX - deltaX * stretch;
+      buffers.trailPositions[trailIndex + 1] = currentY - deltaY * stretch;
+      buffers.trailPositions[trailIndex + 2] = currentZ - deltaZ * stretch;
+      buffers.trailPositions[trailIndex + 3] = currentX;
+      buffers.trailPositions[trailIndex + 4] = currentY;
+      buffers.trailPositions[trailIndex + 5] = currentZ;
+      segmentIndex += 1;
+    }
   }
+
+  // The original Canvas effect measured displacement against the actual previous frame.
+  buffers.previousPositions.set(buffers.positions);
 }
 
 function smoothstep(value: number): number {

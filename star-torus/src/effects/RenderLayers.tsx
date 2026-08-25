@@ -1,23 +1,13 @@
 import type { RefObject } from "react";
 import * as THREE from "three";
+import type { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 
 interface DustTrailLayerProps {
-  objectRef: RefObject<THREE.LineSegments | null>;
-  geometry: THREE.BufferGeometry;
-  material: THREE.LineBasicMaterial;
+  object: LineSegments2;
 }
 
-export function DustTrailLayer({ objectRef, geometry, material }: DustTrailLayerProps) {
-  return (
-    <lineSegments
-      ref={objectRef}
-      name="star-trails"
-      geometry={geometry}
-      material={material}
-      frustumCulled={false}
-      renderOrder={0}
-    />
-  );
+export function DustTrailLayer({ object }: DustTrailLayerProps) {
+  return <primitive object={object} />;
 }
 
 interface StarPointLayerProps {
