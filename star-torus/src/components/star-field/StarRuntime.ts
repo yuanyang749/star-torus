@@ -211,10 +211,11 @@ export class StarRuntime {
 
     const motionSpeed = Math.hypot(this.velocityX, this.velocityY);
     const normalizedSpeed = this.config.interaction.enabled
-      ? clamp01((motionSpeed - 0.014) / 0.065)
+      ? clamp01((motionSpeed - 0.014) / 0.05)
       : 0;
     const easedSpeed = normalizedSpeed * normalizedSpeed * (3 - normalizedSpeed * 2);
-    this.trailStrength = Math.min(0.52, easedSpeed * 0.32 * this.config.effects.trailIntensity);
+    const normalizedIntensity = clamp01(this.config.effects.trailIntensity / 1.5);
+    this.trailStrength = easedSpeed * normalizedIntensity * normalizedIntensity * 0.9;
   }
 
   writeWaveData(target: Float32Array): void {
