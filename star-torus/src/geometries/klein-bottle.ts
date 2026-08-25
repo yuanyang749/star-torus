@@ -1,7 +1,9 @@
 import type { GeometryDefinition } from "@/geometries/types";
 
 const TAU = Math.PI * 2;
-const SCALE = 66;
+const SCALE = 29;
+const CENTER_X = -0.83;
+const CENTER_HEIGHT = -1.02;
 
 export const kleinBottleGeometry: GeometryDefinition = {
   id: "klein",
@@ -12,27 +14,46 @@ export const kleinBottleGeometry: GeometryDefinition = {
     let index = 0;
 
     for (let row = 0; row < rows; row += 1) {
-      const v = row / rows * TAU + phase * 1.1;
-      const sinV = Math.sin(v);
-      const sin2V = Math.sin(2 * v);
-      const cosV = Math.cos(v);
-
       for (let column = 0; column < columns; column += 1) {
-        const u = column / columns * TAU + phase * 0.42;
-        const halfU = u * 0.5;
-        const sinHalfU = Math.sin(halfU);
-        const cosHalfU = Math.cos(halfU);
-        const radial = 2.1 + cosHalfU * sinV - sinHalfU * sin2V;
+        const uJitter = fract(
+          (row + 1) * 0.754877666 + (column + 1) * 0.569840296
+        );
+        const vJitter = fract(
+          (column + 1) * 0.618033989 + (row + 1) * 0.438289
+        );
+        const u = (column + uJitter) / columns * TAU;
+        const v = (row + vJitter) / rows * TAU + phase * 0.92;
+        const sinU = Math.sin(u);
+        const cosU = Math.cos(u);
+        const sinV = Math.sin(v);
+        const cosV = Math.cos(v);
+        const crossSection = 2 * (1 - cosU / 2);
+        const bodyCenter = 3 * cosU * (1 + sinU);
+        let x: number;
+        let height: number;
+
+        if (u < Math.PI) {
+          x = bodyCenter + crossSection * cosU * cosV;
+          height = -8 * sinU - crossSection * sinU * cosV;
+        } else {
+          x = bodyCenter - crossSection * cosV;
+          height = -8 * sinU;
+        }
+
+        const depth = -crossSection * sinV;
+        const energy = 0.5 + Math.sin(u * 3 - phase * 4.6 + v * 0.4) * 0.5;
         const positionIndex = index * 3;
 
-        positions[positionIndex] = radial * Math.cos(u) * SCALE;
-        positions[positionIndex + 1] = radial * Math.sin(u) * SCALE;
-        positions[positionIndex + 2] = (
-          sinHalfU * sinV + cosHalfU * sin2V
-        ) * SCALE;
-        pointSizes[index] = 0.42 + Math.abs(cosV + 0.24) * 0.72;
+        positions[positionIndex] = (x - CENTER_X) * SCALE;
+        positions[positionIndex + 1] = (height - CENTER_HEIGHT) * SCALE;
+        positions[positionIndex + 2] = depth * SCALE;
+        pointSizes[index] = 0.4 + Math.abs(cosV + 0.18) * 0.38 + energy * 0.22;
         index += 1;
       }
     }
   }
 };
+
+function fract(value: number): number {
+  return value - Math.floor(value);
+}
