@@ -1,0 +1,6 @@
+{
+  "$schema": "https://formfield.dev/r/schema/project.json",
+  "registry": "./public/r",
+  "sourceRoot": "src",
+  "alias": "@/"
+}

@@ -1,4 +1,16 @@
-export const SHAPE_IDS = ["torus", "sphere", "mobius"] as const;
+export const SHAPE_IDS = [
+  "torus",
+  "sphere",
+  "mobius",
+  "torus-knot",
+  "klein",
+  "superellipsoid",
+  "helicoid",
+  "double-helix",
+  "wave-surface",
+  "heart",
+  "galaxy"
+] as const;
 export type ShapeId = (typeof SHAPE_IDS)[number];
 
 export type HoldMode = "magnet" | "freeze";
@@ -43,6 +55,8 @@ export interface StarFieldConfig {
   interaction: StarInteractionConfig;
 }
 
+export type FormFieldConfig = StarFieldConfig;
+
 export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
   version: 1,
   shape: "torus",
@@ -67,6 +81,8 @@ export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
   }
 };
 
+export const DEFAULT_FORM_FIELD_CONFIG = DEFAULT_STAR_FIELD_CONFIG;
+
 export function cloneStarFieldConfig(config: StarFieldConfig): StarFieldConfig {
   return {
     version: 1,
@@ -77,3 +93,5 @@ export function cloneStarFieldConfig(config: StarFieldConfig): StarFieldConfig {
     interaction: { ...config.interaction }
   };
 }
+
+export const cloneFormFieldConfig = cloneStarFieldConfig;

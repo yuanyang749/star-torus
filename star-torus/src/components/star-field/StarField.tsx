@@ -8,6 +8,7 @@ import { Canvas } from "@react-three/fiber";
 import type { RuntimeStatus, StarFieldConfig } from "@/domain/star-field";
 import { getGeometryDefinition } from "@/geometries/registry";
 import { StarScene, type StarFieldController } from "@/components/star-field/StarScene";
+import "@/components/star-field/star-field.css";
 
 export interface StarFieldHandle {
   resetView(): void;

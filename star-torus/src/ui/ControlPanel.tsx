@@ -86,8 +86,8 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         <header className="panel-header">
           <div className="panel-orbit" aria-hidden="true"><span /></div>
           <div>
-            <p className="panel-kicker">R3F / COMPONENT LAB</p>
-            <h1 className="panel-title">星环组件台</h1>
+            <p className="panel-kicker">FORMFIELD LAB / REGISTRY</p>
+            <h1 className="panel-title">形场实验室</h1>
           </div>
           <div className="panel-readout">
             <span className="panel-readout__dot" />
@@ -95,13 +95,19 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
           </div>
         </header>
 
+        <div className="platform-pipeline" aria-label="创作、预览与源码分发流程">
+          <span><code>01</code>创作</span>
+          <span><code>02</code>实时预览</span>
+          <span><code>03</code>源码分发</span>
+        </div>
+
         <section className="panel-section">
-          <SectionHeading index="01" title="交互模式" />
+          <SectionHeading index="01" title="预览与交互" />
           <button
             className="interaction-toggle"
             type="button"
             aria-pressed={config.interaction.enabled}
-            aria-label={config.interaction.enabled ? "关闭星环交互" : "开启星环交互"}
+            aria-label={config.interaction.enabled ? "关闭形场交互" : "开启形场交互"}
             onClick={() => setInteractionEnabled(!config.interaction.enabled)}
           >
             <span className="setting-icon" aria-hidden="true">
@@ -110,7 +116,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
               </svg>
             </span>
             <span className="interaction-toggle__copy">
-              <strong className="interaction-toggle__label">星环交互</strong>
+              <strong className="interaction-toggle__label">形场交互</strong>
               <span className="interaction-toggle__state">{STATUS_LABELS[runtimeStatus]}</span>
             </span>
             <span className="switch-track" aria-hidden="true" />
@@ -124,7 +130,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         </section>
 
         <section className="panel-section">
-          <SectionHeading index="02" title="时空与形态" />
+          <SectionHeading index="02" title="形态目录" />
           <div className="motion-controls">
             <div className="motion-control">
               <div className="motion-control__label"><span>HOLD</span><strong>长按行为</strong></div>
@@ -144,7 +150,10 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
               </div>
             </div>
             <div className="motion-control">
-              <div className="motion-control__label"><span>FORM</span><strong>注册形态</strong></div>
+              <div className="motion-control__label">
+                <span>FORM LIBRARY</span>
+                <strong>{GEOMETRY_DEFINITIONS.length} 个注册形态</strong>
+              </div>
               <div className="mode-segments mode-segments--shapes" role="group" aria-label="选择几何形态">
                 {GEOMETRY_DEFINITIONS.map((definition) => (
                   <button
@@ -164,7 +173,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         </section>
 
         <section className="panel-section">
-          <SectionHeading index="03" title="表现参数">
+          <SectionHeading index="03" title="创作参数">
             <button className="section-reset" type="button" onClick={resetParameters}>RESET</button>
           </SectionHeading>
           <div className="parameter-grid">
@@ -224,7 +233,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         </section>
 
         <section className="panel-section panel-section--export">
-          <SectionHeading index="06" title="生成复用组件" />
+          <SectionHeading index="06" title="源码分发" />
           <ExportPanel config={config} />
         </section>
 
