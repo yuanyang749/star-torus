@@ -23,7 +23,7 @@ export const starVertexShader = /* glsl */ `
     );
 
     float pointerDistance = distance(screenPosition, uPointer);
-    float hoverInfluence = pow(max(0.0, 1.0 - pointerDistance / uHoverRadius), 2.0);
+    float hoverInfluence = pow(max(0.0, 1.0 - pointerDistance / uHoverRadius), 1.65);
     float illumination = hoverInfluence * uLightStrength;
 
     if (abs(uMagnetStrength) > 0.001) {
@@ -62,7 +62,7 @@ export const starVertexShader = /* glsl */ `
     vGlow = max(illumination, waveGlow);
     float perspectiveScale = 520.0 / max(260.0, -viewPosition.z);
     float baseSize = max(0.32, aPointSize * 2.15 * uPointScale * perspectiveScale);
-    gl_PointSize = baseSize * (1.0 + vGlow * 0.82) * uPixelRatio;
+    gl_PointSize = baseSize * (1.0 + vGlow * 1.35) * uPixelRatio;
   }
 `;
 
@@ -75,10 +75,10 @@ export const starFragmentShader = /* glsl */ `
   void main() {
     float radius = distance(gl_PointCoord, vec2(0.5));
     float glowAmount = clamp(vGlow, 0.0, 1.0);
-    float coreRadius = mix(0.47, 0.31, glowAmount);
+    float coreRadius = mix(0.47, 0.25, glowAmount);
     float core = 1.0 - smoothstep(coreRadius - 0.075, coreRadius, radius);
     float sprite = 1.0 - smoothstep(0.43, 0.5, radius);
-    float halo = max(0.0, sprite - core) * glowAmount * 0.46;
+    float halo = max(0.0, sprite - core) * glowAmount * 0.64;
     float alpha = max(core, halo);
 
     if (alpha < 0.01) discard;

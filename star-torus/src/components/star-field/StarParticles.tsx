@@ -283,7 +283,8 @@ function rotatePositions(
     const rotatedX = x * cosY + z * sinY;
     const yAfterX = -x * sinY + z * cosY;
     output[positionIndex] = rotatedX;
-    output[positionIndex + 1] = y * cosX - yAfterX * sinX;
+    // Match the original Canvas projection, whose positive Y axis points down.
+    output[positionIndex + 1] = -(y * cosX - yAfterX * sinX);
     output[positionIndex + 2] = y * sinX + yAfterX * cosX;
   }
 }

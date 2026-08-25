@@ -61,7 +61,7 @@ body {
 }
 
 .star-field canvas.is-interactive {
-  cursor: grab;
+  cursor: pointer;
   touch-action: none;
 }
 
