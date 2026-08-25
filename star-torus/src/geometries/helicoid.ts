@@ -2,8 +2,8 @@ import type { GeometryDefinition } from "@/geometries/types";
 
 const GOLDEN_RATIO_CONJUGATE = (Math.sqrt(5) - 1) / 2;
 const HALF_WIDTH = 210;
-const HALF_TURNS = Math.PI * 2.7;
-const PITCH = 17;
+const HALF_TURNS = Math.PI * 1.9;
+const PITCH = 26;
 
 export const helicoidGeometry: GeometryDefinition = {
   id: "helicoid",
