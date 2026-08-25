@@ -12,6 +12,8 @@ import {
   type StarTheme
 } from "@/domain/star-field";
 
+const LEGACY_DEFAULT_HOVER_RADIUS = 170;
+
 interface StudioState {
   config: StarFieldConfig;
   panelCollapsed: boolean;
@@ -106,7 +108,18 @@ export const useStudioStore = create<StudioState>()(
     }),
     {
       name: "star-field-studio",
-      version: 1,
+      version: 2,
+      migrate: (persistedState, version) => {
+        const persisted = persistedState as Partial<StudioState>;
+        if (version >= 2 || !persisted.config) return persistedState as StudioState;
+
+        const config = cloneStarFieldConfig(persisted.config);
+        if (config.effects.hoverRadius === LEGACY_DEFAULT_HOVER_RADIUS) {
+          config.effects.hoverRadius = DEFAULT_STAR_FIELD_CONFIG.effects.hoverRadius;
+        }
+
+        return { ...persisted, config } as StudioState;
+      },
       partialize: (state) => ({
         config: state.config,
         panelCollapsed: state.panelCollapsed

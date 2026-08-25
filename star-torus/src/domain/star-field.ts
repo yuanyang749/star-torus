@@ -57,7 +57,7 @@ export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
     morphDuration: 1.35
   },
   effects: {
-    hoverRadius: 170,
+    hoverRadius: 220,
     hoverIntensity: 1,
     trailIntensity: 1
   },

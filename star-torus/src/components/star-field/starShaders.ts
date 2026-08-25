@@ -23,7 +23,11 @@ export const starVertexShader = /* glsl */ `
     );
 
     float pointerDistance = distance(screenPosition, uPointer);
-    float hoverInfluence = pow(max(0.0, 1.0 - pointerDistance / uHoverRadius), 1.65);
+    float normalizedPointerDistance = min(1.0, pointerDistance / uHoverRadius);
+    float hoverInfluence = pow(
+      1.0 - normalizedPointerDistance * normalizedPointerDistance,
+      2.0
+    );
     float illumination = hoverInfluence * uLightStrength;
 
     if (abs(uMagnetStrength) > 0.001) {

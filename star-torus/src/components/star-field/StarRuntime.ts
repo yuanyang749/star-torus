@@ -253,6 +253,8 @@ export class StarRuntime {
   };
 
   private readonly handlePointerMove = (event: PointerEvent): void => {
+    this.pointerInside = true;
+
     if (!this.dragging) {
       this.updatePointerPosition(event.clientX, event.clientY);
       return;
