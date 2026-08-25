@@ -1,8 +1,9 @@
 import type { GeometryDefinition } from "@/geometries/types";
 
 const TAU = Math.PI * 2;
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 const PATH_SCALE = 72;
-const TUBE_RADIUS = 23;
+const BUNDLE_RADIUS = 11.5;
 
 export const torusKnotGeometry: GeometryDefinition = {
   id: "torus-knot",
@@ -10,15 +11,15 @@ export const torusKnotGeometry: GeometryDefinition = {
   ariaLabel: "由星点组成并持续流动的三叶环面结",
   mark: "torus-knot",
   sample(positions, pointSizes, { phase, columns, rows }) {
+    const pointCount = columns * rows;
     let index = 0;
 
     for (let row = 0; row < rows; row += 1) {
-      const v = row / rows * TAU + phase * 1.25;
-      const cosV = Math.cos(v);
-      const sinV = Math.sin(v);
-
       for (let column = 0; column < columns; column += 1) {
-        const u = column / columns * TAU + phase * 0.52;
+        const sampleOrder = column * rows + row;
+        const progress = (sampleOrder + 0.5) / pointCount;
+        const pathAngle = progress * TAU;
+        const u = pathAngle + phase * 0.44;
         const sin2U = Math.sin(2 * u);
         const cos2U = Math.cos(2 * u);
         const sin3U = Math.sin(3 * u);
@@ -36,37 +37,37 @@ export const torusKnotGeometry: GeometryDefinition = {
         tangentY /= tangentLength;
         tangentZ /= tangentLength;
 
-        let normalX: number;
-        let normalY: number;
-        let normalZ: number;
-        if (Math.abs(tangentZ) < 0.9) {
-          normalX = tangentY;
-          normalY = -tangentX;
-          normalZ = 0;
-        } else {
-          normalX = -tangentZ;
-          normalY = 0;
-          normalZ = tangentX;
-        }
-        const normalLength = Math.hypot(normalX, normalY, normalZ);
-        normalX /= normalLength;
-        normalY /= normalLength;
-        normalZ /= normalLength;
-
+        const normalX = cos3U * cos2U;
+        const normalY = cos3U * sin2U;
+        const normalZ = sin3U;
         const binormalX = tangentY * normalZ - tangentZ * normalY;
         const binormalY = tangentZ * normalX - tangentX * normalZ;
         const binormalZ = tangentX * normalY - tangentY * normalX;
-        const tubeX = (normalX * cosV + binormalX * sinV) * TUBE_RADIUS;
-        const tubeY = (normalY * cosV + binormalY * sinV) * TUBE_RADIUS;
-        const tubeZ = (normalZ * cosV + binormalZ * sinV) * TUBE_RADIUS;
+        const radialSeed = fract(
+          (row + 1) * 0.754877666
+          + (column + 1) * 0.569840296
+        );
+        const dustRadius = 0.7 + radialSeed * radialSeed * BUNDLE_RADIUS;
+        const dustAngle = row * GOLDEN_ANGLE + column * 0.43 + phase * 1.05;
+        const cosDust = Math.cos(dustAngle);
+        const sinDust = Math.sin(dustAngle);
+        const offsetX = (normalX * cosDust + binormalX * sinDust) * dustRadius;
+        const offsetY = (normalY * cosDust + binormalY * sinDust) * dustRadius;
+        const offsetZ = (normalZ * cosDust + binormalZ * sinDust) * dustRadius;
+        const energy = 0.5 + Math.sin(pathAngle * 6 - phase * 5.8) * 0.5;
+        const coreWeight = 1 - (dustRadius - 0.7) / BUNDLE_RADIUS;
         const positionIndex = index * 3;
 
-        positions[positionIndex] = centerX + tubeX;
-        positions[positionIndex + 1] = centerY + tubeY;
-        positions[positionIndex + 2] = centerZ + tubeZ;
-        pointSizes[index] = 0.46 + Math.abs(cosV + 0.18) * 0.72;
+        positions[positionIndex] = centerX + offsetX;
+        positions[positionIndex + 1] = centerY + offsetY;
+        positions[positionIndex + 2] = centerZ + offsetZ;
+        pointSizes[index] = 0.42 + coreWeight * 0.32 + energy * 0.28;
         index += 1;
       }
     }
   }
 };
+
+function fract(value: number): number {
+  return value - Math.floor(value);
+}
