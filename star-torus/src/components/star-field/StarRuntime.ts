@@ -215,7 +215,7 @@ export class StarRuntime {
       : 0;
     const easedSpeed = normalizedSpeed * normalizedSpeed * (3 - normalizedSpeed * 2);
     const normalizedIntensity = clamp01(this.config.effects.trailIntensity / 1.5);
-    this.trailStrength = easedSpeed * normalizedIntensity * normalizedIntensity * 0.9;
+    this.trailStrength = easedSpeed * normalizedIntensity * 0.9;
   }
 
   writeWaveData(target: Float32Array): void {

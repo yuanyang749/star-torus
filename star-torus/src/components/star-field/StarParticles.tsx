@@ -19,6 +19,7 @@ const FLOW_PHASE_PER_SECOND = Math.PI / 40 * 1.2;
 const BASE_SCENE_SCALE = 0.66;
 const TRAIL_POINT_STEP = 2;
 const TRAIL_SEGMENT_COUNT = Math.ceil(POINT_COUNT / TRAIL_POINT_STEP);
+const TRAIL_VISIBILITY_THRESHOLD = 0.04;
 
 interface StarParticlesProps {
   config: StarFieldConfig;
@@ -136,7 +137,7 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
     ) as THREE.InterleavedBufferAttribute;
     positionAttribute.needsUpdate = true;
     sizeAttribute.needsUpdate = true;
-    trailAttribute.data.needsUpdate = runtime.trailStrength > 0.08;
+    trailAttribute.data.needsUpdate = runtime.trailStrength > TRAIL_VISIBILITY_THRESHOLD;
 
     const sceneScale = BASE_SCENE_SCALE * runtime.zoom * (1 + runtime.burstScale);
     pointsRef.current?.scale.setScalar(sceneScale);
@@ -164,7 +165,7 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
       );
     }
 
-    trailMaterial.opacity = runtime.trailStrength > 0.08
+    trailMaterial.opacity = runtime.trailStrength > TRAIL_VISIBILITY_THRESHOLD
       ? 0.055 + runtime.trailStrength * 0.285
       : 0;
     trailMaterial.uniforms.linewidth.value = (
@@ -302,7 +303,7 @@ function updateTrails(
   buffers: ParticleBuffers,
   strength: number
 ): void {
-  if (strength > 0.08) {
+  if (strength > TRAIL_VISIBILITY_THRESHOLD) {
     const maxLength = (12 + strength * 24) / BASE_SCENE_SCALE;
     const maxFrameDistance = 60 / BASE_SCENE_SCALE;
     let segmentIndex = 0;
