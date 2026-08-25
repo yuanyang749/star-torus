@@ -179,21 +179,23 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
 
         <section className="panel-section">
           <SectionHeading index="04" title="主题预设" />
-          <div className="theme-grid">
+          <div className="theme-grid" role="group" aria-label="选择主题预设">
             {THEME_PRESETS.map((preset) => (
               <button
                 key={preset.id}
                 className="theme-preset"
                 type="button"
                 aria-pressed={activePreset?.id === preset.id}
+                aria-label={preset.label}
+                title={preset.label}
                 style={{
                   "--preset-bg": preset.background,
-                  "--preset-star": preset.star
+                  "--preset-star": preset.star,
+                  "--preset-glow": preset.glow
                 } as CSSProperties}
                 onClick={() => setTheme(preset)}
               >
-                <span className="theme-preset__swatch" />
-                <span className="theme-preset__name">{preset.label}</span>
+                <span className="theme-preset__swatch" aria-hidden="true" />
               </button>
             ))}
           </div>
