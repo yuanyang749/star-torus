@@ -1,0 +1,5 @@
+{
+  "registry": ".formfield-registry",
+  "sourceRoot": "src",
+  "alias": "@/"
+}
