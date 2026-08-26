@@ -76,6 +76,10 @@ button {
   transition: transform 460ms var(--ease-out);
 }
 
+.control-panel.is-english {
+  width: min(344px, calc(100vw - 82px));
+}
+
 .control-panel.is-collapsed {
   transform: translate(calc(100% + 20px), -50%);
 }
@@ -106,6 +110,7 @@ button {
 }
 
 .panel-toggle:focus-visible,
+.language-switch button:focus-visible,
 .interaction-toggle:focus-visible,
 .mode-segment:focus-visible,
 .theme-preset:focus-visible,
@@ -184,6 +189,42 @@ button {
   overflow: hidden;
 }
 
+.language-switch {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  z-index: 1;
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid rgba(var(--panel-ink-rgb), 0.14);
+  border-radius: 8px;
+  background: rgba(var(--panel-ink-rgb), 0.035);
+}
+
+.language-switch button {
+  min-width: 27px;
+  height: 23px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  color: rgba(var(--panel-ink-rgb), 0.38);
+  font: 650 7.5px/1 ui-monospace, "SFMono-Regular", monospace;
+  letter-spacing: 0.05em;
+  background: transparent;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.language-switch button:hover {
+  color: rgba(var(--panel-ink-rgb), 0.72);
+}
+
+.language-switch button[aria-pressed="true"] {
+  color: rgb(var(--panel-rgb));
+  background: var(--panel-accent);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--panel-accent) 24%, transparent);
+}
+
 .panel-header::after {
   position: absolute;
   right: -42px;
@@ -250,6 +291,13 @@ button {
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.03em;
+}
+
+.control-panel.is-english .panel-title {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: 0.075em;
 }
 
 .panel-readout {
@@ -557,6 +605,33 @@ button {
   gap: 5px;
   font-size: 8px;
   letter-spacing: 0.02em;
+}
+
+.shape-segment__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.control-panel.is-english .shape-segment {
+  padding-inline: 4px;
+  gap: 4px;
+  font-size: 7.5px;
+  letter-spacing: 0;
+}
+
+.control-panel.is-english .section-heading h2 {
+  letter-spacing: 0.075em;
+}
+
+.control-panel.is-english .motion-control__label strong {
+  letter-spacing: 0.045em;
+}
+
+.control-panel.is-english .export-actions button,
+.control-panel.is-english .panel-action {
+  letter-spacing: 0.015em;
 }
 
 .shape-mark {
@@ -1275,11 +1350,22 @@ button {
   .panel-toggle {
     left: -50px;
   }
+
+  .control-panel.is-english {
+    width: min(316px, calc(100vw - 72px));
+  }
+}
+
+@media (max-width: 350px) {
+  .control-panel.is-english .mode-segments--shapes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .control-panel,
   .panel-toggle__chevron,
+  .language-switch button,
   .interaction-toggle,
   .mode-segment,
   .switch-track::after,

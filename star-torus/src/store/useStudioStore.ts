@@ -11,11 +11,13 @@ import {
   type StarMotionConfig,
   type StarTheme
 } from "@/domain/star-field";
+import type { Locale } from "@/i18n/messages";
 
 const LEGACY_DEFAULT_HOVER_RADIUS = 170;
 
 interface StudioState {
   config: StarFieldConfig;
+  locale: Locale;
   panelCollapsed: boolean;
   runtimeStatus: RuntimeStatus;
   setShape(shape: ShapeId): void;
@@ -26,6 +28,7 @@ interface StudioState {
   setMotionValue(key: keyof StarMotionConfig, value: number): void;
   setEffectValue(key: keyof StarEffectConfig, value: number): void;
   setPanelCollapsed(collapsed: boolean): void;
+  setLocale(locale: Locale): void;
   setRuntimeStatus(status: RuntimeStatus): void;
   resetTheme(): void;
   resetParameters(): void;
@@ -35,6 +38,7 @@ export const useStudioStore = create<StudioState>()(
   persist(
     (set) => ({
       config: cloneStarFieldConfig(DEFAULT_STAR_FIELD_CONFIG),
+      locale: "zh-CN",
       panelCollapsed: false,
       runtimeStatus: "disabled",
 
@@ -89,6 +93,7 @@ export const useStudioStore = create<StudioState>()(
       })),
 
       setPanelCollapsed: (panelCollapsed) => set({ panelCollapsed }),
+      setLocale: (locale) => set({ locale }),
       setRuntimeStatus: (runtimeStatus) => set({ runtimeStatus }),
 
       resetTheme: () => set((state) => ({
@@ -108,7 +113,7 @@ export const useStudioStore = create<StudioState>()(
     }),
     {
       name: "star-field-studio",
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         const persisted = persistedState as Partial<StudioState>;
         if (version >= 2 || !persisted.config) return persistedState as StudioState;
@@ -122,6 +127,7 @@ export const useStudioStore = create<StudioState>()(
       },
       partialize: (state) => ({
         config: state.config,
+        locale: state.locale,
         panelCollapsed: state.panelCollapsed
       }),
       merge: (persistedState, currentState) => {

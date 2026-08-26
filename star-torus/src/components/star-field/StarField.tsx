@@ -16,13 +16,14 @@ export interface StarFieldHandle {
 
 export interface StarFieldProps {
   config: StarFieldConfig;
+  ariaLabel?: string;
   className?: string;
   style?: CSSProperties;
   onRuntimeStatusChange?: (status: RuntimeStatus) => void;
 }
 
 export const StarField = forwardRef<StarFieldHandle, StarFieldProps>(function StarField(
-  { config, className = "", style, onRuntimeStatusChange },
+  { config, ariaLabel, className = "", style, onRuntimeStatusChange },
   forwardedRef
 ) {
   const controllerRef = useRef<StarFieldController | null>(null);
@@ -37,7 +38,7 @@ export const StarField = forwardRef<StarFieldHandle, StarFieldProps>(function St
       className={`star-field ${className}`.trim()}
       style={{ background: config.theme.background, ...style }}
       role="img"
-      aria-label={definition.ariaLabel}
+      aria-label={ariaLabel ?? definition.ariaLabel}
     >
       <Canvas
         camera={{ fov: 60, near: 1, far: 1600, position: [0, 0, 519.615] }}

@@ -5,9 +5,9 @@ import {
   type RefObject
 } from "react";
 import type { StarFieldHandle } from "@/components/star-field";
-import type { RuntimeStatus } from "@/domain/star-field";
 import { THEME_PRESETS, findThemePreset } from "@/domain/theme-presets";
 import { GEOMETRY_DEFINITIONS } from "@/geometries/registry";
+import { MESSAGES, type Locale } from "@/i18n/messages";
 import { useStudioStore } from "@/store/useStudioStore";
 import { ExportPanel } from "@/ui/ExportPanel";
 import { ParameterSlider } from "@/ui/ParameterSlider";
@@ -16,17 +16,9 @@ interface ControlPanelProps {
   starFieldRef: RefObject<StarFieldHandle | null>;
 }
 
-const STATUS_LABELS: Record<RuntimeStatus, string> = {
-  disabled: "已关闭",
-  idle: "已开启",
-  dragging: "旋转中",
-  attracting: "吸附中",
-  repelling: "排斥中",
-  frozen: "时空冻结"
-};
-
 export function ControlPanel({ starFieldRef }: ControlPanelProps) {
   const config = useStudioStore((state) => state.config);
+  const locale = useStudioStore((state) => state.locale);
   const panelCollapsed = useStudioStore((state) => state.panelCollapsed);
   const runtimeStatus = useStudioStore((state) => state.runtimeStatus);
   const setShape = useStudioStore((state) => state.setShape);
@@ -37,9 +29,11 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
   const setMotionValue = useStudioStore((state) => state.setMotionValue);
   const setEffectValue = useStudioStore((state) => state.setEffectValue);
   const setPanelCollapsed = useStudioStore((state) => state.setPanelCollapsed);
+  const setLocale = useStudioStore((state) => state.setLocale);
   const resetTheme = useStudioStore((state) => state.resetTheme);
   const resetParameters = useStudioStore((state) => state.resetParameters);
   const activePreset = findThemePreset(config.theme);
+  const messages = MESSAGES[locale];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -51,15 +45,15 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
 
   return (
     <aside
-      className={`control-panel${panelCollapsed ? " is-collapsed" : ""}`}
-      aria-label="星环组件控制面板"
+      className={`control-panel${panelCollapsed ? " is-collapsed" : ""}${locale === "en-US" ? " is-english" : ""}`}
+      aria-label={messages.panel.ariaLabel}
     >
       <button
         className="panel-toggle"
         type="button"
         aria-expanded={!panelCollapsed}
         aria-controls="panelSurface"
-        title={panelCollapsed ? "展开控制面板" : "收起控制面板"}
+        title={panelCollapsed ? messages.panel.expand : messages.panel.collapse}
         onClick={() => setPanelCollapsed(!panelCollapsed)}
       >
         <svg className="panel-toggle__palette" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24">
@@ -74,7 +68,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
             <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m9 18 6-6-6-6" />
           </svg>
         </span>
-        <span className="sr-only">{panelCollapsed ? "展开控制面板" : "收起控制面板"}</span>
+        <span className="sr-only">{panelCollapsed ? messages.panel.expand : messages.panel.collapse}</span>
       </button>
 
       <div
@@ -87,27 +81,30 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
           <div className="panel-orbit" aria-hidden="true"><span /></div>
           <div>
             <p className="panel-kicker">FORMFIELD LAB / REGISTRY</p>
-            <h1 className="panel-title">形场实验室</h1>
+            <h1 className="panel-title">{messages.panel.title}</h1>
           </div>
+          <LanguageSwitch locale={locale} setLocale={setLocale} />
           <div className="panel-readout">
             <span className="panel-readout__dot" />
             <span>{activePreset?.readout ?? "CUSTOM"}</span>
           </div>
         </header>
 
-        <div className="platform-pipeline" aria-label="创作、预览与源码分发流程">
-          <span><code>01</code>创作</span>
-          <span><code>02</code>实时预览</span>
-          <span><code>03</code>源码分发</span>
+        <div className="platform-pipeline" aria-label={messages.panel.pipelineAria}>
+          <span><code>01</code>{messages.panel.pipelineCreate}</span>
+          <span><code>02</code>{messages.panel.pipelinePreview}</span>
+          <span><code>03</code>{messages.panel.pipelineExport}</span>
         </div>
 
         <section className="panel-section">
-          <SectionHeading index="01" title="预览与交互" />
+          <SectionHeading index="01" title={messages.panel.previewSection} />
           <button
             className="interaction-toggle"
             type="button"
             aria-pressed={config.interaction.enabled}
-            aria-label={config.interaction.enabled ? "关闭形场交互" : "开启形场交互"}
+            aria-label={config.interaction.enabled
+              ? messages.panel.interactionDisableAria
+              : messages.panel.interactionEnableAria}
             onClick={() => setInteractionEnabled(!config.interaction.enabled)}
           >
             <span className="setting-icon" aria-hidden="true">
@@ -116,25 +113,25 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
               </svg>
             </span>
             <span className="interaction-toggle__copy">
-              <strong className="interaction-toggle__label">形场交互</strong>
-              <span className="interaction-toggle__state">{STATUS_LABELS[runtimeStatus]}</span>
+              <strong className="interaction-toggle__label">{messages.panel.interactionLabel}</strong>
+              <span className="interaction-toggle__state">{messages.statuses[runtimeStatus]}</span>
             </span>
             <span className="switch-track" aria-hidden="true" />
           </button>
           <p className="interaction-note">
-            <span>Hover 打光（常驻）· 拖拽旋转 · 滚轮缩放</span>
+            <span>{messages.panel.interactionPrimaryNote}</span>
             <span>{config.interaction.holdMode === "freeze"
-              ? "单击脉冲 · 长按冻结 · 松开渐进恢复"
-              : "单击脉冲 · 长按吸附 · Shift 长按排斥"}</span>
+              ? messages.panel.interactionFreezeNote
+              : messages.panel.interactionMagnetNote}</span>
           </p>
         </section>
 
         <section className="panel-section">
-          <SectionHeading index="02" title="形态目录" />
+          <SectionHeading index="02" title={messages.panel.shapesSection} />
           <div className="motion-controls">
             <div className="motion-control">
-              <div className="motion-control__label"><span>HOLD</span><strong>长按行为</strong></div>
-              <div className="mode-segments mode-segments--two" role="group" aria-label="选择长按行为">
+              <div className="motion-control__label"><span>HOLD</span><strong>{messages.panel.holdLabel}</strong></div>
+              <div className="mode-segments mode-segments--two" role="group" aria-label={messages.panel.holdGroupAria}>
                 {(["magnet", "freeze"] as const).map((mode) => (
                   <button
                     key={mode}
@@ -144,17 +141,17 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
                     onClick={() => setHoldMode(mode)}
                   >
                     <span className="mode-segment__signal" />
-                    {mode === "magnet" ? "磁力" : "冻结"}
+                    {mode === "magnet" ? messages.panel.magnet : messages.panel.freeze}
                   </button>
                 ))}
               </div>
             </div>
             <div className="motion-control">
               <div className="motion-control__label">
-                <span>FORM LIBRARY</span>
-                <strong>{GEOMETRY_DEFINITIONS.length} 个注册形态</strong>
+                <span>{messages.panel.formLibrary}</span>
+                <strong>{messages.panel.shapeCount(GEOMETRY_DEFINITIONS.length)}</strong>
               </div>
-              <div className="mode-segments mode-segments--shapes" role="group" aria-label="选择几何形态">
+              <div className="mode-segments mode-segments--shapes" role="group" aria-label={messages.panel.shapeGroupAria}>
                 {GEOMETRY_DEFINITIONS.map((definition) => (
                   <button
                     key={definition.id}
@@ -164,7 +161,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
                     onClick={() => setShape(definition.id)}
                   >
                     <span className={`shape-mark shape-mark--${definition.mark}`} />
-                    {definition.label}
+                    <span className="shape-segment__label">{messages.shapes[definition.id].label}</span>
                   </button>
                 ))}
               </div>
@@ -173,30 +170,30 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         </section>
 
         <section className="panel-section">
-          <SectionHeading index="03" title="创作参数">
-            <button className="section-reset" type="button" onClick={resetParameters}>RESET</button>
+          <SectionHeading index="03" title={messages.panel.parametersSection}>
+            <button className="section-reset" type="button" onClick={resetParameters}>{messages.panel.reset}</button>
           </SectionHeading>
           <div className="parameter-grid">
-            <ParameterSlider label="流动速度" code="SPD" value={config.motion.flowSpeed} min={0} max={2} step={0.05} digits={2} onChange={(value) => setMotionValue("flowSpeed", value)} />
-            <ParameterSlider label="星点尺寸" code="PTS" value={config.motion.pointScale} min={0.55} max={1.8} step={0.05} digits={2} onChange={(value) => setMotionValue("pointScale", value)} />
-            <ParameterSlider label="变形时长" code="MRP" value={config.motion.morphDuration} min={0.25} max={2.6} step={0.05} suffix="s" digits={2} onChange={(value) => setMotionValue("morphDuration", value)} />
-            <ParameterSlider label="光照半径" code="RAD" value={config.effects.hoverRadius} min={70} max={260} step={5} suffix="px" digits={0} onChange={(value) => setEffectValue("hoverRadius", value)} />
-            <ParameterSlider label="光照强度" code="LUX" value={config.effects.hoverIntensity} min={0} max={1.5} step={0.05} digits={2} onChange={(value) => setEffectValue("hoverIntensity", value)} />
-            <ParameterSlider label="尾迹强度" code="TRL" value={config.effects.trailIntensity} min={0} max={1.5} step={0.05} digits={2} onChange={(value) => setEffectValue("trailIntensity", value)} />
+            <ParameterSlider label={messages.panel.flowSpeed} code="SPD" value={config.motion.flowSpeed} min={0} max={2} step={0.05} digits={2} onChange={(value) => setMotionValue("flowSpeed", value)} />
+            <ParameterSlider label={messages.panel.pointSize} code="PTS" value={config.motion.pointScale} min={0.55} max={1.8} step={0.05} digits={2} onChange={(value) => setMotionValue("pointScale", value)} />
+            <ParameterSlider label={messages.panel.morphDuration} code="MRP" value={config.motion.morphDuration} min={0.25} max={2.6} step={0.05} suffix="s" digits={2} onChange={(value) => setMotionValue("morphDuration", value)} />
+            <ParameterSlider label={messages.panel.lightRadius} code="RAD" value={config.effects.hoverRadius} min={70} max={260} step={5} suffix="px" digits={0} onChange={(value) => setEffectValue("hoverRadius", value)} />
+            <ParameterSlider label={messages.panel.lightIntensity} code="LUX" value={config.effects.hoverIntensity} min={0} max={1.5} step={0.05} digits={2} onChange={(value) => setEffectValue("hoverIntensity", value)} />
+            <ParameterSlider label={messages.panel.trailIntensity} code="TRL" value={config.effects.trailIntensity} min={0} max={1.5} step={0.05} digits={2} onChange={(value) => setEffectValue("trailIntensity", value)} />
           </div>
         </section>
 
         <section className="panel-section">
-          <SectionHeading index="04" title="主题预设" />
-          <div className="theme-grid" role="group" aria-label="选择主题预设">
+          <SectionHeading index="04" title={messages.panel.themesSection} />
+          <div className="theme-grid" role="group" aria-label={messages.panel.themeGroupAria}>
             {THEME_PRESETS.map((preset) => (
               <button
                 key={preset.id}
                 className="theme-preset"
                 type="button"
                 aria-pressed={activePreset?.id === preset.id}
-                aria-label={preset.label}
-                title={preset.label}
+                aria-label={messages.themes[preset.id]}
+                title={messages.themes[preset.id]}
                 style={{
                   "--preset-bg": preset.background,
                   "--preset-star": preset.star,
@@ -211,12 +208,12 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         </section>
 
         <section className="panel-section">
-          <SectionHeading index="05" title="自定义颜色" />
+          <SectionHeading index="05" title={messages.panel.colorsSection} />
           <div className="color-controls">
             {([
-              ["background", "背景色"],
-              ["star", "星点色"],
-              ["glow", "光照色"]
+              ["background", messages.panel.backgroundColor],
+              ["star", messages.panel.starColor],
+              ["glow", messages.panel.glowColor]
             ] as const).map(([channel, label]) => (
               <label className="color-control" key={channel}>
                 <span className="color-control__name">{label}</span>
@@ -224,7 +221,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
                 <input
                   type="color"
                   value={config.theme[channel]}
-                  aria-label={`选择${label}`}
+                  aria-label={messages.panel.selectColor(label)}
                   onChange={(event) => setThemeColor(channel, event.target.value)}
                 />
               </label>
@@ -233,8 +230,8 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         </section>
 
         <section className="panel-section panel-section--export">
-          <SectionHeading index="06" title="源码分发" />
-          <ExportPanel config={config} />
+          <SectionHeading index="06" title={messages.panel.sourceSection} />
+          <ExportPanel config={config} copy={messages.export} />
         </section>
 
         <footer className="panel-footer">
@@ -242,12 +239,43 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24">
               <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" />
             </svg>
-            复位视角
+            {messages.panel.resetView}
           </button>
-          <button className="panel-action" type="button" onClick={resetTheme}>恢复黑白</button>
+          <button className="panel-action" type="button" onClick={resetTheme}>{messages.panel.resetTheme}</button>
         </footer>
       </div>
     </aside>
+  );
+}
+
+function LanguageSwitch({
+  locale,
+  setLocale
+}: {
+  locale: Locale;
+  setLocale(locale: Locale): void;
+}) {
+  const messages = MESSAGES[locale];
+
+  return (
+    <div className="language-switch" role="group" aria-label={messages.language.groupAria}>
+      <button
+        type="button"
+        aria-label={messages.language.chineseAria}
+        aria-pressed={locale === "zh-CN"}
+        onClick={() => setLocale("zh-CN")}
+      >
+        中
+      </button>
+      <button
+        type="button"
+        aria-label={messages.language.englishAria}
+        aria-pressed={locale === "en-US"}
+        onClick={() => setLocale("en-US")}
+      >
+        EN
+      </button>
+    </div>
   );
 }
 

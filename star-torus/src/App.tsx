@@ -1,17 +1,24 @@
 import { useEffect, useRef } from "react";
 import { StarField, type StarFieldHandle } from "@/components/star-field";
 import type { StarTheme } from "@/domain/star-field";
+import { MESSAGES } from "@/i18n/messages";
 import { useStudioStore } from "@/store/useStudioStore";
 import { ControlPanel } from "@/ui/ControlPanel";
 
 export default function App() {
   const config = useStudioStore((state) => state.config);
+  const locale = useStudioStore((state) => state.locale);
   const setRuntimeStatus = useStudioStore((state) => state.setRuntimeStatus);
   const starFieldRef = useRef<StarFieldHandle | null>(null);
+  const messages = MESSAGES[locale];
 
   useEffect(() => {
     applyThemeToDocument(config.theme);
   }, [config.theme]);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   return (
     <main className="studio-shell">
@@ -19,6 +26,7 @@ export default function App() {
         <StarField
           ref={starFieldRef}
           config={config}
+          ariaLabel={messages.shapes[config.shape].ariaLabel}
           onRuntimeStatusChange={setRuntimeStatus}
         />
       </div>

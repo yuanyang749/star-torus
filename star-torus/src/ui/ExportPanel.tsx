@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { StarFieldConfig } from "@/domain/star-field";
+import type { ExportCopy } from "@/i18n/messages";
 import {
   generateComponentInstallCommand,
   generateConfigJson,
@@ -11,11 +12,12 @@ import {
 
 interface ExportPanelProps {
   config: StarFieldConfig;
+  copy: ExportCopy;
 }
 
-export function ExportPanel({ config }: ExportPanelProps) {
+export function ExportPanel({ config, copy }: ExportPanelProps) {
   const [requestedName, setRequestedName] = useState("MyFormField");
-  const [notice, setNotice] = useState("参数变化会实时写入导出组件");
+  const [notice, setNotice] = useState(copy.initialNotice);
   const componentName = useMemo(() => normalizeComponentName(requestedName), [requestedName]);
   const registryName = useMemo(() => normalizeRegistryName(requestedName), [requestedName]);
   const componentSource = useMemo(
@@ -31,24 +33,28 @@ export function ExportPanel({ config }: ExportPanelProps) {
     [componentName]
   );
 
+  useEffect(() => {
+    setNotice(copy.initialNotice);
+  }, [copy]);
+
   const copyComponent = async () => {
     await copyText(componentSource);
-    setNotice(`已复制 ${componentName}.tsx`);
+    setNotice(copy.copiedComponent(componentName));
   };
 
   const copyConfig = async () => {
     await copyText(generateConfigJson(config));
-    setNotice("已复制可序列化配置 JSON");
+    setNotice(copy.copiedConfig);
   };
 
   const copyRegistry = async () => {
     await copyText(registrySource);
-    setNotice(`已复制 ${registryName}.json Registry 清单`);
+    setNotice(copy.copiedRegistry(registryName));
   };
 
   const copyInstallCommand = async () => {
     await copyText(installCommand);
-    setNotice("已复制 CLI 安装命令");
+    setNotice(copy.copiedInstallCommand);
   };
 
   const downloadComponent = () => {
@@ -59,17 +65,17 @@ export function ExportPanel({ config }: ExportPanelProps) {
     anchor.download = `${componentName}.tsx`;
     anchor.click();
     URL.revokeObjectURL(url);
-    setNotice(`已生成 ${componentName}.tsx`);
+    setNotice(copy.generatedComponent(componentName));
   };
 
   return (
     <div className="export-panel">
       <label className="component-name">
-        <span>组件名称</span>
+        <span>{copy.componentName}</span>
         <input
           value={requestedName}
           spellCheck={false}
-          aria-label="导出组件名称"
+          aria-label={copy.componentNameAria}
           onChange={(event) => setRequestedName(event.target.value)}
         />
         <code>.tsx</code>
@@ -79,15 +85,15 @@ export function ExportPanel({ config }: ExportPanelProps) {
         <code>{registryName}</code>
       </div>
       <div className="export-actions">
-        <button type="button" onClick={copyComponent}>复制 TSX</button>
-        <button type="button" className="is-primary" onClick={downloadComponent}>下载组件</button>
-        <button type="button" onClick={copyConfig}>复制配置</button>
-        <button type="button" onClick={copyRegistry}>复制 Registry</button>
+        <button type="button" onClick={copyComponent}>{copy.copyTsx}</button>
+        <button type="button" className="is-primary" onClick={downloadComponent}>{copy.downloadComponent}</button>
+        <button type="button" onClick={copyConfig}>{copy.copyConfig}</button>
+        <button type="button" onClick={copyRegistry}>{copy.copyRegistry}</button>
       </div>
       <button className="install-command" type="button" onClick={copyInstallCommand}>
         <span>CLI</span>
         <code>{installCommand}</code>
-        <strong>复制</strong>
+        <strong>{copy.copy}</strong>
       </button>
       <p className="export-notice" aria-live="polite">
         <span aria-hidden="true"></span>{notice}
