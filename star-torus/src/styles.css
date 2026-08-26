@@ -861,9 +861,9 @@ button {
 
 .theme-grid {
   display: flex;
-  margin: -7px -22px -10px;
-  padding: 7px 22px 13px;
-  gap: 11px;
+  margin: -6px -22px -8px;
+  padding: 6px 22px 10px;
+  gap: 9px;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
@@ -891,10 +891,10 @@ button {
 .theme-preset {
   position: relative;
   display: grid;
-  width: 52px;
-  height: 52px;
-  flex: 0 0 52px;
-  padding: 5px;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  padding: 4px;
   place-items: center;
   border: 1px solid transparent;
   border-radius: 50%;
@@ -907,19 +907,19 @@ button {
 .theme-preset:hover {
   border-color: rgba(var(--panel-ink-rgb), 0.22);
   background: rgba(var(--panel-ink-rgb), 0.055);
-  transform: translateY(-2px) scale(1.035);
+  transform: translateY(-1.5px) scale(1.035);
 }
 
 .theme-preset[aria-pressed="true"] {
   border-color: var(--panel-accent);
   background: rgba(var(--panel-ink-rgb), 0.07);
-  box-shadow: 0 0 0 2px rgba(var(--panel-rgb), 0.9), 0 0 0 3px var(--panel-accent);
+  box-shadow: 0 0 0 1.5px rgba(var(--panel-rgb), 0.9), 0 0 0 2.5px var(--panel-accent);
 }
 
 .theme-preset__swatch {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   overflow: hidden;
   border: 0;
   border-radius: 50%;
@@ -929,9 +929,9 @@ button {
   box-shadow:
     inset 0 0 0 1px rgba(var(--panel-ink-rgb), 0.42),
     inset 0 0 0 2px rgba(var(--panel-rgb), 0.2),
-    inset 5px 5px 9px rgba(255, 255, 255, 0.14),
-    inset -8px -9px 13px rgba(0, 0, 0, 0.28),
-    0 7px 15px rgba(0, 0, 0, 0.22);
+    inset 4px 4px 7px rgba(255, 255, 255, 0.14),
+    inset -6px -7px 10px rgba(0, 0, 0, 0.28),
+    0 6px 12px rgba(0, 0, 0, 0.22);
   isolation: isolate;
   transition: box-shadow 180ms ease, transform 180ms ease;
 }
@@ -940,23 +940,23 @@ button {
   box-shadow:
     inset 0 0 0 1px rgba(var(--panel-ink-rgb), 0.58),
     inset 0 0 0 2px rgba(var(--panel-rgb), 0.24),
-    inset 5px 5px 9px rgba(255, 255, 255, 0.2),
-    inset -8px -9px 13px rgba(0, 0, 0, 0.24),
-    0 9px 19px rgba(0, 0, 0, 0.3);
+    inset 4px 4px 7px rgba(255, 255, 255, 0.2),
+    inset -6px -7px 10px rgba(0, 0, 0, 0.24),
+    0 7px 15px rgba(0, 0, 0, 0.3);
 }
 
 .theme-preset__swatch::after {
   position: absolute;
   right: 1px;
   bottom: 1px;
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   content: "";
   opacity: 0;
-  border: 2px solid rgb(var(--panel-rgb));
+  border: 1.5px solid rgb(var(--panel-rgb));
   border-radius: 50%;
   background: var(--panel-accent);
-  box-shadow: 0 0 8px var(--panel-accent);
+  box-shadow: 0 0 6px var(--panel-accent);
   transform: scale(0.5);
   transition: opacity 180ms ease, transform 180ms ease;
 }
