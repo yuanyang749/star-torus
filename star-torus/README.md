@@ -6,7 +6,7 @@
 
 - **创作**：主题、运动、形态、光照、尾迹与交互参数实时调节。
 - **预览**：TypedArray + Shader 驱动的实时粒子形场。
-- **形态**：星环、球体、莫比乌斯环、三叶结、克莱因瓶、超椭球、螺旋面、双螺旋、波浪面、心形面与星系漩涡。
+- **形态**：星环、球体、莫比乌斯环、三叶结、克莱因瓶、超椭球、螺旋面、双螺旋、波浪面、流光丝带、心形面与星系漩涡。
 - **源码输出**：复制 TSX、配置 JSON、Registry JSON 与 CLI 安装命令。
 - **Registry**：构建可公开托管的组件源码注册表。
 - **CLI**：递归解析组件依赖，并将源码写入 React 项目。
@@ -56,6 +56,7 @@ public/r/index.json
 public/r/form-field-runtime.json
 public/r/star-torus.json
 public/r/torus-knot.json
+public/r/flow-ribbon.json
 public/r/galaxy-vortex.json
 ```
 

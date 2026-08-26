@@ -1,5 +1,6 @@
 import type { ShapeId } from "@/domain/star-field";
 import { doubleHelixGeometry } from "@/geometries/double-helix";
+import { flowRibbonGeometry } from "@/geometries/flow-ribbon";
 import { galaxyVortexGeometry } from "@/geometries/galaxy-vortex";
 import { heartSurfaceGeometry } from "@/geometries/heart-surface";
 import { helicoidGeometry } from "@/geometries/helicoid";
@@ -22,6 +23,7 @@ export const GEOMETRY_DEFINITIONS: readonly GeometryDefinition[] = [
   helicoidGeometry,
   doubleHelixGeometry,
   waveSurfaceGeometry,
+  flowRibbonGeometry,
   heartSurfaceGeometry,
   galaxyVortexGeometry
 ];

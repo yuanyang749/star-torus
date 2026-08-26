@@ -23,7 +23,7 @@ try {
   });
 
   const { GEOMETRY_DEFINITIONS } = await import(pathToFileURL(outputFile).href);
-  assert.equal(GEOMETRY_DEFINITIONS.length, 11);
+  assert.equal(GEOMETRY_DEFINITIONS.length, 12);
 
   for (const definition of GEOMETRY_DEFINITIONS) {
     for (const phase of [0, 0.73, 2.15]) {

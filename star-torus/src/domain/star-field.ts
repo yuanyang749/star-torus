@@ -8,6 +8,7 @@ export const SHAPE_IDS = [
   "helicoid",
   "double-helix",
   "wave-surface",
+  "flow-ribbon",
   "heart",
   "galaxy"
 ] as const;

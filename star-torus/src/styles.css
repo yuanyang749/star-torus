@@ -709,6 +709,27 @@ button {
   border-radius: 50%;
 }
 
+.shape-mark--flow-ribbon::before,
+.shape-mark--flow-ribbon::after {
+  position: absolute;
+  left: 0;
+  width: 14px;
+  height: 7px;
+  content: "";
+  border-top: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.shape-mark--flow-ribbon::before {
+  top: 2px;
+  transform: rotate(12deg) skewX(-18deg);
+}
+
+.shape-mark--flow-ribbon::after {
+  top: 5px;
+  transform: rotate(-12deg) skewX(18deg);
+}
+
 .shape-mark--heart {
   width: 9px;
   height: 9px;

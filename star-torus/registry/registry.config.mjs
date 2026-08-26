@@ -20,6 +20,7 @@ export const runtimeFiles = [
   ["src/geometries/helicoid.ts", "components/formfield/geometries/helicoid.ts", "registry:file"],
   ["src/geometries/double-helix.ts", "components/formfield/geometries/double-helix.ts", "registry:file"],
   ["src/geometries/wave-surface.ts", "components/formfield/geometries/wave-surface.ts", "registry:file"],
+  ["src/geometries/flow-ribbon.ts", "components/formfield/geometries/flow-ribbon.ts", "registry:file"],
   ["src/geometries/heart-surface.ts", "components/formfield/geometries/heart-surface.ts", "registry:file"],
   ["src/geometries/galaxy-vortex.ts", "components/formfield/geometries/galaxy-vortex.ts", "registry:file"]
 ];
@@ -34,6 +35,7 @@ export const visualPresets = [
   ["helicoid", "HelicoidField", "螺旋曲面", "helicoid"],
   ["double-helix", "DoubleHelixField", "双螺旋", "double-helix"],
   ["wave-surface", "WaveSurfaceField", "波浪马鞍面", "wave-surface"],
+  ["flow-ribbon", "FlowRibbonField", "流光丝带", "flow-ribbon"],
   ["heart-surface", "HeartSurfaceField", "心形曲面", "heart"],
   ["galaxy-vortex", "GalaxyVortexField", "星系漩涡", "galaxy"]
 ];

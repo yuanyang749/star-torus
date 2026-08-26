@@ -164,6 +164,22 @@
       }
     },
     {
+      "name": "flow-ribbon",
+      "title": "流光丝带",
+      "description": "FORMFIELD LAB 的流光丝带生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "flow-ribbon",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "flow-ribbon"
+        ]
+      }
+    },
+    {
       "name": "heart-surface",
       "title": "心形曲面",
       "description": "FORMFIELD LAB 的心形曲面生成式视觉组件。",

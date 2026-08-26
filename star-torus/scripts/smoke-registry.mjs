@@ -13,10 +13,11 @@ const index = await readJson(resolve(registryDirectory, "index.json"));
 const itemNames = new Set(index.items.map((item) => item.name));
 
 assert.equal(index.name, "formfield");
-assert.equal(index.items.length, 12);
+assert.equal(index.items.length, 13);
 assert(itemNames.has("form-field-runtime"));
 assert(itemNames.has("star-torus"));
 assert(itemNames.has("galaxy-vortex"));
+assert(itemNames.has("flow-ribbon"));
 
 for (const itemName of itemNames) {
   const item = await readJson(resolve(registryDirectory, `${itemName}.json`));
