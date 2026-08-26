@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>solcard · feature cards</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050507;
+      --card: #121218;
+      --card-edge: rgba(255, 255, 255, 0.06);
+      --text: #f4f4f5;
+      --muted: #8b8b96;
+      --purple: #b57cff;
+      --purple-deep: #7a3dff;
+      --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+      --stage: 100vmin;
+      --card-w: calc(var(--stage) * 0.382);
+      --card-h: calc(var(--stage) * 0.585);
+      --gap: calc(var(--stage) * 0.034);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Satoshi", "Inter", "SF Pro Display", system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    .stage {
+      width: var(--stage);
+      height: var(--stage);
+      position: relative;
+      overflow: hidden;
+      background: #050507;
+      isolation: isolate;
+    }
+
+    html.tweet {
+      --stage: 100vh;
+    }
+
+    html.tweet,
+    html.tweet body {
+      width: 100%;
+      height: 100%;
+      background: #050507;
+    }
+
+    html.tweet .stage {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    html.tweet .scrubber {
+      width: min(860px, calc(100vw - 72px));
+      bottom: 28px;
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+      z-index: 5;
+    }
+
+    .track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--gap);
+      will-change: transform;
+      height: var(--card-h);
+    }
+
+    .feature-card {
+      width: var(--card-w);
+      height: var(--card-h);
+      flex: 0 0 var(--card-w);
+      position: relative;
+      border-radius: calc(var(--card-w) * 0.118);
+      background:
+        radial-gradient(ellipse 92% 48% at 50% 118%, rgba(86, 42, 168, 0.42), transparent 72%),
+        linear-gradient(180deg, #181822 0%, #111117 50%, #0d0d14 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.8),
+        0 14px 28px -6px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+      padding: calc(var(--card-w) * 0.078);
+      overflow: hidden;
+      transform: translateZ(0);
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.06) 35%,
+        rgba(255, 255, 255, 0.01) 70%,
+        rgba(255, 255, 255, 0.10) 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .feature-card.clone-spacer {
+      margin-left: calc(var(--stage) * 0.24);
+    }
+
+    .card-wash {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      bottom: -18%;
+      height: 58%;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(ellipse 88% 78% at 50% 92%, rgba(98, 42, 196, 0.42), rgba(78, 30, 150, 0.14) 48%, transparent 72%);
+    }
+
+    .card-glow {
+      position: absolute;
+      left: -22%;
+      right: -22%;
+      bottom: -32%;
+      height: 78%;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(ellipse 72% 64% at 50% 68%, rgba(176, 102, 255, 0.92), rgba(118, 48, 214, 0.38) 48%, transparent 76%);
+      opacity: 0;
+      filter: blur(10px);
+    }
+
+    .card-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background-image: var(--frost-grain);
+      background-size: 180px 180px;
+      opacity: 0.28;
+      mix-blend-mode: overlay;
+      -webkit-mask-image: linear-gradient(180deg, transparent 38%, rgba(0,0,0,0.32) 60%, #000 100%);
+      mask-image: linear-gradient(180deg, transparent 38%, rgba(0,0,0,0.32) 60%, #000 100%);
+      animation: frost-flow-c 28s linear infinite;
+    }
+
+    .dots,
+    .dots-fine {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 1;
+      -webkit-mask-image: linear-gradient(180deg, transparent 38%, rgba(0,0,0,0.18) 58%, #000 100%);
+      mask-image: linear-gradient(180deg, transparent 38%, rgba(0,0,0,0.18) 58%, #000 100%);
+    }
+
+    .dots {
+      background-image: var(--frost-dots);
+      background-size: 96px 96px;
+      animation: frost-flow-a 16s linear infinite;
+    }
+
+    .dots-fine {
+      background-image: var(--frost-dots-fine);
+      background-size: 64px 64px;
+      opacity: 0.85;
+      animation: frost-flow-b 23s linear infinite reverse;
+    }
+
+    @keyframes frost-flow-a {
+      from { background-position: 0 0; }
+      to { background-position: 96px -48px; }
+    }
+
+    @keyframes frost-flow-b {
+      from { background-position: 12px 8px; }
+      to { background-position: -52px 72px; }
+    }
+
+    @keyframes frost-flow-c {
+      from { background-position: 0 0; }
+      to { background-position: -90px 180px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dots,
+      .dots-fine,
+      .card-grain {
+        animation: none;
+      }
+    }
+
+    .icon-btn,
+    .copy {
+      position: relative;
+      z-index: 3;
+    }
+
+    .icon-btn {
+      width: calc(var(--card-w) * 0.138);
+      height: calc(var(--card-w) * 0.138);
+      border-radius: 50%;
+      background:
+        radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.35) 100%),
+        #1a1a24;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow:
+        0 8px 18px -2px rgba(0, 0, 0, 0.55),
+        0 2px 5px rgba(0, 0, 0, 0.35),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 -1.5px 3px 0 rgba(0, 0, 0, 0.65);
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      position: relative;
+      z-index: 3;
+      overflow: hidden;
+      clip-path: circle(50%);
+    }
+
+    .icon-btn svg {
+      width: 50%;
+      height: 50%;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon-shine {
+      position: absolute;
+      top: -35%;
+      left: 0;
+      width: 38%;
+      height: 170%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.06) 28%,
+        rgba(255, 255, 255, 0.62) 50%,
+        rgba(255, 255, 255, 0.08) 68%,
+        transparent 100%
+      );
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0;
+    }
+
+    .copy {
+      margin-top: calc(var(--card-h) * 0.072);
+      font-size: calc(var(--card-w) * 0.056);
+      line-height: 1.38;
+      letter-spacing: -0.021em;
+      font-weight: 500;
+      max-width: 94%;
+    }
+
+    .copy strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .copy span {
+      color: var(--muted);
+      font-weight: 450;
+    }
+
+    .widget {
+      position: absolute;
+      left: calc(var(--card-w) * 0.078);
+      right: calc(var(--card-w) * 0.078);
+      bottom: calc(var(--card-w) * 0.07);
+      z-index: 3;
+    }
+
+    /* Plastic card */
+    .plastic {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1.62 / 1;
+      border-radius: calc(var(--card-w) * 0.055);
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.28), transparent 34%),
+        linear-gradient(118deg, #f7d2ff 0%, #f0abfc 14%, #d8b4fe 32%, #c084fc 48%, #8b5cf6 68%, #6d28d9 100%);
+      box-shadow: 0 18px 40px rgba(80, 20, 140, 0.28);
+    }
+
+    .plastic .brand {
+      position: absolute;
+      top: 16%;
+      left: 8.5%;
+      display: flex;
+      align-items: center;
+      gap: 0.42em;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: calc(var(--card-w) * 0.048);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .mark {
+      width: 1.15em;
+      height: 1.15em;
+      border-radius: 50%;
+      background: conic-gradient(from 210deg, #fff, #c4b5fd, #fff);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.25) inset;
+    }
+
+    .mark::after {
+      content: "";
+      width: 42%;
+      height: 42%;
+      background: #7c3aed;
+      clip-path: polygon(50% 8%, 90% 78%, 10% 78%);
+      border-radius: 1px;
+    }
+
+    .reg {
+      font-size: 0.55em;
+      vertical-align: super;
+      opacity: 0.8;
+      margin-left: 0.08em;
+    }
+
+    .chip {
+      position: absolute;
+      right: 9%;
+      top: 46%;
+      width: 13.5%;
+      height: 18%;
+      border-radius: 18%;
+      background:
+        linear-gradient(135deg, #d4d4d8 0%, #a1a1aa 40%, #e4e4e7 70%, #71717a 100%);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
+    .pan {
+      position: absolute;
+      left: 8.5%;
+      bottom: 14%;
+      font-size: calc(var(--card-w) * 0.038);
+      letter-spacing: 0.16em;
+      color: rgba(255,255,255,0.88);
+      font-weight: 500;
+    }
+
+    .frost {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .frost-noise {
+      position: absolute;
+      inset: -12%;
+      background:
+        radial-gradient(ellipse 60% 48% at 30% 40%, rgba(255,255,255,0.55), transparent 62%),
+        radial-gradient(ellipse 55% 46% at 72% 58%, rgba(245, 230, 255, 0.42), transparent 64%),
+        radial-gradient(ellipse 50% 38% at 52% 18%, rgba(255,255,255,0.28), transparent 70%);
+      filter: blur(10px) contrast(1.1);
+      mix-blend-mode: soft-light;
+    }
+
+    .frost-film {
+      position: absolute;
+      inset: 0;
+      background:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+      mix-blend-mode: overlay;
+      opacity: 0.55;
+    }
+
+    .plastic .bloom {
+      position: absolute;
+      inset: -8%;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(200, 150, 255, 0.28), transparent 70%);
+      filter: blur(12px);
+      mix-blend-mode: screen;
+    }
+
+    .snowflake {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      transform: scale(0.86);
+    }
+
+    .snowflake svg {
+      width: 34%;
+      height: 34%;
+      filter: drop-shadow(0 0 14px rgba(255,255,255,0.85));
+    }
+
+    /* Top-up */
+    .topup {
+      display: grid;
+      justify-items: center;
+      gap: calc(var(--card-w) * 0.045);
+    }
+
+    .topup-label {
+      font-size: calc(var(--card-w) * 0.042);
+      color: #9a9aa6;
+      font-weight: 500;
+    }
+
+    .stepper {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: calc(var(--card-w) * 0.03);
+    }
+
+    .step {
+      width: calc(var(--card-w) * 0.112);
+      height: calc(var(--card-w) * 0.112);
+      flex: 0 0 auto;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #1a1a22;
+      color: #d4d4dc;
+      display: grid;
+      place-items: center;
+      font-size: calc(var(--card-w) * 0.07);
+      font-weight: 400;
+    }
+
+    .amount-pill {
+      flex: 1;
+      height: calc(var(--card-w) * 0.168);
+      border-radius: 999px;
+      background: #0c0c12;
+      border: 1.5px solid rgba(140, 90, 255, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55em;
+      box-shadow: 0 0 0 0 rgba(140, 90, 255, 0);
+    }
+
+    .amount-val {
+      font-size: calc(var(--card-w) * 0.078);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      transform: translateY(0.06em);
+    }
+
+    .amount-ccy {
+      font-size: calc(var(--card-w) * 0.042);
+      color: #c4c4d0;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      transform: translateY(0.08em);
+    }
+
+    /* Spend ring */
+    .spend {
+      display: grid;
+      place-items: center;
+      height: calc(var(--card-w) * 0.72);
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: calc(var(--card-w) * 0.62);
+      height: calc(var(--card-w) * 0.62);
+    }
+
+    .ring-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring-label {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .spend-val {
+      font-size: calc(var(--card-w) * 0.118);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .spend-sub {
+      margin-top: 0.35em;
+      font-size: calc(var(--card-w) * 0.036);
+      color: #9a9aa6;
+      font-weight: 500;
+    }
+
+    .ring-tip-wrap {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    .ring-tip {
+      position: absolute;
+      top: 11%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(var(--card-w) * 0.046);
+      height: calc(var(--card-w) * 0.046);
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow:
+        0 0 16px 6px rgba(220, 180, 255, 0.95),
+        0 0 6px 2px rgba(255, 255, 255, 0.9);
+      filter: blur(1px);
+    }
+
+    .scrubber {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      width: min(720px, calc(100vw - 40px));
+      display: grid;
+      grid-template-columns: 36px 1fr 52px;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(12, 12, 16, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      z-index: 20;
+      user-select: none;
+    }
+
+    .scrubber-play {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: #1c1c24;
+      color: #f4f4f5;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .scrubber-play svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+
+    .scrubber-play[data-paused="0"] .icon-play,
+    .scrubber-play[data-paused="1"] .icon-pause {
+      display: none;
+    }
+
+    .scrubber-track {
+      position: relative;
+      height: 28px;
+      display: grid;
+      align-items: center;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .scrubber-rail {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .scrubber-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #7a3dff, #c4b5fd);
+    }
+
+    .scrubber-thumb {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 14px;
+      height: 14px;
+      margin-left: -7px;
+      border-radius: 50%;
+      background: #f4f4f5;
+      box-shadow: 0 0 0 4px rgba(122, 61, 255, 0.28);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .scrubber-marks {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 4px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .scrubber-marks span {
+      position: absolute;
+      top: 50%;
+      width: 2px;
+      height: 8px;
+      margin-left: -1px;
+      border-radius: 1px;
+      background: rgba(255, 255, 255, 0.28);
+      transform: translateY(-50%);
+    }
+
+    .scrubber-time {
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      color: #9a9aa6;
+      text-align: right;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#5b21b6" />
+        <stop offset="45%" stop-color="#a78bfa" />
+        <stop offset="100%" stop-color="#f5d0fe" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="stage" id="stage">
+    <div class="track" id="track"></div>
+  </div>
+
+  <div class="scrubber" id="scrubber">
+    <button class="scrubber-play" id="scrubPlay" type="button" data-paused="0" aria-label="Pause">
+      <svg class="icon-play" viewBox="0 0 14 14" fill="currentColor"><path d="M3 1.8v10.4L12.2 7 3 1.8Z"/></svg>
+      <svg class="icon-pause" viewBox="0 0 14 14" fill="currentColor"><rect x="2.4" y="1.8" width="3.2" height="10.4" rx="0.8"/><rect x="8.4" y="1.8" width="3.2" height="10.4" rx="0.8"/></svg>
+    </button>
+    <div class="scrubber-track" id="scrubTrack">
+      <div class="scrubber-rail"><div class="scrubber-fill" id="scrubFill"></div></div>
+      <div class="scrubber-marks" id="scrubMarks"></div>
+      <div class="scrubber-thumb" id="scrubThumb"></div>
+    </div>
+    <div class="scrubber-time" id="scrubTime">0.00</div>
+  </div>
+
+  <script src="./gsap.min.js"></script>
+  <script>
+    function mulberry32(seed) {
+      let a = seed >>> 0;
+      return () => {
+        a = (a + 0x6D2B79F5) >>> 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function stampDot(ctx, x, y, r, size) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+      const wrapX = x < r ? x + size : x > size - r ? x - size : null;
+      const wrapY = y < r ? y + size : y > size - r ? y - size : null;
+      if (wrapX !== null) {
+        ctx.beginPath();
+        ctx.arc(wrapX, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (wrapY !== null) {
+        ctx.beginPath();
+        ctx.arc(x, wrapY, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (wrapX !== null && wrapY !== null) {
+        ctx.beginPath();
+        ctx.arc(wrapX, wrapY, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function makeRandomDots(size, cell, seed, minR, maxR, minA, maxA, extra) {
+      const rand = mulberry32(seed);
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const cols = Math.round(size / cell);
+      const step = size / cols;
+      for (let gy = 0; gy < cols; gy++) {
+        for (let gx = 0; gx < cols; gx++) {
+          const x = (gx + rand()) * step;
+          const y = (gy + rand()) * step;
+          const r = minR + rand() * (maxR - minR);
+          ctx.fillStyle = `rgba(255,255,255,${minA + rand() * (maxA - minA)})`;
+          stampDot(ctx, x, y, r, size);
+        }
+      }
+      for (let i = 0; i < extra; i++) {
+        const x = rand() * size;
+        const y = rand() * size;
+        const r = minR * 0.7 + rand() * (maxR - minR);
+        ctx.fillStyle = `rgba(255,255,255,${minA + rand() * (maxA - minA)})`;
+        stampDot(ctx, x, y, r, size);
+      }
+      return `url(${canvas.toDataURL("image/png")})`;
+    }
+
+    function makeGrain(size, seed) {
+      const rand = mulberry32(seed);
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const img = ctx.createImageData(size, size);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = 180 + rand() * 75;
+        img.data[i] = v;
+        img.data[i + 1] = v;
+        img.data[i + 2] = v;
+        img.data[i + 3] = 28 + rand() * 70;
+      }
+      ctx.putImageData(img, 0, 0);
+      return `url(${canvas.toDataURL("image/png")})`;
+    }
+
+    const frost = document.documentElement.style;
+    frost.setProperty("--frost-dots", makeRandomDots(160, 1.7, 0xA41C3, 0.16, 0.52, 0.28, 0.95, 1400));
+    frost.setProperty("--frost-dots-fine", makeRandomDots(96, 1.25, 0x5E17D, 0.09, 0.3, 0.14, 0.58, 1100));
+    frost.setProperty("--frost-grain", makeGrain(180, 0xC0FFEE));
+
+    const icons = {
+      freeze: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5v19M12 12 18.5 5.5M12 12 5.5 5.5M12 12l6.5 6.5M12 12 5.5 18.5M5 8.5h14M5 15.5h14M7.5 5.5l1.5 3M16.5 5.5l-1.5 3M7.5 18.5l1.5-3M16.5 18.5l-1.5-3"/></svg>`,
+      topup: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>`,
+      spend: `<svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5Zm0 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>`,
+      snow: `<svg viewBox="0 0 64 64" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4v56M32 32 50 12M32 32 14 12M32 32l18 20M32 32 14 52M8 22h48M8 42h48M14 12l6 10M50 12l-6 10M14 52l6-10M50 52l-6-10M8 22l10 4M56 22l-10 4M8 42l10-4M56 42l-10-4"/></svg>`
+    };
+
+    const cards = [
+      {
+        id: "freeze",
+        icon: icons.freeze,
+        title: `<strong>Freeze or unfreeze your card</strong><br><span>instantly with a single tap —<br>pause it anytime and<br>reactivate in seconds</span>`,
+        widget: `
+          <div class="plastic" data-plastic>
+            <div class="brand"><span class="mark"></span>solcard<span class="reg">®</span></div>
+            <div class="chip"></div>
+            <div class="pan">••••  2330</div>
+            <div class="bloom" data-bloom></div>
+            <div class="frost" data-frost>
+              <div class="frost-noise"></div>
+              <div class="frost-film"></div>
+            </div>
+            <div class="snowflake" data-snow>${icons.snow}</div>
+          </div>`
+      },
+      {
+        id: "topup",
+        icon: icons.topup,
+        title: `<strong>Instant top-ups from<br>any wallet</strong><span> — add funds<br>in seconds and start<br>spending immediately</span>`,
+        widget: `
+          <div class="topup">
+            <div class="topup-label">Top up amount</div>
+            <div class="stepper">
+              <div class="step">−</div>
+              <div class="amount-pill" data-pill>
+                <span class="amount-val" data-amount>0</span>
+                <span class="amount-ccy">USD</span>
+              </div>
+              <div class="step">+</div>
+            </div>
+          </div>`
+      },
+      {
+        id: "spend",
+        icon: icons.spend,
+        title: `<strong>Smart controls for safer<br>spending</strong><span> — set limits, manage<br>categories, and stay in control<br>of every transaction.</span>`,
+        widget: `
+          <div class="spend">
+            <div class="ring-wrap">
+              <svg viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="78" fill="none" stroke="#2a2a33" stroke-width="8" />
+                <circle class="ring-fill" data-ring cx="100" cy="100" r="78" fill="none"
+                  stroke="url(#ringGrad)" stroke-width="8" stroke-linecap="round"
+                  stroke-dasharray="490.09" stroke-dashoffset="490.09" />
+              </svg>
+              <div class="ring-tip-wrap" data-tip><div class="ring-tip"></div></div>
+              <div class="ring-label">
+                <div>
+                  <div class="spend-val" data-spend>$0</div>
+                  <div class="spend-sub">Spent this month</div>
+                </div>
+              </div>
+            </div>
+          </div>`
+      }
+    ];
+
+    const params = new URLSearchParams(location.search);
+    if (params.has("tweet") || params.has("wide")) {
+      document.documentElement.classList.add("tweet");
+    }
+
+    const track = document.getElementById("track");
+    const stage = document.getElementById("stage");
+    const CIRC = 2 * Math.PI * 78;
+
+    function cardHTML(card, extraClass = "") {
+      return `<article class="feature-card ${extraClass}" data-card="${card.id}">
+        <div class="card-wash"></div>
+        <div class="card-glow" data-glow></div>
+        <div class="card-grain"></div>
+        <div class="dots"></div>
+        <div class="dots-fine"></div>
+        <div class="icon-btn">
+          <span class="icon-shine" data-shine></span>
+          ${card.icon}
+        </div>
+        <p class="copy">${card.title}</p>
+        <div class="widget">${card.widget}</div>
+      </article>`;
+    }
+
+    track.innerHTML = [
+      cardHTML(cards[0]),
+      cardHTML(cards[1]),
+      cardHTML(cards[2]),
+      cardHTML(cards[0], "clone-spacer")
+    ].join("");
+
+    const nodes = [...track.querySelectorAll(".feature-card")];
+    const amountEl = track.querySelector("[data-amount]");
+    const spendEl = track.querySelector("[data-spend]");
+    const ringEl = track.querySelector("[data-ring]");
+    const tipEl = track.querySelector("[data-tip]");
+    const pillEl = track.querySelector("[data-pill]");
+
+    const freezeA = nodes[0];
+    const freezeB = nodes[3];
+
+    function xFor(index) {
+      const card = nodes[index];
+      return stage.clientWidth / 2 - card.offsetWidth / 2 - card.offsetLeft;
+    }
+
+    function formatAmount(n) {
+      return Math.round(n).toLocaleString("en-US");
+    }
+
+    const counters = { amount: 0, spend: 0 };
+    const blurOn = "blur(11px)";
+    const blurOff = "blur(0px)";
+
+    function resetFreeze(el) {
+      const bloom = el.querySelector("[data-bloom]");
+      gsap.set(el.querySelector("[data-frost]"), { opacity: 0 });
+      gsap.set(el.querySelector("[data-snow]"), { opacity: 0, scale: 0.86 });
+      gsap.set(el.querySelector("[data-plastic]"), {
+        filter: "brightness(1) saturate(1)",
+        boxShadow: "0 18px 40px rgba(80, 20, 140, 0.28)"
+      });
+      gsap.set(el.querySelector("[data-glow]"), { opacity: 0 });
+      if (bloom) gsap.set(bloom, { opacity: 0 });
+    }
+
+    function shineIcon(el, at, timeline, duration = 0.95) {
+      const shine = el.querySelector("[data-shine]");
+      if (!shine) return;
+      timeline.fromTo(shine, {
+        xPercent: -220,
+        rotation: 18,
+        opacity: 0.9
+      }, {
+        xPercent: 420,
+        rotation: 18,
+        opacity: 0.9,
+        duration,
+        ease: "power1.inOut"
+      }, at);
+      timeline.to(shine, { opacity: 0, duration: 0.16, ease: "none" }, at + duration - 0.16);
+      timeline.set(shine, { xPercent: -220, opacity: 0 }, at + duration);
+    }
+
+    function freezeCard(el, at, timeline) {
+      const bloom = el.querySelector("[data-bloom]");
+      timeline.to(el.querySelector("[data-frost]"), { opacity: 1, duration: 0.55, ease: "power2.out" }, at);
+      timeline.to(el.querySelector("[data-snow]"), { opacity: 1, scale: 1, duration: 0.42, ease: "power2.out" }, at + 0.12);
+      timeline.to(el.querySelector("[data-plastic]"), {
+        filter: "brightness(1.18) saturate(0.78)",
+        boxShadow: "0 0 28px 8px rgba(180,120,255,0.55), 0 18px 40px rgba(80, 20, 140, 0.28)",
+        duration: 0.5,
+        ease: "power2.out"
+      }, at);
+      timeline.to(el.querySelector("[data-glow]"), { opacity: 1, duration: 0.5, ease: "power2.out" }, at + 0.05);
+      if (bloom) timeline.to(bloom, { opacity: 1, duration: 0.45, ease: "power2.out" }, at + 0.08);
+    }
+
+    const x0 = xFor(0);
+    const x1 = xFor(1);
+    const x2 = xFor(2);
+    const x3 = xFor(3);
+
+    gsap.set(track, { yPercent: -50, x: x0 });
+    gsap.set(nodes, { opacity: 0.38, filter: blurOn });
+    gsap.set(nodes[0], { opacity: 1, filter: blurOff });
+    gsap.set(nodes[3], { opacity: 0, filter: "blur(12px)" });
+    resetFreeze(freezeA);
+    resetFreeze(freezeB);
+    gsap.set(ringEl, { strokeDasharray: CIRC, strokeDashoffset: CIRC });
+
+    const scrubPlay = document.getElementById("scrubPlay");
+    const scrubTrack = document.getElementById("scrubTrack");
+    const scrubFill = document.getElementById("scrubFill");
+    const scrubThumb = document.getElementById("scrubThumb");
+    const scrubTime = document.getElementById("scrubTime");
+    const scrubMarks = document.getElementById("scrubMarks");
+    let scrubbing = false;
+    let tl;
+
+    function loopDuration() {
+      return (tl && tl.duration()) || 5;
+    }
+
+    function setScrubUI(progress) {
+      const p = Math.min(1, Math.max(0, progress));
+      scrubFill.style.width = p * 100 + "%";
+      scrubThumb.style.left = p * 100 + "%";
+      scrubTime.textContent = (p * loopDuration()).toFixed(2);
+      const paused = !tl || tl.paused();
+      scrubPlay.dataset.paused = paused ? "1" : "0";
+      scrubPlay.setAttribute("aria-label", paused ? "Play" : "Pause");
+    }
+
+    function updateScrubber() {
+      if (scrubbing || !tl) return;
+      const dur = loopDuration();
+      setScrubUI(dur ? tl.time() / dur : 0);
+    }
+
+    tl = gsap.timeline({
+      repeat: -1,
+      defaults: { ease: "power2.inOut" },
+      onUpdate: updateScrubber
+    });
+
+    freezeCard(freezeA, 0.28, tl);
+    shineIcon(freezeA, 0.12, tl);
+
+    tl.to(track, { x: x1, duration: 1.08, ease: "elastic.out(0.55, 0.78)" }, 1.18);
+    tl.to(nodes[0], { opacity: 0.38, filter: blurOn, duration: 0.42, ease: "power2.out" }, 1.18);
+    tl.to(nodes[1], { opacity: 1, filter: blurOff, duration: 0.42, ease: "power2.out" }, 1.18);
+    shineIcon(nodes[1], 1.32, tl);
+
+    tl.to(counters, {
+      amount: 525,
+      duration: 0.22,
+      ease: "power1.out",
+      onUpdate: () => { amountEl.textContent = formatAmount(counters.amount); }
+    }, 1.68);
+    tl.to(counters, {
+      amount: 10500,
+      duration: 0.72,
+      ease: "power2.out",
+      onUpdate: () => { amountEl.textContent = formatAmount(counters.amount); }
+    }, 1.92);
+    tl.to(pillEl, {
+      borderColor: "rgba(180, 130, 255, 0.85)",
+      boxShadow: "0 0 28px 8px rgba(140, 80, 255, 0.5)",
+      duration: 0.4,
+      ease: "power2.out"
+    }, 2.0);
+    tl.to(nodes[1].querySelector("[data-glow]"), { opacity: 1, duration: 0.45, ease: "power2.out" }, 2.0);
+
+    tl.to(track, { x: x2, duration: 1.08, ease: "elastic.out(0.55, 0.78)" }, 2.82);
+    tl.to(nodes[1], { opacity: 0.38, filter: blurOn, duration: 0.42, ease: "power2.out" }, 2.82);
+    tl.to(nodes[2], { opacity: 1, filter: blurOff, duration: 0.42, ease: "power2.out" }, 2.82);
+    shineIcon(nodes[2], 2.96, tl);
+
+    tl.to(tipEl, { opacity: 1, duration: 0.15 }, 3.32);
+    tl.to(counters, {
+      spend: 894,
+      duration: 0.98,
+      ease: "power2.out",
+      onUpdate: () => { spendEl.textContent = "$" + Math.round(counters.spend).toLocaleString("en-US"); }
+    }, 3.34);
+    tl.to(ringEl, {
+      strokeDashoffset: CIRC * (1 - 0.72),
+      duration: 0.98,
+      ease: "power2.out"
+    }, 3.34);
+    tl.to(tipEl, { rotation: 259.2, duration: 0.98, ease: "power2.out" }, 3.34);
+    tl.to(nodes[2].querySelector("[data-glow]"), { opacity: 1, duration: 0.5, ease: "power2.out" }, 3.4);
+
+    tl.set(freezeB.querySelector("[data-frost]"), { opacity: 0 }, 4.36);
+    tl.set(freezeB.querySelector("[data-snow]"), { opacity: 0, scale: 0.86 }, 4.36);
+    tl.set(freezeB.querySelector("[data-glow]"), { opacity: 0 }, 4.36);
+    tl.to(track, { x: x3, duration: 0.52, ease: "elastic.out(0.48, 0.82)" }, 4.38);
+    tl.to(nodes[2], { opacity: 0.38, filter: blurOn, duration: 0.4, ease: "power2.out" }, 4.38);
+    tl.to(nodes[3], { opacity: 1, filter: blurOff, duration: 0.4, ease: "power2.out" }, 4.38);
+    shineIcon(nodes[3], 4.46, tl, 0.42);
+
+    tl.set(track, { x: x0 }, 4.92);
+    tl.set(nodes[3], { opacity: 0, filter: "blur(12px)" }, 4.92);
+    tl.set(nodes[0], { opacity: 1, filter: blurOff }, 4.92);
+    tl.set(freezeA.querySelector("[data-frost]"), { opacity: 0 }, 4.92);
+    tl.set(freezeA.querySelector("[data-snow]"), { opacity: 0, scale: 0.86 }, 4.92);
+    tl.set(freezeA.querySelector("[data-plastic]"), {
+      filter: "brightness(1) saturate(1)",
+      boxShadow: "0 18px 40px rgba(80, 20, 140, 0.28)"
+    }, 4.92);
+    tl.set(freezeA.querySelector("[data-glow]"), { opacity: 0 }, 4.92);
+    tl.set(freezeA.querySelector("[data-bloom]"), { opacity: 0 }, 4.92);
+    tl.set(counters, { amount: 0, spend: 0 }, 4.92);
+    tl.add(() => {
+      amountEl.textContent = "0";
+      spendEl.textContent = "$0";
+    }, 4.92);
+    tl.set(pillEl, {
+      borderColor: "rgba(140, 90, 255, 0.28)",
+      boxShadow: "0 0 0 0 rgba(140,90,255,0)"
+    }, 4.92);
+    tl.set(nodes[1].querySelector("[data-glow]"), { opacity: 0 }, 4.92);
+    tl.set(nodes[2].querySelector("[data-glow]"), { opacity: 0 }, 4.92);
+    nodes.forEach((el) => {
+      const shine = el.querySelector("[data-shine]");
+      if (shine) tl.set(shine, { xPercent: -220, rotation: 18, opacity: 0 }, 4.92);
+    });
+    tl.set(ringEl, { strokeDashoffset: CIRC }, 4.92);
+    tl.set(tipEl, { rotation: 0, opacity: 0 }, 4.92);
+    tl.to({}, { duration: 0.08 }, 4.92);
+
+    window.addEventListener("resize", () => {
+      const t = tl.time();
+      let idx = 0;
+      if (t >= 4.38) idx = 3;
+      else if (t >= 2.82) idx = 2;
+      else if (t >= 1.18) idx = 1;
+      gsap.set(track, { x: xFor(idx) });
+    });
+
+    [0, 1.18, 2.82, 4.38].forEach((t) => {
+      const mark = document.createElement("span");
+      mark.style.left = (t / loopDuration()) * 100 + "%";
+      scrubMarks.appendChild(mark);
+    });
+
+    function seekFromEvent(e) {
+      const rect = scrubTrack.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      tl.pause();
+      tl.time(p * loopDuration());
+      setScrubUI(p);
+    }
+
+    scrubTrack.addEventListener("pointerdown", (e) => {
+      scrubbing = true;
+      scrubTrack.setPointerCapture(e.pointerId);
+      seekFromEvent(e);
+    });
+    scrubTrack.addEventListener("pointermove", (e) => {
+      if (!scrubbing) return;
+      seekFromEvent(e);
+    });
+    const endScrub = () => { scrubbing = false; updateScrubber(); };
+    scrubTrack.addEventListener("pointerup", endScrub);
+    scrubTrack.addEventListener("pointercancel", endScrub);
+
+    function togglePlay() {
+      tl.paused() ? tl.play() : tl.pause();
+      updateScrubber();
+    }
+
+    scrubPlay.addEventListener("click", togglePlay);
+
+    if (params.has("t")) {
+      tl.pause();
+      tl.time(parseFloat(params.get("t")));
+    }
+    updateScrubber();
+
+    window.__cards = {
+      tl,
+      seek(t) { tl.pause(); tl.time(t); updateScrubber(); },
+      play() { tl.play(); updateScrubber(); }
+    };
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlay();
+      }
+    });
+  </script>
+</body>
+</html>
