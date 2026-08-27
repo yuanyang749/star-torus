@@ -577,6 +577,74 @@ button {
   background: rgba(var(--panel-ink-rgb), 0.2);
 }
 
+.particle-text-control {
+  display: grid;
+  margin-top: 7px;
+  padding: 9px 10px 10px;
+  gap: 6px;
+  border: 1px solid rgba(var(--panel-ink-rgb), 0.1);
+  border-radius: 11px;
+  background: rgba(var(--panel-ink-rgb), 0.028);
+}
+
+.particle-text-control label {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.particle-text-control label span,
+.particle-text-control label em {
+  color: rgba(var(--panel-ink-rgb), 0.36);
+  font: 600 7px/1 ui-monospace, "SFMono-Regular", monospace;
+  letter-spacing: 0.12em;
+}
+
+.particle-text-control label strong {
+  color: rgba(var(--panel-ink-rgb), 0.72);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+}
+
+.particle-text-control label em {
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
+.particle-text-control input {
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  padding: 0 10px;
+  border: 1px solid rgba(var(--panel-ink-rgb), 0.13);
+  border-radius: 8px;
+  outline: 0;
+  color: rgb(var(--panel-ink-rgb));
+  font: 600 10px/1.2 system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  background: rgba(var(--panel-rgb), 0.55);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.particle-text-control input::placeholder {
+  color: rgba(var(--panel-ink-rgb), 0.28);
+}
+
+.particle-text-control input:focus {
+  border-color: var(--panel-accent);
+  background: rgba(var(--panel-rgb), 0.78);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--panel-accent) 16%, transparent);
+}
+
+.particle-text-control small {
+  color: rgba(var(--panel-ink-rgb), 0.34);
+  font-size: 7px;
+  line-height: 1.4;
+  letter-spacing: 0.035em;
+}
+
 .mode-segment {
   display: flex;
   min-width: 0;

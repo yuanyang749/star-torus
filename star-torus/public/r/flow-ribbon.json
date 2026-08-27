@@ -14,7 +14,7 @@
       "path": "registry/flow-ribbon/FlowRibbonField.tsx",
       "target": "components/formfield/presets/FlowRibbonField.tsx",
       "type": "registry:component",
-      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { flowRibbonGeometry } from \"@/components/formfield/geometries/flow-ribbon\";\n\nconst FlowRibbonFieldGeometries = [flowRibbonGeometry] as const;\n\nexport const FlowRibbonFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"flow-ribbon\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  }\n} satisfies FormFieldConfig;\n\nexport function FlowRibbonField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={FlowRibbonFieldConfig} geometries={FlowRibbonFieldGeometries} />\n    </div>\n  );\n}\n"
+      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { flowRibbonGeometry } from \"@/components/formfield/geometries/flow-ribbon\";\n\nconst FlowRibbonFieldGeometries = [flowRibbonGeometry] as const;\n\nexport const FlowRibbonFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"flow-ribbon\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  },\n  \"content\": {\n    \"text\": \"形场实验室\"\n  }\n} satisfies FormFieldConfig;\n\nexport function FlowRibbonField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={FlowRibbonFieldConfig} geometries={FlowRibbonFieldGeometries} />\n    </div>\n  );\n}\n"
     }
   ],
   "meta": {
@@ -48,6 +48,9 @@
     "interaction": {
       "enabled": false,
       "holdMode": "magnet"
+    },
+    "content": {
+      "text": "形场实验室"
     }
   }
 }

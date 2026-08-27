@@ -68,6 +68,13 @@ export interface StarInteractionConfig {
   actions?: Partial<StarInteractionActions>;
 }
 
+export interface StarContentConfig {
+  text: string;
+}
+
+export const DEFAULT_PARTICLE_TEXT = "形场实验室";
+export const MAX_PARTICLE_TEXT_LENGTH = 12;
+
 export interface StarFieldConfig {
   version: 1;
   shape: ShapeId;
@@ -75,6 +82,7 @@ export interface StarFieldConfig {
   motion: StarMotionConfig;
   effects: StarEffectConfig;
   interaction: StarInteractionConfig;
+  content?: StarContentConfig;
 }
 
 export type FormFieldConfig = StarFieldConfig;
@@ -113,6 +121,9 @@ export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
     holdMode: "magnet",
     parallaxStrength: DEFAULT_PARALLAX_STRENGTH,
     actions: { ...DEFAULT_INTERACTION_ACTIONS }
+  },
+  content: {
+    text: DEFAULT_PARTICLE_TEXT
   }
 };
 
@@ -130,6 +141,9 @@ export function cloneStarFieldConfig(config: StarFieldConfig): StarFieldConfig {
       holdMode: config.interaction.holdMode,
       parallaxStrength: resolveParallaxStrength(config.interaction),
       actions: resolveInteractionActions(config.interaction)
+    },
+    content: {
+      text: limitParticleText(config.content?.text ?? DEFAULT_PARTICLE_TEXT)
     }
   };
 }
@@ -150,4 +164,13 @@ export function resolveParallaxStrength(interaction: StarInteractionConfig): num
     1.5,
     Math.max(0, interaction.parallaxStrength ?? DEFAULT_PARALLAX_STRENGTH)
   );
+}
+
+export function limitParticleText(value: string): string {
+  return Array.from(value).slice(0, MAX_PARTICLE_TEXT_LENGTH).join("");
+}
+
+export function resolveParticleText(config: StarFieldConfig): string {
+  const text = limitParticleText(config.content?.text ?? DEFAULT_PARTICLE_TEXT);
+  return text.trim() ? text : DEFAULT_PARTICLE_TEXT;
 }

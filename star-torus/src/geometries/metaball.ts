@@ -1,27 +1,28 @@
 import type { GeometryDefinition } from "@/geometries/types";
 
 const TAU = Math.PI * 2;
-const BASE_RADIUS = 105;
+const ISO_LEVEL = 1;
+const SEARCH_RADIUS = 230;
+const BISECTION_STEPS = 12;
 
-interface Direction {
+interface Blob {
   x: number;
   y: number;
   z: number;
-  strength: number;
-  sharpness: number;
+  radiusSquared: number;
 }
 
 export const metaballGeometry: GeometryDefinition = {
   id: "metaball",
   label: "流体软体",
-  ariaLabel: "多个柔性体融合并呼吸变形的粒子 Metaball",
+  ariaLabel: "多个隐式球场融合并呼吸变形的粒子 Metaball",
   mark: "metaball",
   sample(positions, pointSizes, { phase, columns, rows }) {
-    const lobes: Direction[] = [
-      direction(0.7 + Math.sin(phase * 0.7) * 0.18, 0.3, 1.0, 62, 3.7),
-      direction(-0.82, 0.42 + Math.cos(phase * 0.6) * 0.16, 0.2, 54, 4.2),
-      direction(0.05, -0.9, -0.45 + Math.sin(phase * 0.5) * 0.15, 48, 4.5),
-      direction(-0.2 + Math.cos(phase * 0.8) * 0.2, 0.05, 1.0, 43, 5.1)
+    const blobs: readonly Blob[] = [
+      blob(78 + Math.sin(phase * 0.72) * 10, 20, 45, 56),
+      blob(-74, 50 + Math.cos(phase * 0.63) * 9, 12, 54),
+      blob(2, -76, -42 + Math.sin(phase * 0.51) * 8, 50),
+      blob(-20 + Math.cos(phase * 0.81) * 7, 5, 78, 48)
     ];
     let index = 0;
 
@@ -34,41 +35,53 @@ export const metaballGeometry: GeometryDefinition = {
         const directionX = Math.cos(longitude) * cosLatitude;
         const directionY = Math.sin(latitude);
         const directionZ = Math.sin(longitude) * cosLatitude;
-        let radius = BASE_RADIUS;
+        let inner = 0;
+        let outer = SEARCH_RADIUS;
 
-        for (const lobe of lobes) {
-          const alignment = directionX * lobe.x + directionY * lobe.y + directionZ * lobe.z;
-          radius += lobe.strength * Math.exp((alignment - 1) * lobe.sharpness);
+        for (let step = 0; step < BISECTION_STEPS; step += 1) {
+          const distance = (inner + outer) * 0.5;
+          const field = sampleField(
+            distance * directionX,
+            distance * directionY,
+            distance * directionZ,
+            blobs
+          );
+          if (field >= ISO_LEVEL) {
+            inner = distance;
+          } else {
+            outer = distance;
+          }
         }
 
-        radius += Math.sin(longitude * 3 + latitude * 4 - phase * 1.6) * 3.2;
+        const radius = (inner + outer) * 0.5;
         const positionIndex = index * 3;
         positions[positionIndex] = directionX * radius;
         positions[positionIndex + 1] = directionY * radius;
         positions[positionIndex + 2] = directionZ * radius;
-        pointSizes[index] = 0.46 + (radius - BASE_RADIUS) / 100 * 0.46
-          + hash(index * 23) * 0.12;
+        pointSizes[index] = 0.48 + Math.min(0.38, Math.abs(radius - 120) / 150)
+          + hash(index * 23) * 0.1;
         index += 1;
       }
     }
   }
 };
 
-function direction(
-  x: number,
-  y: number,
-  z: number,
-  strength: number,
-  sharpness: number
-): Direction {
-  const length = Math.hypot(x, y, z) || 1;
-  return {
-    x: x / length,
-    y: y / length,
-    z: z / length,
-    strength,
-    sharpness
-  };
+function blob(x: number, y: number, z: number, radius: number): Blob {
+  return { x, y, z, radiusSquared: radius * radius };
+}
+
+function sampleField(x: number, y: number, z: number, blobs: readonly Blob[]): number {
+  let field = 0;
+  for (const item of blobs) {
+    const deltaX = x - item.x;
+    const deltaY = y - item.y;
+    const deltaZ = z - item.z;
+    field += item.radiusSquared / Math.max(
+      1,
+      deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ
+    );
+  }
+  return field;
 }
 
 function hash(value: number): number {

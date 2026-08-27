@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import {
   cloneStarFieldConfig,
   DEFAULT_STAR_FIELD_CONFIG,
+  limitParticleText,
   type HoldMode,
   type RuntimeStatus,
   type ShapeId,
@@ -28,6 +29,7 @@ interface StudioState {
   setParallaxStrength(value: number): void;
   setMotionValue(key: keyof StarMotionConfig, value: number): void;
   setEffectValue(key: keyof StarEffectConfig, value: number): void;
+  setParticleText(value: string): void;
   setPanelCollapsed(collapsed: boolean): void;
   setLocale(locale: Locale): void;
   setRuntimeStatus(status: RuntimeStatus): void;
@@ -97,6 +99,13 @@ export const useStudioStore = create<StudioState>()(
         config: {
           ...state.config,
           effects: { ...state.config.effects, [key]: value }
+        }
+      })),
+
+      setParticleText: (value) => set((state) => ({
+        config: {
+          ...state.config,
+          content: { text: limitParticleText(value) }
         }
       })),
 

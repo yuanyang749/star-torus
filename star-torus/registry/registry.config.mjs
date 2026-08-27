@@ -80,6 +80,9 @@ export function createPresetConfig(shape) {
     interaction: {
       enabled: false,
       holdMode: "magnet"
+    },
+    content: {
+      text: "形场实验室"
     }
   };
 }

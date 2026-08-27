@@ -63,6 +63,10 @@ interface Messages {
     formLibrary: string;
     shapeCount(count: number): string;
     shapeGroupAria: string;
+    particleText: string;
+    particleTextAria: string;
+    particleTextPlaceholder: string;
+    particleTextHint: string;
     parametersSection: string;
     reset: string;
     flowSpeed: string;
@@ -120,6 +124,10 @@ export const MESSAGES = {
       formLibrary: "FORM LIBRARY",
       shapeCount: (count) => `${count} 个注册形态`,
       shapeGroupAria: "选择几何形态",
+      particleText: "粒子文字",
+      particleTextAria: "输入粒子文字内容",
+      particleTextPlaceholder: "输入中文或英文",
+      particleTextHint: "支持中英文与数字，最多 12 个字符",
       parametersSection: "创作参数",
       reset: "RESET",
       flowSpeed: "流动速度",
@@ -235,6 +243,10 @@ export const MESSAGES = {
       formLibrary: "FORM LIBRARY",
       shapeCount: (count) => `${count} REGISTERED FORMS`,
       shapeGroupAria: "Select geometry",
+      particleText: "Particle Text",
+      particleTextAria: "Enter particle text content",
+      particleTextPlaceholder: "Enter Chinese or English text",
+      particleTextHint: "Chinese, English and numbers · 12 characters max",
       parametersSection: "Creative Parameters",
       reset: "RESET",
       flowSpeed: "Flow Speed",

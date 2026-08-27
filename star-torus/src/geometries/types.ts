@@ -8,6 +8,7 @@ export interface GeometrySampleContext {
   phase: number;
   columns: number;
   rows: number;
+  text?: string;
 }
 
 export interface GeometryDefinition {

@@ -8,7 +8,11 @@ import {
   type RefObject
 } from "react";
 import type { StarFieldHandle } from "@/components/star-field";
-import { DEFAULT_PARALLAX_STRENGTH } from "@/domain/star-field";
+import {
+  DEFAULT_PARALLAX_STRENGTH,
+  DEFAULT_PARTICLE_TEXT,
+  MAX_PARTICLE_TEXT_LENGTH
+} from "@/domain/star-field";
 import { THEME_PRESETS, findThemePreset } from "@/domain/theme-presets";
 import { GEOMETRY_DEFINITIONS } from "@/geometries/registry";
 import { MESSAGES, type Locale } from "@/i18n/messages";
@@ -33,12 +37,14 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
   const setParallaxStrength = useStudioStore((state) => state.setParallaxStrength);
   const setMotionValue = useStudioStore((state) => state.setMotionValue);
   const setEffectValue = useStudioStore((state) => state.setEffectValue);
+  const setParticleText = useStudioStore((state) => state.setParticleText);
   const setPanelCollapsed = useStudioStore((state) => state.setPanelCollapsed);
   const setLocale = useStudioStore((state) => state.setLocale);
   const resetTheme = useStudioStore((state) => state.resetTheme);
   const resetParameters = useStudioStore((state) => state.resetParameters);
   const activePreset = findThemePreset(config.theme);
   const messages = MESSAGES[locale];
+  const particleText = config.content?.text ?? DEFAULT_PARTICLE_TEXT;
   const themeDragState = useRef({
     pointerId: -1,
     startX: 0,
@@ -229,6 +235,25 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
                   </button>
                 ))}
               </div>
+              {config.shape === "particle-logo" && (
+                <div className="particle-text-control">
+                  <label htmlFor="particleTextInput">
+                    <span>TXT</span>
+                    <strong>{messages.panel.particleText}</strong>
+                    <em>{Array.from(particleText).length}/{MAX_PARTICLE_TEXT_LENGTH}</em>
+                  </label>
+                  <input
+                    id="particleTextInput"
+                    type="text"
+                    value={particleText}
+                    maxLength={MAX_PARTICLE_TEXT_LENGTH}
+                    aria-label={messages.panel.particleTextAria}
+                    placeholder={messages.panel.particleTextPlaceholder}
+                    onChange={(event) => setParticleText(event.currentTarget.value)}
+                  />
+                  <small>{messages.panel.particleTextHint}</small>
+                </div>
+              )}
             </div>
           </div>
         </section>
