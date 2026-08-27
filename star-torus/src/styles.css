@@ -116,6 +116,7 @@ button {
 .theme-preset:focus-visible,
 .panel-action:focus-visible,
 .section-reset:focus-visible,
+.export-interaction-option:focus-visible,
 .export-actions button:focus-visible,
 .component-name:focus-within,
 .parameter-control input:focus-visible,
@@ -1192,6 +1193,108 @@ button {
   font: 600 8px/1 ui-monospace, "SFMono-Regular", monospace;
 }
 
+.export-interactions {
+  display: grid;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid rgba(var(--panel-ink-rgb), 0.11);
+  border-radius: 11px;
+  background: rgba(var(--panel-ink-rgb), 0.025);
+}
+
+.export-interactions__header {
+  display: flex;
+  padding: 0 2px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.export-interactions__header span,
+.export-interactions__header strong {
+  font: 650 7px/1 ui-monospace, "SFMono-Regular", monospace;
+  letter-spacing: 0.08em;
+}
+
+.export-interactions__header span {
+  color: rgba(var(--panel-ink-rgb), 0.46);
+}
+
+.export-interactions__header strong {
+  color: var(--panel-accent);
+}
+
+.export-interactions__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.export-interaction-option {
+  display: flex;
+  min-width: 0;
+  min-height: 29px;
+  padding: 0 8px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(var(--panel-ink-rgb), 0.1);
+  border-radius: 8px;
+  color: rgba(var(--panel-ink-rgb), 0.42);
+  font-size: 7.5px;
+  font-weight: 620;
+  text-align: left;
+  background: rgba(var(--panel-ink-rgb), 0.025);
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.export-interaction-option:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.export-interaction-option:hover {
+  border-color: rgba(var(--panel-ink-rgb), 0.28);
+  color: rgba(var(--panel-ink-rgb), 0.76);
+}
+
+.export-interaction-option__signal {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(var(--panel-ink-rgb), 0.24);
+  border-radius: 50%;
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.export-interaction-option__signal::after {
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: rgb(var(--panel-rgb));
+  content: "";
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 180ms ease, transform 180ms var(--ease-out);
+}
+
+.export-interaction-option[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--panel-accent) 52%, transparent);
+  color: rgb(var(--panel-ink-rgb));
+  background: color-mix(in srgb, var(--panel-accent) 10%, transparent);
+}
+
+.export-interaction-option[aria-pressed="true"] .export-interaction-option__signal {
+  border-color: var(--panel-accent);
+  background: var(--panel-accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--panel-accent) 58%, transparent);
+}
+
+.export-interaction-option[aria-pressed="true"] .export-interaction-option__signal::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .export-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1368,6 +1471,9 @@ button {
   .language-switch button,
   .interaction-toggle,
   .mode-segment,
+  .export-interaction-option,
+  .export-interaction-option__signal,
+  .export-interaction-option__signal::after,
   .switch-track::after,
   .theme-preset,
   .panel-action {

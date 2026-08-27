@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import type { StarFieldConfig } from "@/domain/star-field";
+import {
+  INTERACTION_ACTION_IDS,
+  resolveInteractionActions,
+  type InteractionActionId,
+  type StarFieldConfig,
+  type StarInteractionActions
+} from "@/domain/star-field";
 import type { ExportCopy } from "@/i18n/messages";
 import {
   generateComponentInstallCommand,
@@ -18,15 +24,32 @@ interface ExportPanelProps {
 export function ExportPanel({ config, copy }: ExportPanelProps) {
   const [requestedName, setRequestedName] = useState("MyFormField");
   const [notice, setNotice] = useState(copy.initialNotice);
+  const [interactionActions, setInteractionActions] = useState<StarInteractionActions>(
+    () => resolveInteractionActions(config.interaction)
+  );
   const componentName = useMemo(() => normalizeComponentName(requestedName), [requestedName]);
   const registryName = useMemo(() => normalizeRegistryName(requestedName), [requestedName]);
+  const exportConfig = useMemo<StarFieldConfig>(() => ({
+    ...config,
+    interaction: {
+      ...config.interaction,
+      enabled: INTERACTION_ACTION_IDS.some(
+        (action) => action !== "hoverLight" && interactionActions[action]
+      ),
+      actions: interactionActions
+    }
+  }), [config, interactionActions]);
+  const selectedInteractionCount = INTERACTION_ACTION_IDS.reduce(
+    (count, action) => count + Number(interactionActions[action]),
+    0
+  );
   const componentSource = useMemo(
-    () => generateReactComponent(config, componentName),
-    [componentName, config]
+    () => generateReactComponent(exportConfig, componentName),
+    [componentName, exportConfig]
   );
   const registrySource = useMemo(
-    () => generateRegistryJson(config, componentName),
-    [componentName, config]
+    () => generateRegistryJson(exportConfig, componentName),
+    [componentName, exportConfig]
   );
   const installCommand = useMemo(
     () => generateComponentInstallCommand(componentName),
@@ -43,7 +66,7 @@ export function ExportPanel({ config, copy }: ExportPanelProps) {
   };
 
   const copyConfig = async () => {
-    await copyText(generateConfigJson(config));
+    await copyText(generateConfigJson(exportConfig));
     setNotice(copy.copiedConfig);
   };
 
@@ -68,6 +91,13 @@ export function ExportPanel({ config, copy }: ExportPanelProps) {
     setNotice(copy.generatedComponent(componentName));
   };
 
+  const toggleInteractionAction = (action: InteractionActionId) => {
+    setInteractionActions((current) => ({
+      ...current,
+      [action]: !current[action]
+    }));
+  };
+
   return (
     <div className="export-panel">
       <label className="component-name">
@@ -83,6 +113,33 @@ export function ExportPanel({ config, copy }: ExportPanelProps) {
       <div className="registry-identity">
         <span>REGISTRY ID</span>
         <code>{registryName}</code>
+      </div>
+      <div className="export-interactions">
+        <div className="export-interactions__header">
+          <span>{copy.interactionTitle}</span>
+          <strong>{copy.interactionCount(
+            selectedInteractionCount,
+            INTERACTION_ACTION_IDS.length
+          )}</strong>
+        </div>
+        <div
+          className="export-interactions__options"
+          role="group"
+          aria-label={copy.interactionGroupAria}
+        >
+          {INTERACTION_ACTION_IDS.map((action) => (
+            <button
+              key={action}
+              className="export-interaction-option"
+              type="button"
+              aria-pressed={interactionActions[action]}
+              onClick={() => toggleInteractionAction(action)}
+            >
+              <span className="export-interaction-option__signal" aria-hidden="true" />
+              <span>{copy.interactionActions[action]}</span>
+            </button>
+          ))}
+        </div>
       </div>
       <div className="export-actions">
         <button type="button" onClick={copyComponent}>{copy.copyTsx}</button>

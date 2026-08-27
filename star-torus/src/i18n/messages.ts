@@ -1,4 +1,8 @@
-import type { RuntimeStatus, ShapeId } from "@/domain/star-field";
+import type {
+  InteractionActionId,
+  RuntimeStatus,
+  ShapeId
+} from "@/domain/star-field";
 import type { ThemePresetId } from "@/domain/theme-presets";
 
 export const LOCALES = ["zh-CN", "en-US"] as const;
@@ -18,6 +22,10 @@ export interface ExportCopy {
   generatedComponent(componentName: string): string;
   componentName: string;
   componentNameAria: string;
+  interactionTitle: string;
+  interactionGroupAria: string;
+  interactionCount(selected: number, total: number): string;
+  interactionActions: Record<InteractionActionId, string>;
   copyTsx: string;
   downloadComponent: string;
   copyConfig: string;
@@ -161,7 +169,7 @@ export const MESSAGES = {
       pearl: "月尘白"
     },
     export: {
-      initialNotice: "参数变化会实时写入导出组件",
+      initialNotice: "参数与所选交互会实时写入导出组件",
       copiedComponent: (componentName) => `已复制 ${componentName}.tsx`,
       copiedConfig: "已复制可序列化配置 JSON",
       copiedRegistry: (registryName) => `已复制 ${registryName}.json Registry 清单`,
@@ -169,6 +177,16 @@ export const MESSAGES = {
       generatedComponent: (componentName) => `已生成 ${componentName}.tsx`,
       componentName: "组件名称",
       componentNameAria: "导出组件名称",
+      interactionTitle: "保留交互",
+      interactionGroupAria: "选择导出组件保留的交互动作",
+      interactionCount: (selected, total) => `${selected}/${total} 已选`,
+      interactionActions: {
+        hoverLight: "跟随打光",
+        dragRotate: "拖拽旋转",
+        wheelZoom: "滚轮缩放",
+        clickPulse: "单击脉冲",
+        holdAction: "长按行为"
+      },
       copyTsx: "复制 TSX",
       downloadComponent: "下载组件",
       copyConfig: "复制配置",
@@ -256,7 +274,7 @@ export const MESSAGES = {
       pearl: "Lunar Pearl"
     },
     export: {
-      initialNotice: "Parameter changes are reflected in the exported component",
+      initialNotice: "Parameters and selected interactions are reflected in the export",
       copiedComponent: (componentName) => `Copied ${componentName}.tsx`,
       copiedConfig: "Copied serializable config JSON",
       copiedRegistry: (registryName) => `Copied ${registryName}.json registry manifest`,
@@ -264,6 +282,16 @@ export const MESSAGES = {
       generatedComponent: (componentName) => `Generated ${componentName}.tsx`,
       componentName: "Component Name",
       componentNameAria: "Exported component name",
+      interactionTitle: "Keep Interactions",
+      interactionGroupAria: "Choose interactions to keep in the exported component",
+      interactionCount: (selected, total) => `${selected}/${total} selected`,
+      interactionActions: {
+        hoverLight: "Hover Light",
+        dragRotate: "Drag Rotate",
+        wheelZoom: "Wheel Zoom",
+        clickPulse: "Click Pulse",
+        holdAction: "Hold Action"
+      },
       copyTsx: "Copy TSX",
       downloadComponent: "Download Component",
       copyConfig: "Copy Config",
