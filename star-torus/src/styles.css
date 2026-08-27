@@ -872,6 +872,84 @@ button {
   border-radius: 50%;
 }
 
+.shape-mark--network-globe {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 45%, currentColor 48% 52%, transparent 55%),
+    linear-gradient(transparent 45%, currentColor 48% 52%, transparent 55%);
+}
+
+.shape-mark--particle-logo::before {
+  content: "F";
+  position: absolute;
+  inset: 0;
+  font: 800 12px/14px ui-monospace, monospace;
+  text-align: center;
+}
+
+.shape-mark--light-tunnel {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px rgba(var(--panel-rgb), 0.9), inset 0 0 0 4px currentColor;
+}
+
+.shape-mark--lissajous-orbit::before,
+.shape-mark--lissajous-orbit::after {
+  position: absolute;
+  inset: 3px -1px;
+  content: "";
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.shape-mark--lissajous-orbit::before { transform: rotate(45deg); }
+.shape-mark--lissajous-orbit::after { transform: rotate(-45deg); }
+
+.shape-mark--gyroid {
+  border: 1px solid currentColor;
+  border-radius: 45% 55% 38% 62%;
+  transform: rotate(45deg);
+}
+
+.shape-mark--gyroid::after {
+  position: absolute;
+  inset: 3px;
+  content: "";
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.shape-mark--metaball::before,
+.shape-mark--metaball::after {
+  position: absolute;
+  content: "";
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.shape-mark--metaball::before { inset: 0 4px 4px 0; }
+.shape-mark--metaball::after { inset: 5px 0 0 5px; }
+
+.shape-mark--particle-terrain {
+  border-bottom: 1px solid currentColor;
+  clip-path: polygon(0 100%, 18% 56%, 36% 76%, 58% 20%, 76% 62%, 100% 38%, 100% 100%);
+  background: currentColor;
+}
+
+.shape-mark--dna-ring {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.shape-mark--dna-ring::after {
+  position: absolute;
+  inset: 2px;
+  content: "";
+  border: 1px dashed currentColor;
+  border-radius: 50%;
+}
+
 .section-reset {
   padding: 3px 6px;
   border: 0;

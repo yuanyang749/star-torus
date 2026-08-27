@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-dna-ring",
+  "title": "DNA 环链几何",
+  "description": "FORMFIELD LAB 的DNA 环链几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/dna-ring.ts",
+      "target": "components/formfield/geometries/dna-ring.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst TAU = Math.PI * 2;\nconst RING_RADIUS = 150;\nconst HELIX_RADIUS = 29;\nconst STRAND_POINTS = 16;\nconst HELIX_TURNS = 9;\n\nexport const dnaRingGeometry: GeometryDefinition = {\n  id: \"dna-ring\",\n  label: \"DNA 环链\",\n  ariaLabel: \"首尾相连并带有梯级连接的环形 DNA 双螺旋\",\n  mark: \"dna-ring\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    let index = 0;\n\n    for (let column = 0; column < columns; column += 1) {\n      const progress = column / columns;\n      const ringAngle = progress * TAU;\n      const helixAngle = progress * TAU * HELIX_TURNS - phase * 1.1;\n      const cosRing = Math.cos(ringAngle);\n      const sinRing = Math.sin(ringAngle);\n      const strandOffset = Math.cos(helixAngle) * HELIX_RADIUS;\n      const strandHeight = Math.sin(helixAngle) * HELIX_RADIUS;\n\n      for (let row = 0; row < rows; row += 1) {\n        const positionIndex = index * 3;\n        let radialOffset: number;\n        let y: number;\n\n        if (row < STRAND_POINTS * 2) {\n          const strand = row < STRAND_POINTS ? 1 : -1;\n          const tubeIndex = row % STRAND_POINTS;\n          const tubeAngle = tubeIndex / STRAND_POINTS * TAU;\n          const tubeRadius = 3.2;\n          radialOffset = strand * strandOffset + Math.cos(tubeAngle) * tubeRadius;\n          y = strand * strandHeight + Math.sin(tubeAngle) * tubeRadius;\n          pointSizes[index] = 0.58 + (tubeIndex % 4 === 0 ? 0.18 : 0);\n        } else {\n          const rungCount = Math.max(1, rows - STRAND_POINTS * 2);\n          const rungProgress = rungCount > 1\n            ? (row - STRAND_POINTS * 2) / (rungCount - 1)\n            : 0.5;\n          const interpolation = rungProgress * 2 - 1;\n          radialOffset = strandOffset * interpolation;\n          y = strandHeight * interpolation;\n          pointSizes[index] = 0.42 + Math.sin(rungProgress * Math.PI) * 0.24;\n        }\n\n        const ringRadius = RING_RADIUS + radialOffset;\n        positions[positionIndex] = cosRing * ringRadius;\n        positions[positionIndex + 1] = y;\n        positions[positionIndex + 2] = sinRing * ringRadius;\n        index += 1;\n      }\n    }\n  }\n};\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "dna-ring",
+    "tags": [
+      "formfield",
+      "geometry",
+      "dna-ring"
+    ]
+  }
+}

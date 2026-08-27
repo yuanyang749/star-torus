@@ -66,5 +66,45 @@ export const GEOMETRY_DISTRIBUTION = {
     registryName: "geometry-galaxy-vortex",
     moduleName: "galaxy-vortex",
     exportName: "galaxyVortexGeometry"
+  },
+  "network-globe": {
+    registryName: "geometry-network-globe",
+    moduleName: "network-globe",
+    exportName: "networkGlobeGeometry"
+  },
+  "particle-logo": {
+    registryName: "geometry-particle-logo",
+    moduleName: "particle-logo",
+    exportName: "particleLogoGeometry"
+  },
+  "light-tunnel": {
+    registryName: "geometry-light-tunnel",
+    moduleName: "light-tunnel",
+    exportName: "lightTunnelGeometry"
+  },
+  "lissajous-orbit": {
+    registryName: "geometry-lissajous-orbit",
+    moduleName: "lissajous-orbit",
+    exportName: "lissajousOrbitGeometry"
+  },
+  gyroid: {
+    registryName: "geometry-gyroid",
+    moduleName: "gyroid",
+    exportName: "gyroidGeometry"
+  },
+  metaball: {
+    registryName: "geometry-metaball",
+    moduleName: "metaball",
+    exportName: "metaballGeometry"
+  },
+  "particle-terrain": {
+    registryName: "geometry-particle-terrain",
+    moduleName: "particle-terrain",
+    exportName: "particleTerrainGeometry"
+  },
+  "dna-ring": {
+    registryName: "geometry-dna-ring",
+    moduleName: "dna-ring",
+    exportName: "dnaRingGeometry"
   }
 } satisfies Record<ShapeId, GeometryDistribution>;

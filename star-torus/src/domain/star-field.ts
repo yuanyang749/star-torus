@@ -10,7 +10,15 @@ export const SHAPE_IDS = [
   "wave-surface",
   "flow-ribbon",
   "heart",
-  "galaxy"
+  "galaxy",
+  "network-globe",
+  "particle-logo",
+  "light-tunnel",
+  "lissajous-orbit",
+  "gyroid",
+  "metaball",
+  "particle-terrain",
+  "dna-ring"
 ] as const;
 export type ShapeId = (typeof SHAPE_IDS)[number];
 

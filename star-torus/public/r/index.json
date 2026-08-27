@@ -200,6 +200,126 @@
       }
     },
     {
+      "name": "geometry-network-globe",
+      "title": "网络地球几何",
+      "description": "FORMFIELD LAB 的网络地球几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "network-globe",
+        "tags": [
+          "formfield",
+          "geometry",
+          "network-globe"
+        ]
+      }
+    },
+    {
+      "name": "geometry-particle-logo",
+      "title": "文字标志几何",
+      "description": "FORMFIELD LAB 的文字标志几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "particle-logo",
+        "tags": [
+          "formfield",
+          "geometry",
+          "particle-logo"
+        ]
+      }
+    },
+    {
+      "name": "geometry-light-tunnel",
+      "title": "光隧道几何",
+      "description": "FORMFIELD LAB 的光隧道几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "light-tunnel",
+        "tags": [
+          "formfield",
+          "geometry",
+          "light-tunnel"
+        ]
+      }
+    },
+    {
+      "name": "geometry-lissajous-orbit",
+      "title": "利萨如星轨几何",
+      "description": "FORMFIELD LAB 的利萨如星轨几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "lissajous-orbit",
+        "tags": [
+          "formfield",
+          "geometry",
+          "lissajous-orbit"
+        ]
+      }
+    },
+    {
+      "name": "geometry-gyroid",
+      "title": "Gyroid 极小曲面几何",
+      "description": "FORMFIELD LAB 的Gyroid 极小曲面几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "gyroid",
+        "tags": [
+          "formfield",
+          "geometry",
+          "gyroid"
+        ]
+      }
+    },
+    {
+      "name": "geometry-metaball",
+      "title": "流体软体几何",
+      "description": "FORMFIELD LAB 的流体软体几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "metaball",
+        "tags": [
+          "formfield",
+          "geometry",
+          "metaball"
+        ]
+      }
+    },
+    {
+      "name": "geometry-particle-terrain",
+      "title": "粒子地形几何",
+      "description": "FORMFIELD LAB 的粒子地形几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "particle-terrain",
+        "tags": [
+          "formfield",
+          "geometry",
+          "particle-terrain"
+        ]
+      }
+    },
+    {
+      "name": "geometry-dna-ring",
+      "title": "DNA 环链几何",
+      "description": "FORMFIELD LAB 的DNA 环链几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "dna-ring",
+        "tags": [
+          "formfield",
+          "geometry",
+          "dna-ring"
+        ]
+      }
+    },
+    {
       "name": "star-torus",
       "title": "星环",
       "description": "FORMFIELD LAB 的星环生成式视觉组件。",
@@ -388,6 +508,134 @@
           "r3f",
           "particles",
           "galaxy"
+        ]
+      }
+    },
+    {
+      "name": "network-globe",
+      "title": "网络地球",
+      "description": "FORMFIELD LAB 的网络地球生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "network-globe",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "network-globe"
+        ]
+      }
+    },
+    {
+      "name": "particle-logo",
+      "title": "文字标志",
+      "description": "FORMFIELD LAB 的文字标志生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "particle-logo",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "particle-logo"
+        ]
+      }
+    },
+    {
+      "name": "light-tunnel",
+      "title": "光隧道",
+      "description": "FORMFIELD LAB 的光隧道生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "light-tunnel",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "light-tunnel"
+        ]
+      }
+    },
+    {
+      "name": "lissajous-orbit",
+      "title": "利萨如星轨",
+      "description": "FORMFIELD LAB 的利萨如星轨生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "lissajous-orbit",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "lissajous-orbit"
+        ]
+      }
+    },
+    {
+      "name": "gyroid",
+      "title": "Gyroid 极小曲面",
+      "description": "FORMFIELD LAB 的Gyroid 极小曲面生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "gyroid",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "gyroid"
+        ]
+      }
+    },
+    {
+      "name": "metaball",
+      "title": "流体软体",
+      "description": "FORMFIELD LAB 的流体软体生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "metaball",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "metaball"
+        ]
+      }
+    },
+    {
+      "name": "particle-terrain",
+      "title": "粒子地形",
+      "description": "FORMFIELD LAB 的粒子地形生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "particle-terrain",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "particle-terrain"
+        ]
+      }
+    },
+    {
+      "name": "dna-ring",
+      "title": "DNA 环链",
+      "description": "FORMFIELD LAB 的DNA 环链生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "dna-ring",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "dna-ring"
         ]
       }
     }

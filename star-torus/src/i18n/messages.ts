@@ -160,7 +160,15 @@ export const MESSAGES = {
       "wave-surface": { label: "波浪面", ariaLabel: "由星点展开形成并持续起伏的波浪马鞍曲面" },
       "flow-ribbon": { label: "流光丝带", ariaLabel: "由星点编织并持续流动的三维流光丝带" },
       heart: { label: "心形面", ariaLabel: "由星点组成并持续流动的三维心形曲面" },
-      galaxy: { label: "星系漩涡", ariaLabel: "由四条星点旋臂组成并持续旋转的星系漩涡" }
+      galaxy: { label: "星系漩涡", ariaLabel: "由四条星点旋臂组成并持续旋转的星系漩涡" },
+      "network-globe": { label: "网络地球", ariaLabel: "由节点和跃迁弧线构成的三维网络地球" },
+      "particle-logo": { label: "文字标志", ariaLabel: "由星点聚合形成的 FORMFIELD 三维文字标志" },
+      "light-tunnel": { label: "光隧道", ariaLabel: "由连续粒子光环构成的纵深穿梭隧道" },
+      "lissajous-orbit": { label: "星轨", ariaLabel: "由多组闭合利萨如轨道交错形成的三维星轨" },
+      gyroid: { label: "极小曲面", ariaLabel: "满足三周期极小曲面方程的粒子 Gyroid" },
+      metaball: { label: "流体软体", ariaLabel: "多个柔性体融合并呼吸变形的粒子 Metaball" },
+      "particle-terrain": { label: "粒子地形", ariaLabel: "由多频波场生成并缓慢流动的粒子山脉地形" },
+      "dna-ring": { label: "DNA 环链", ariaLabel: "首尾相连并带有梯级连接的环形 DNA 双螺旋" }
     },
     themes: {
       mono: "经典黑白",
@@ -267,7 +275,15 @@ export const MESSAGES = {
       "wave-surface": { label: "Wave", ariaLabel: "A continuously undulating particle wave saddle surface" },
       "flow-ribbon": { label: "Ribbon", ariaLabel: "A three-dimensional ribbon woven from flowing particles" },
       heart: { label: "Heart", ariaLabel: "A flowing three-dimensional particle heart surface" },
-      galaxy: { label: "Galaxy", ariaLabel: "A rotating particle galaxy with four spiral arms" }
+      galaxy: { label: "Galaxy", ariaLabel: "A rotating particle galaxy with four spiral arms" },
+      "network-globe": { label: "Network Globe", ariaLabel: "A network globe made of nodes and elevated connection arcs" },
+      "particle-logo": { label: "Particle Logo", ariaLabel: "A three-dimensional FORMFIELD wordmark assembled from particles" },
+      "light-tunnel": { label: "Light Tunnel", ariaLabel: "A deep light tunnel assembled from continuous particle rings" },
+      "lissajous-orbit": { label: "Star Orbits", ariaLabel: "Interwoven three-dimensional Lissajous particle orbits" },
+      gyroid: { label: "Gyroid", ariaLabel: "A particle gyroid based on a triply periodic minimal surface" },
+      metaball: { label: "Metaball", ariaLabel: "Breathing and merging particle metaballs" },
+      "particle-terrain": { label: "Terrain", ariaLabel: "A flowing particle mountain terrain generated from layered waves" },
+      "dna-ring": { label: "DNA Ring", ariaLabel: "A closed DNA double helix with particle rungs" }
     },
     themes: {
       mono: "Monochrome",

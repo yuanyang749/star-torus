@@ -1,0 +1,53 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "network-globe",
+  "title": "网络地球",
+  "description": "FORMFIELD LAB 的网络地球生成式视觉组件。",
+  "type": "registry:visual",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "geometry-network-globe"
+  ],
+  "files": [
+    {
+      "path": "registry/network-globe/NetworkGlobeField.tsx",
+      "target": "components/formfield/presets/NetworkGlobeField.tsx",
+      "type": "registry:component",
+      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { networkGlobeGeometry } from \"@/components/formfield/geometries/network-globe\";\n\nconst NetworkGlobeFieldGeometries = [networkGlobeGeometry] as const;\n\nexport const NetworkGlobeFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"network-globe\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  }\n} satisfies FormFieldConfig;\n\nexport function NetworkGlobeField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={NetworkGlobeFieldConfig} geometries={NetworkGlobeFieldGeometries} />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "meta": {
+    "category": "field",
+    "shape": "network-globe",
+    "tags": [
+      "formfield",
+      "r3f",
+      "particles",
+      "network-globe"
+    ]
+  },
+  "config": {
+    "version": 1,
+    "shape": "network-globe",
+    "theme": {
+      "background": "#000000",
+      "star": "#FFFFFF",
+      "glow": "#FFFFFF"
+    },
+    "motion": {
+      "flowSpeed": 1,
+      "pointScale": 1,
+      "morphDuration": 1.35
+    },
+    "effects": {
+      "hoverRadius": 220,
+      "hoverIntensity": 1,
+      "trailIntensity": 1
+    },
+    "interaction": {
+      "enabled": false,
+      "holdMode": "magnet"
+    }
+  }
+}

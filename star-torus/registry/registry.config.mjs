@@ -24,7 +24,15 @@ export const geometryItems = [
   { name: "geometry-wave-surface", shape: "wave-surface", title: "波浪马鞍面几何", moduleName: "wave-surface", exportName: "waveSurfaceGeometry" },
   { name: "geometry-flow-ribbon", shape: "flow-ribbon", title: "流光丝带几何", moduleName: "flow-ribbon", exportName: "flowRibbonGeometry" },
   { name: "geometry-heart-surface", shape: "heart", title: "心形曲面几何", moduleName: "heart-surface", exportName: "heartSurfaceGeometry" },
-  { name: "geometry-galaxy-vortex", shape: "galaxy", title: "星系漩涡几何", moduleName: "galaxy-vortex", exportName: "galaxyVortexGeometry" }
+  { name: "geometry-galaxy-vortex", shape: "galaxy", title: "星系漩涡几何", moduleName: "galaxy-vortex", exportName: "galaxyVortexGeometry" },
+  { name: "geometry-network-globe", shape: "network-globe", title: "网络地球几何", moduleName: "network-globe", exportName: "networkGlobeGeometry" },
+  { name: "geometry-particle-logo", shape: "particle-logo", title: "文字标志几何", moduleName: "particle-logo", exportName: "particleLogoGeometry" },
+  { name: "geometry-light-tunnel", shape: "light-tunnel", title: "光隧道几何", moduleName: "light-tunnel", exportName: "lightTunnelGeometry" },
+  { name: "geometry-lissajous-orbit", shape: "lissajous-orbit", title: "利萨如星轨几何", moduleName: "lissajous-orbit", exportName: "lissajousOrbitGeometry" },
+  { name: "geometry-gyroid", shape: "gyroid", title: "Gyroid 极小曲面几何", moduleName: "gyroid", exportName: "gyroidGeometry" },
+  { name: "geometry-metaball", shape: "metaball", title: "流体软体几何", moduleName: "metaball", exportName: "metaballGeometry" },
+  { name: "geometry-particle-terrain", shape: "particle-terrain", title: "粒子地形几何", moduleName: "particle-terrain", exportName: "particleTerrainGeometry" },
+  { name: "geometry-dna-ring", shape: "dna-ring", title: "DNA 环链几何", moduleName: "dna-ring", exportName: "dnaRingGeometry" }
 ];
 
 export const visualPresets = [
@@ -39,7 +47,15 @@ export const visualPresets = [
   ["wave-surface", "WaveSurfaceField", "波浪马鞍面", "wave-surface"],
   ["flow-ribbon", "FlowRibbonField", "流光丝带", "flow-ribbon"],
   ["heart-surface", "HeartSurfaceField", "心形曲面", "heart"],
-  ["galaxy-vortex", "GalaxyVortexField", "星系漩涡", "galaxy"]
+  ["galaxy-vortex", "GalaxyVortexField", "星系漩涡", "galaxy"],
+  ["network-globe", "NetworkGlobeField", "网络地球", "network-globe"],
+  ["particle-logo", "ParticleLogoField", "文字标志", "particle-logo"],
+  ["light-tunnel", "LightTunnelField", "光隧道", "light-tunnel"],
+  ["lissajous-orbit", "LissajousOrbitField", "利萨如星轨", "lissajous-orbit"],
+  ["gyroid", "GyroidField", "Gyroid 极小曲面", "gyroid"],
+  ["metaball", "MetaballField", "流体软体", "metaball"],
+  ["particle-terrain", "ParticleTerrainField", "粒子地形", "particle-terrain"],
+  ["dna-ring", "DnaRingField", "DNA 环链", "dna-ring"]
 ];
 
 export function createPresetConfig(shape) {

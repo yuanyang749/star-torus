@@ -13,13 +13,26 @@ const index = await readJson(resolve(registryDirectory, "index.json"));
 const itemNames = new Set(index.items.map((item) => item.name));
 
 assert.equal(index.name, "formfield");
-assert.equal(index.items.length, 25);
+assert.equal(index.items.length, 41);
 assert(itemNames.has("form-field-runtime"));
 assert(itemNames.has("geometry-torus"));
 assert(itemNames.has("geometry-galaxy-vortex"));
 assert(itemNames.has("star-torus"));
 assert(itemNames.has("galaxy-vortex"));
 assert(itemNames.has("flow-ribbon"));
+for (const name of [
+  "network-globe",
+  "particle-logo",
+  "light-tunnel",
+  "lissajous-orbit",
+  "gyroid",
+  "metaball",
+  "particle-terrain",
+  "dna-ring"
+]) {
+  assert(itemNames.has(name), `Missing visual registry item ${name}`);
+  assert(itemNames.has(`geometry-${name}`), `Missing geometry registry item ${name}`);
+}
 
 for (const itemName of itemNames) {
   const item = await readJson(resolve(registryDirectory, `${itemName}.json`));
@@ -49,7 +62,7 @@ try {
     [
       resolve(root, "packages/cli/bin/formfield.mjs"),
       "add",
-      "star-torus",
+      "dna-ring",
       "--cwd",
       sandbox,
       "--registry",
@@ -61,20 +74,21 @@ try {
 
   assert.equal(cliResult.status, 0, cliResult.stderr || cliResult.stdout);
   assert(existsSync(resolve(sandbox, "src/components/formfield/StarField.tsx")));
-  assert(existsSync(resolve(sandbox, "src/components/formfield/geometries/torus.ts")));
+  assert(existsSync(resolve(sandbox, "src/components/formfield/geometries/dna-ring.ts")));
   assert(!existsSync(resolve(sandbox, "src/components/formfield/geometries/sphere.ts")));
+  assert(!existsSync(resolve(sandbox, "src/components/formfield/geometries/torus.ts")));
   assert(!existsSync(resolve(sandbox, "src/components/formfield/geometries/registry.ts")));
-  assert(existsSync(resolve(sandbox, "src/components/formfield/presets/StarTorus.tsx")));
+  assert(existsSync(resolve(sandbox, "src/components/formfield/presets/DnaRingField.tsx")));
   const installedPreset = await readFile(
-    resolve(sandbox, "src/components/formfield/presets/StarTorus.tsx"),
+    resolve(sandbox, "src/components/formfield/presets/DnaRingField.tsx"),
     "utf8"
   );
   assert(installedPreset.includes('from "@/components/formfield"'));
-  assert(installedPreset.includes('from "@/components/formfield/geometries/torus"'));
-  assert(installedPreset.includes("geometries={StarTorusGeometries}"));
+  assert(installedPreset.includes('from "@/components/formfield/geometries/dna-ring"'));
+  assert(installedPreset.includes("geometries={DnaRingFieldGeometries}"));
 
   await build({
-    entryPoints: [resolve(sandbox, "src/components/formfield/presets/StarTorus.tsx")],
+    entryPoints: [resolve(sandbox, "src/components/formfield/presets/DnaRingField.tsx")],
     outdir: resolve(sandbox, ".build"),
     bundle: true,
     write: false,
