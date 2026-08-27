@@ -996,6 +996,17 @@ button {
   -webkit-overflow-scrolling: touch;
 }
 
+.theme-grid.is-dragging {
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.theme-grid.is-dragging,
+.theme-grid.is-dragging .theme-preset {
+  cursor: grabbing;
+}
+
 .theme-grid::-webkit-scrollbar {
   height: 3px;
 }

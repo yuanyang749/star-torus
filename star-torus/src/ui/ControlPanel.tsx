@@ -1,6 +1,9 @@
 import {
   useEffect,
+  useRef,
   type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
   type RefObject
 } from "react";
@@ -36,6 +39,13 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
   const resetParameters = useStudioStore((state) => state.resetParameters);
   const activePreset = findThemePreset(config.theme);
   const messages = MESSAGES[locale];
+  const themeDragState = useRef({
+    pointerId: -1,
+    startX: 0,
+    startScrollLeft: 0,
+    dragged: false
+  });
+  const suppressThemeClick = useRef(false);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -44,6 +54,54 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [panelCollapsed, setPanelCollapsed]);
+
+  const handleThemePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
+    themeDragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startScrollLeft: event.currentTarget.scrollLeft,
+      dragged: false
+    };
+  };
+
+  const handleThemePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = themeDragState.current;
+    if (drag.pointerId !== event.pointerId) return;
+
+    const distance = event.clientX - drag.startX;
+    if (!drag.dragged && Math.abs(distance) < 4) return;
+    if (!drag.dragged) {
+      drag.dragged = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      event.currentTarget.classList.add("is-dragging");
+    }
+
+    event.preventDefault();
+    event.currentTarget.scrollLeft = drag.startScrollLeft - distance;
+  };
+
+  const finishThemeDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = themeDragState.current;
+    if (drag.pointerId !== event.pointerId) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    event.currentTarget.classList.remove("is-dragging");
+    suppressThemeClick.current = drag.dragged;
+    themeDragState.current.pointerId = -1;
+    window.setTimeout(() => {
+      suppressThemeClick.current = false;
+    }, 0);
+  };
+
+  const handleThemeClickCapture = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (!suppressThemeClick.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+    suppressThemeClick.current = false;
+  };
 
   return (
     <aside
@@ -192,7 +250,16 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
 
         <section className="panel-section">
           <SectionHeading index="04" title={messages.panel.themesSection} />
-          <div className="theme-grid" role="group" aria-label={messages.panel.themeGroupAria}>
+          <div
+            className="theme-grid"
+            role="group"
+            aria-label={messages.panel.themeGroupAria}
+            onPointerDown={handleThemePointerDown}
+            onPointerMove={handleThemePointerMove}
+            onPointerUp={finishThemeDrag}
+            onPointerCancel={finishThemeDrag}
+            onClickCapture={handleThemeClickCapture}
+          >
             {THEME_PRESETS.map((preset) => (
               <button
                 key={preset.id}
