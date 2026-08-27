@@ -180,21 +180,27 @@ button {
 
 .panel-header {
   position: relative;
-  display: grid;
-  min-height: 114px;
-  padding: 22px 22px 18px;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 15px;
+  display: flex;
+  min-height: 126px;
+  padding: 17px 22px 18px;
+  flex-direction: column;
+  gap: 14px;
   border-bottom: 1px solid rgba(var(--panel-ink-rgb), 0.1);
   overflow: hidden;
 }
 
-.language-switch {
-  position: absolute;
-  top: 14px;
-  right: 18px;
+.panel-header__meta {
+  position: relative;
   z-index: 1;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.language-switch {
+  flex: 0 0 auto;
   display: inline-flex;
   padding: 2px;
   border: 1px solid rgba(var(--panel-ink-rgb), 0.14);
@@ -240,6 +246,22 @@ button {
     0 0 0 38px rgba(var(--panel-ink-rgb), 0.012);
 }
 
+.panel-brand {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 15px;
+}
+
+.panel-brand__copy {
+  display: grid;
+  min-width: 0;
+  gap: 9px;
+}
+
 .panel-orbit {
   position: relative;
   display: grid;
@@ -278,10 +300,14 @@ button {
 }
 
 .panel-kicker {
-  margin: 0 0 7px;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
   color: rgba(var(--panel-ink-rgb), 0.48);
   font: 600 8px/1.2 ui-monospace, "SFMono-Regular", monospace;
   letter-spacing: 0.2em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .panel-title {
@@ -302,10 +328,8 @@ button {
 }
 
 .panel-readout {
-  position: absolute;
-  right: 22px;
-  bottom: 14px;
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: 6px;
   color: rgba(var(--panel-ink-rgb), 0.48);

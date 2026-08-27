@@ -78,15 +78,19 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
         inert={panelCollapsed ? true : undefined}
       >
         <header className="panel-header">
-          <div className="panel-orbit" aria-hidden="true"><span /></div>
-          <div>
+          <div className="panel-header__meta">
             <p className="panel-kicker">FORMFIELD LAB / REGISTRY</p>
-            <h1 className="panel-title">{messages.panel.title}</h1>
+            <LanguageSwitch locale={locale} setLocale={setLocale} />
           </div>
-          <LanguageSwitch locale={locale} setLocale={setLocale} />
-          <div className="panel-readout">
-            <span className="panel-readout__dot" />
-            <span>{activePreset?.readout ?? "CUSTOM"}</span>
+          <div className="panel-brand">
+            <div className="panel-orbit" aria-hidden="true"><span /></div>
+            <div className="panel-brand__copy">
+              <h1 className="panel-title">{messages.panel.title}</h1>
+              <div className="panel-readout">
+                <span className="panel-readout__dot" />
+                <span>{activePreset?.readout ?? "CUSTOM"}</span>
+              </div>
+            </div>
           </div>
         </header>
 
