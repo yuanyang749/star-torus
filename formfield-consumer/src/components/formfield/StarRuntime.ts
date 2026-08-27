@@ -1,5 +1,6 @@
 import {
   resolveInteractionActions,
+  resolveParallaxStrength,
   type RuntimeStatus,
   type StarFieldConfig,
   type StarInteractionActions
@@ -53,6 +54,7 @@ export class StarRuntime {
 
   private canvas: HTMLCanvasElement | null = null;
   private interactionActions: StarInteractionActions;
+  private parallaxStrength: number;
   private statusListener?: StatusListener;
   private status: RuntimeStatus = "disabled";
   private pointerInside = false;
@@ -78,6 +80,7 @@ export class StarRuntime {
   constructor(config: StarFieldConfig, statusListener?: StatusListener) {
     this.config = config;
     this.interactionActions = resolveInteractionActions(config.interaction);
+    this.parallaxStrength = resolveParallaxStrength(config.interaction);
     this.statusListener = statusListener;
     this.emitStatus(true);
   }
@@ -86,6 +89,7 @@ export class StarRuntime {
     const interactionWasEnabled = this.config.interaction.enabled;
     this.config = config;
     this.interactionActions = resolveInteractionActions(config.interaction);
+    this.parallaxStrength = resolveParallaxStrength(config.interaction);
 
     if (
       (interactionWasEnabled && !config.interaction.enabled)
@@ -236,6 +240,7 @@ export class StarRuntime {
 
     const parallaxActive = this.config.interaction.enabled
       && this.interactionActions.pointerParallax
+      && this.parallaxStrength > 0
       && this.pointerInside
       && !this.dragging;
     const normalizedPointerX = parallaxActive
@@ -244,8 +249,8 @@ export class StarRuntime {
     const normalizedPointerY = parallaxActive
       ? Math.min(1, Math.max(-1, this.pointerY / Math.max(1, this.viewportHeight) * 2 - 1))
       : 0;
-    const targetParallaxX = normalizedPointerY * PARALLAX_ROTATION_X;
-    const targetParallaxY = normalizedPointerX * PARALLAX_ROTATION_Y;
+    const targetParallaxX = normalizedPointerY * PARALLAX_ROTATION_X * this.parallaxStrength;
+    const targetParallaxY = normalizedPointerX * PARALLAX_ROTATION_Y * this.parallaxStrength;
     const parallaxEase = 1 - Math.pow(parallaxActive ? 0.72 : 0.82, deltaFrames);
     this.parallaxX += (targetParallaxX - this.parallaxX) * parallaxEase;
     this.parallaxY += (targetParallaxY - this.parallaxY) * parallaxEase;
@@ -505,7 +510,7 @@ export class StarRuntime {
     return this.hasPressInteraction()
       || (this.config.interaction.enabled && (
         this.interactionActions.wheelZoom
-        || this.interactionActions.pointerParallax
+        || (this.interactionActions.pointerParallax && this.parallaxStrength > 0)
       ));
   }
 

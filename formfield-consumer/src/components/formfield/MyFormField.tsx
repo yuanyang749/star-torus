@@ -24,6 +24,7 @@ export const MyFormFieldConfig = {
   "interaction": {
     "enabled": true,
     "holdMode": "magnet",
+    "parallaxStrength": 0.8,
     "actions": {
       "hoverLight": true,
       "dragRotate": true,

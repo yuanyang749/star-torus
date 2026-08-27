@@ -25,6 +25,7 @@ interface StudioState {
   setThemeColor(channel: keyof StarTheme, value: string): void;
   setInteractionEnabled(enabled: boolean): void;
   setHoldMode(mode: HoldMode): void;
+  setParallaxStrength(value: number): void;
   setMotionValue(key: keyof StarMotionConfig, value: number): void;
   setEffectValue(key: keyof StarEffectConfig, value: number): void;
   setPanelCollapsed(collapsed: boolean): void;
@@ -78,6 +79,13 @@ export const useStudioStore = create<StudioState>()(
         }
       })),
 
+      setParallaxStrength: (parallaxStrength) => set((state) => ({
+        config: {
+          ...state.config,
+          interaction: { ...state.config.interaction, parallaxStrength }
+        }
+      })),
+
       setMotionValue: (key, value) => set((state) => ({
         config: {
           ...state.config,
@@ -107,7 +115,11 @@ export const useStudioStore = create<StudioState>()(
         config: {
           ...state.config,
           motion: { ...DEFAULT_STAR_FIELD_CONFIG.motion },
-          effects: { ...DEFAULT_STAR_FIELD_CONFIG.effects }
+          effects: { ...DEFAULT_STAR_FIELD_CONFIG.effects },
+          interaction: {
+            ...state.config.interaction,
+            parallaxStrength: DEFAULT_STAR_FIELD_CONFIG.interaction.parallaxStrength
+          }
         }
       }))
     }),

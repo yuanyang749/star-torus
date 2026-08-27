@@ -71,6 +71,7 @@ interface Messages {
     lightRadius: string;
     lightIntensity: string;
     trailIntensity: string;
+    parallaxStrength: string;
     themesSection: string;
     themeGroupAria: string;
     colorsSection: string;
@@ -127,6 +128,7 @@ export const MESSAGES = {
       lightRadius: "光照半径",
       lightIntensity: "光照强度",
       trailIntensity: "尾迹强度",
+      parallaxStrength: "视差强度",
       themesSection: "主题预设",
       themeGroupAria: "选择主题预设",
       colorsSection: "自定义颜色",
@@ -233,6 +235,7 @@ export const MESSAGES = {
       lightRadius: "Light Radius",
       lightIntensity: "Light Intensity",
       trailIntensity: "Trail Intensity",
+      parallaxStrength: "Parallax Strength",
       themesSection: "Theme Presets",
       themeGroupAria: "Select a theme preset",
       colorsSection: "Custom Colors",

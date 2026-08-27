@@ -5,6 +5,7 @@ import {
   type RefObject
 } from "react";
 import type { StarFieldHandle } from "@/components/star-field";
+import { DEFAULT_PARALLAX_STRENGTH } from "@/domain/star-field";
 import { THEME_PRESETS, findThemePreset } from "@/domain/theme-presets";
 import { GEOMETRY_DEFINITIONS } from "@/geometries/registry";
 import { MESSAGES, type Locale } from "@/i18n/messages";
@@ -26,6 +27,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
   const setThemeColor = useStudioStore((state) => state.setThemeColor);
   const setInteractionEnabled = useStudioStore((state) => state.setInteractionEnabled);
   const setHoldMode = useStudioStore((state) => state.setHoldMode);
+  const setParallaxStrength = useStudioStore((state) => state.setParallaxStrength);
   const setMotionValue = useStudioStore((state) => state.setMotionValue);
   const setEffectValue = useStudioStore((state) => state.setEffectValue);
   const setPanelCollapsed = useStudioStore((state) => state.setPanelCollapsed);
@@ -184,6 +186,7 @@ export function ControlPanel({ starFieldRef }: ControlPanelProps) {
             <ParameterSlider label={messages.panel.lightRadius} code="RAD" value={config.effects.hoverRadius} min={70} max={260} step={5} suffix="px" digits={0} onChange={(value) => setEffectValue("hoverRadius", value)} />
             <ParameterSlider label={messages.panel.lightIntensity} code="LUX" value={config.effects.hoverIntensity} min={0} max={1.5} step={0.05} digits={2} onChange={(value) => setEffectValue("hoverIntensity", value)} />
             <ParameterSlider label={messages.panel.trailIntensity} code="TRL" value={config.effects.trailIntensity} min={0} max={1.5} step={0.05} digits={2} onChange={(value) => setEffectValue("trailIntensity", value)} />
+            <ParameterSlider label={messages.panel.parallaxStrength} code="PAR" value={config.interaction.parallaxStrength ?? DEFAULT_PARALLAX_STRENGTH} min={0} max={1.5} step={0.05} digits={2} onChange={setParallaxStrength} />
           </div>
         </section>
 

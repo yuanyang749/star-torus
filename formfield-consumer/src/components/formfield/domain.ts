@@ -56,6 +56,7 @@ export interface StarEffectConfig {
 export interface StarInteractionConfig {
   enabled: boolean;
   holdMode: HoldMode;
+  parallaxStrength?: number;
   actions?: Partial<StarInteractionActions>;
 }
 
@@ -79,6 +80,8 @@ export const DEFAULT_INTERACTION_ACTIONS: StarInteractionActions = {
   holdAction: true
 };
 
+export const DEFAULT_PARALLAX_STRENGTH = 0.8;
+
 export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
   version: 1,
   shape: "torus",
@@ -100,6 +103,7 @@ export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
   interaction: {
     enabled: false,
     holdMode: "magnet",
+    parallaxStrength: DEFAULT_PARALLAX_STRENGTH,
     actions: { ...DEFAULT_INTERACTION_ACTIONS }
   }
 };
@@ -116,6 +120,7 @@ export function cloneStarFieldConfig(config: StarFieldConfig): StarFieldConfig {
     interaction: {
       enabled: config.interaction.enabled,
       holdMode: config.interaction.holdMode,
+      parallaxStrength: resolveParallaxStrength(config.interaction),
       actions: resolveInteractionActions(config.interaction)
     }
   };
@@ -130,4 +135,11 @@ export function resolveInteractionActions(
     ...DEFAULT_INTERACTION_ACTIONS,
     ...interaction.actions
   };
+}
+
+export function resolveParallaxStrength(interaction: StarInteractionConfig): number {
+  return Math.min(
+    1.5,
+    Math.max(0, interaction.parallaxStrength ?? DEFAULT_PARALLAX_STRENGTH)
+  );
 }

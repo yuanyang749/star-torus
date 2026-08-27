@@ -14,7 +14,7 @@
       "path": "registry/my-form-field/MyFormField.tsx",
       "target": "components/formfield/MyFormField.tsx",
       "type": "registry:component",
-      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { torusGeometry } from \"@/components/formfield/geometries/torus\";\n\nconst MyFormFieldGeometries = [torusGeometry] as const;\n\nexport const MyFormFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"torus\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": true,\n    \"holdMode\": \"magnet\",\n    \"actions\": {\n      \"hoverLight\": true,\n      \"dragRotate\": true,\n      \"wheelZoom\": true,\n      \"clickPulse\": true,\n      \"holdAction\": true,\n      \"pointerParallax\": true\n    }\n  }\n} satisfies FormFieldConfig;\n\nexport function MyFormField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={MyFormFieldConfig} geometries={MyFormFieldGeometries} />\n    </div>\n  );\n}\n"
+      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { torusGeometry } from \"@/components/formfield/geometries/torus\";\n\nconst MyFormFieldGeometries = [torusGeometry] as const;\n\nexport const MyFormFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"torus\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": true,\n    \"holdMode\": \"magnet\",\n    \"parallaxStrength\": 0.8,\n    \"actions\": {\n      \"hoverLight\": true,\n      \"dragRotate\": true,\n      \"wheelZoom\": true,\n      \"clickPulse\": true,\n      \"holdAction\": true,\n      \"pointerParallax\": true\n    }\n  }\n} satisfies FormFieldConfig;\n\nexport function MyFormField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={MyFormFieldConfig} geometries={MyFormFieldGeometries} />\n    </div>\n  );\n}\n"
     }
   ],
   "meta": {
@@ -48,6 +48,7 @@
     "interaction": {
       "enabled": true,
       "holdMode": "magnet",
+      "parallaxStrength": 0.8,
       "actions": {
         "hoverLight": true,
         "dragRotate": true,
