@@ -1,5 +1,6 @@
 import type { StarFieldConfig } from "@/domain/star-field";
 import { createInstallCommand } from "@/domain/brand";
+import { GEOMETRY_DISTRIBUTION } from "@/geometries/distribution";
 import {
   REGISTRY_SCHEMA,
   type FormFieldRegistryItem
@@ -30,15 +31,20 @@ export function generateReactComponent(
 ): string {
   const componentName = normalizeComponentName(requestedName);
   const serializedConfig = JSON.stringify(config, null, 2);
+  const geometry = GEOMETRY_DISTRIBUTION[config.shape];
+  const geometryCollectionName = `${componentName}Geometries`;
 
   return `import { FormField, type FormFieldConfig } from "@/components/formfield";
+import { ${geometry.exportName} } from "@/components/formfield/geometries/${geometry.moduleName}";
+
+const ${geometryCollectionName} = [${geometry.exportName}] as const;
 
 export const ${componentName}Config = ${serializedConfig} satisfies FormFieldConfig;
 
 export function ${componentName}() {
   return (
     <div style={{ width: "100%", minHeight: 420, aspectRatio: "1 / 1" }}>
-      <FormField config={${componentName}Config} />
+      <FormField config={${componentName}Config} geometries={${geometryCollectionName}} />
     </div>
   );
 }
@@ -55,6 +61,7 @@ export function generateRegistryItem(
 ): FormFieldRegistryItem {
   const componentName = normalizeComponentName(requestedName);
   const registryName = normalizeRegistryName(requestedName);
+  const geometry = GEOMETRY_DISTRIBUTION[config.shape];
 
   return {
     $schema: REGISTRY_SCHEMA,
@@ -62,9 +69,9 @@ export function generateRegistryItem(
     title: componentName,
     description: `由 FORMFIELD LAB 生成的 ${config.shape} 视觉组件。`,
     type: "registry:visual",
-    dependencies: ["react", "three", "@react-three/fiber"],
-    devDependencies: ["@types/three"],
-    registryDependencies: ["form-field-runtime"],
+    dependencies: [],
+    devDependencies: [],
+    registryDependencies: [geometry.registryName],
     files: [
       {
         path: `registry/${registryName}/${componentName}.tsx`,

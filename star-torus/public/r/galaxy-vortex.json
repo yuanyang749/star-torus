@@ -7,14 +7,14 @@
   "dependencies": [],
   "devDependencies": [],
   "registryDependencies": [
-    "form-field-runtime"
+    "geometry-galaxy-vortex"
   ],
   "files": [
     {
       "path": "registry/galaxy-vortex/GalaxyVortexField.tsx",
       "target": "components/formfield/presets/GalaxyVortexField.tsx",
       "type": "registry:component",
-      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\n\nexport const GalaxyVortexFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"galaxy\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  }\n} satisfies FormFieldConfig;\n\nexport function GalaxyVortexField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={GalaxyVortexFieldConfig} />\n    </div>\n  );\n}\n"
+      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { galaxyVortexGeometry } from \"@/components/formfield/geometries/galaxy-vortex\";\n\nconst GalaxyVortexFieldGeometries = [galaxyVortexGeometry] as const;\n\nexport const GalaxyVortexFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"galaxy\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  }\n} satisfies FormFieldConfig;\n\nexport function GalaxyVortexField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={GalaxyVortexFieldConfig} geometries={GalaxyVortexFieldGeometries} />\n    </div>\n  );\n}\n"
     }
   ],
   "meta": {

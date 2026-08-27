@@ -1,4 +1,7 @@
 import { FormField, type FormFieldConfig } from "@/components/formfield";
+import { torusGeometry } from "@/components/formfield/geometries/torus";
+
+const MyFormFieldGeometries = [torusGeometry] as const;
 
 export const MyFormFieldConfig = {
   "version": 1,
@@ -27,7 +30,7 @@ export const MyFormFieldConfig = {
 export function MyFormField() {
   return (
     <div style={{ width: "100%", minHeight: 420, aspectRatio: "1 / 1" }}>
-      <FormField config={MyFormFieldConfig} />
+      <FormField config={MyFormFieldConfig} geometries={MyFormFieldGeometries} />
     </div>
   );
 }

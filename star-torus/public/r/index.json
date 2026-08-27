@@ -20,6 +20,186 @@
       }
     },
     {
+      "name": "geometry-torus",
+      "title": "星环几何",
+      "description": "FORMFIELD LAB 的星环几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "torus",
+        "tags": [
+          "formfield",
+          "geometry",
+          "torus"
+        ]
+      }
+    },
+    {
+      "name": "geometry-sphere",
+      "title": "球体几何",
+      "description": "FORMFIELD LAB 的球体几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "sphere",
+        "tags": [
+          "formfield",
+          "geometry",
+          "sphere"
+        ]
+      }
+    },
+    {
+      "name": "geometry-mobius",
+      "title": "莫比乌斯几何",
+      "description": "FORMFIELD LAB 的莫比乌斯几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "mobius",
+        "tags": [
+          "formfield",
+          "geometry",
+          "mobius"
+        ]
+      }
+    },
+    {
+      "name": "geometry-torus-knot",
+      "title": "三叶环面结几何",
+      "description": "FORMFIELD LAB 的三叶环面结几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "torus-knot",
+        "tags": [
+          "formfield",
+          "geometry",
+          "torus-knot"
+        ]
+      }
+    },
+    {
+      "name": "geometry-klein-bottle",
+      "title": "克莱因瓶几何",
+      "description": "FORMFIELD LAB 的克莱因瓶几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "klein",
+        "tags": [
+          "formfield",
+          "geometry",
+          "klein"
+        ]
+      }
+    },
+    {
+      "name": "geometry-superellipsoid",
+      "title": "超椭球几何",
+      "description": "FORMFIELD LAB 的超椭球几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "superellipsoid",
+        "tags": [
+          "formfield",
+          "geometry",
+          "superellipsoid"
+        ]
+      }
+    },
+    {
+      "name": "geometry-helicoid",
+      "title": "螺旋曲面几何",
+      "description": "FORMFIELD LAB 的螺旋曲面几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "helicoid",
+        "tags": [
+          "formfield",
+          "geometry",
+          "helicoid"
+        ]
+      }
+    },
+    {
+      "name": "geometry-double-helix",
+      "title": "双螺旋几何",
+      "description": "FORMFIELD LAB 的双螺旋几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "double-helix",
+        "tags": [
+          "formfield",
+          "geometry",
+          "double-helix"
+        ]
+      }
+    },
+    {
+      "name": "geometry-wave-surface",
+      "title": "波浪马鞍面几何",
+      "description": "FORMFIELD LAB 的波浪马鞍面几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "wave-surface",
+        "tags": [
+          "formfield",
+          "geometry",
+          "wave-surface"
+        ]
+      }
+    },
+    {
+      "name": "geometry-flow-ribbon",
+      "title": "流光丝带几何",
+      "description": "FORMFIELD LAB 的流光丝带几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "flow-ribbon",
+        "tags": [
+          "formfield",
+          "geometry",
+          "flow-ribbon"
+        ]
+      }
+    },
+    {
+      "name": "geometry-heart-surface",
+      "title": "心形曲面几何",
+      "description": "FORMFIELD LAB 的心形曲面几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "heart",
+        "tags": [
+          "formfield",
+          "geometry",
+          "heart"
+        ]
+      }
+    },
+    {
+      "name": "geometry-galaxy-vortex",
+      "title": "星系漩涡几何",
+      "description": "FORMFIELD LAB 的星系漩涡几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "galaxy",
+        "tags": [
+          "formfield",
+          "geometry",
+          "galaxy"
+        ]
+      }
+    },
+    {
       "name": "star-torus",
       "title": "星环",
       "description": "FORMFIELD LAB 的星环生成式视觉组件。",

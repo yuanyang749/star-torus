@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { StarField, type StarFieldHandle } from "@/components/star-field";
 import type { StarTheme } from "@/domain/star-field";
 import { MESSAGES } from "@/i18n/messages";
+import { GEOMETRY_DEFINITIONS } from "@/geometries/registry";
 import { useStudioStore } from "@/store/useStudioStore";
 import { ControlPanel } from "@/ui/ControlPanel";
 
@@ -26,6 +27,7 @@ export default function App() {
         <StarField
           ref={starFieldRef}
           config={config}
+          geometries={GEOMETRY_DEFINITIONS}
           ariaLabel={messages.shapes[config.shape].ariaLabel}
           onRuntimeStatusChange={setRuntimeStatus}
         />

@@ -13,8 +13,10 @@ const index = await readJson(resolve(registryDirectory, "index.json"));
 const itemNames = new Set(index.items.map((item) => item.name));
 
 assert.equal(index.name, "formfield");
-assert.equal(index.items.length, 13);
+assert.equal(index.items.length, 25);
 assert(itemNames.has("form-field-runtime"));
+assert(itemNames.has("geometry-torus"));
+assert(itemNames.has("geometry-galaxy-vortex"));
 assert(itemNames.has("star-torus"));
 assert(itemNames.has("galaxy-vortex"));
 assert(itemNames.has("flow-ribbon"));
@@ -59,12 +61,17 @@ try {
 
   assert.equal(cliResult.status, 0, cliResult.stderr || cliResult.stdout);
   assert(existsSync(resolve(sandbox, "src/components/formfield/StarField.tsx")));
+  assert(existsSync(resolve(sandbox, "src/components/formfield/geometries/torus.ts")));
+  assert(!existsSync(resolve(sandbox, "src/components/formfield/geometries/sphere.ts")));
+  assert(!existsSync(resolve(sandbox, "src/components/formfield/geometries/registry.ts")));
   assert(existsSync(resolve(sandbox, "src/components/formfield/presets/StarTorus.tsx")));
   const installedPreset = await readFile(
     resolve(sandbox, "src/components/formfield/presets/StarTorus.tsx"),
     "utf8"
   );
   assert(installedPreset.includes('from "@/components/formfield"'));
+  assert(installedPreset.includes('from "@/components/formfield/geometries/torus"'));
+  assert(installedPreset.includes("geometries={StarTorusGeometries}"));
 
   await build({
     entryPoints: [resolve(sandbox, "src/components/formfield/presets/StarTorus.tsx")],

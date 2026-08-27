@@ -27,7 +27,8 @@
     "type": {
       "enum": [
         "registry:visual",
-        "registry:runtime"
+        "registry:runtime",
+        "registry:geometry"
       ]
     },
     "dependencies": {

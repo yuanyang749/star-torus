@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-torus",
+  "title": "星环几何",
+  "description": "FORMFIELD LAB 的星环几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/torus.ts",
+      "target": "components/formfield/geometries/torus.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst STEP = Math.PI / 40;\nconst RADIUS = 90;\n\nexport const torusGeometry: GeometryDefinition = {\n  id: \"torus\",\n  label: \"星环\",\n  ariaLabel: \"由星点组成并持续流动的三维星环\",\n  mark: \"torus\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    let index = 0;\n\n    for (let row = 0; row < rows; row += 1) {\n      const v = row * STEP * 2 + phase * 2;\n      const sinV = Math.sin(v);\n      const cosV = Math.cos(v);\n      const ringRadius = (2 + sinV) * RADIUS;\n\n      for (let column = 0; column < columns; column += 1) {\n        const u = column * STEP + phase;\n        const positionIndex = index * 3;\n        positions[positionIndex] = ringRadius * Math.cos(u);\n        positions[positionIndex + 1] = ringRadius * Math.sin(u);\n        positions[positionIndex + 2] = cosV * RADIUS;\n        pointSizes[index] = Math.abs(cosV + 0.3);\n        index += 1;\n      }\n    }\n  }\n};\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "torus",
+    "tags": [
+      "formfield",
+      "geometry",
+      "torus"
+    ]
+  }
+}

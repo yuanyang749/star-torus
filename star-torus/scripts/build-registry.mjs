@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   createPresetConfig,
+  geometryItems,
   runtimeFiles,
   visualPresets
 } from "../registry/registry.config.mjs";
@@ -36,9 +37,38 @@ const runtimeItem = {
   }
 };
 
+const geometryRegistryItems = await Promise.all(geometryItems.map(async (geometry) => ({
+  $schema: schemaUrl,
+  name: geometry.name,
+  title: geometry.title,
+  description: `FORMFIELD LAB 的${geometry.title}采样器。`,
+  type: "registry:geometry",
+  dependencies: [],
+  devDependencies: [],
+  registryDependencies: ["form-field-runtime"],
+  files: [
+    {
+      path: `src/geometries/${geometry.moduleName}.ts`,
+      target: `components/formfield/geometries/${geometry.moduleName}.ts`,
+      type: "registry:file",
+      content: rewriteRuntimeImports(await readFile(
+        resolve(root, `src/geometries/${geometry.moduleName}.ts`),
+        "utf8"
+      ))
+    }
+  ],
+  meta: {
+    category: "geometry",
+    shape: geometry.shape,
+    tags: ["formfield", "geometry", geometry.shape]
+  }
+})));
+
 const visualItems = visualPresets.map(([name, componentName, title, shape]) => {
   const config = createPresetConfig(shape);
-  const componentSource = createPresetComponentSource(componentName, config);
+  const geometry = geometryItems.find((item) => item.shape === shape);
+  if (!geometry) throw new Error(`Missing geometry distribution for ${shape}.`);
+  const componentSource = createPresetComponentSource(componentName, config, geometry);
   return {
     $schema: schemaUrl,
     name,
@@ -47,7 +77,7 @@ const visualItems = visualPresets.map(([name, componentName, title, shape]) => {
     type: "registry:visual",
     dependencies: [],
     devDependencies: [],
-    registryDependencies: ["form-field-runtime"],
+    registryDependencies: [geometry.name],
     files: [
       {
         path: `registry/${name}/${componentName}.tsx`,
@@ -65,7 +95,7 @@ const visualItems = visualPresets.map(([name, componentName, title, shape]) => {
   };
 });
 
-const items = [runtimeItem, ...visualItems];
+const items = [runtimeItem, ...geometryRegistryItems, ...visualItems];
 const index = {
   name: "formfield",
   title: "形场实验室 / FORMFIELD LAB",
@@ -99,15 +129,18 @@ function rewriteRuntimeImports(source) {
     .replaceAll("@/effects/", "@/components/formfield/effects/");
 }
 
-function createPresetComponentSource(componentName, config) {
+function createPresetComponentSource(componentName, config, geometry) {
   return `import { FormField, type FormFieldConfig } from "@/components/formfield";
+import { ${geometry.exportName} } from "@/components/formfield/geometries/${geometry.moduleName}";
+
+const ${componentName}Geometries = [${geometry.exportName}] as const;
 
 export const ${componentName}Config = ${JSON.stringify(config, null, 2)} satisfies FormFieldConfig;
 
 export function ${componentName}() {
   return (
     <div style={{ width: "100%", minHeight: 420, aspectRatio: "1 / 1" }}>
-      <FormField config={${componentName}Config} />
+      <FormField config={${componentName}Config} geometries={${componentName}Geometries} />
     </div>
   );
 }
@@ -139,7 +172,7 @@ function createRegistrySchema() {
       name: { type: "string", pattern: "^[a-z0-9-]+$" },
       title: { type: "string" },
       description: { type: "string" },
-      type: { enum: ["registry:visual", "registry:runtime"] },
+      type: { enum: ["registry:visual", "registry:runtime", "registry:geometry"] },
       dependencies: { type: "array", items: { type: "string" } },
       devDependencies: { type: "array", items: { type: "string" } },
       registryDependencies: { type: "array", items: { type: "string" } },

@@ -21,3 +21,14 @@ export interface GeometryDefinition {
     context: GeometrySampleContext
   ): void;
 }
+
+export function resolveGeometryDefinition(
+  definitions: readonly GeometryDefinition[],
+  id: ShapeId
+): GeometryDefinition {
+  const fallback = definitions[0];
+  if (!fallback) {
+    throw new Error("FormField requires at least one geometry definition.");
+  }
+  return definitions.find((definition) => definition.id === id) ?? fallback;
+}

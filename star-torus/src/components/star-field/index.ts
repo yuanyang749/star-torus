@@ -9,5 +9,5 @@ export {
   DEFAULT_FORM_FIELD_CONFIG,
   DEFAULT_STAR_FIELD_CONFIG
 } from "@/domain/star-field";
-export { GEOMETRY_DEFINITIONS } from "@/geometries/registry";
+export type { GeometryDefinition } from "@/geometries/types";
 export { EFFECT_DEFINITIONS } from "@/effects/registry";

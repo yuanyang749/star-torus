@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-wave-surface",
+  "title": "波浪马鞍面几何",
+  "description": "FORMFIELD LAB 的波浪马鞍面几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/wave-surface.ts",
+      "target": "components/formfield/geometries/wave-surface.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst HALF_SIZE = 210;\n\nexport const waveSurfaceGeometry: GeometryDefinition = {\n  id: \"wave-surface\",\n  label: \"波浪面\",\n  ariaLabel: \"由星点展开形成并持续起伏的波浪马鞍曲面\",\n  mark: \"wave-surface\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    let index = 0;\n\n    for (let row = 0; row < rows; row += 1) {\n      const y = (row / (rows - 1) * 2 - 1) * HALF_SIZE;\n\n      for (let column = 0; column < columns; column += 1) {\n        const x = (column / (columns - 1) * 2 - 1) * HALF_SIZE;\n        const wave = Math.sin(x * 0.024 + phase * 1.45)\n          * Math.cos(y * 0.021 - phase * 0.86) * 62;\n        const saddle = (x * x - y * y) * 0.00064;\n        const z = wave + saddle;\n        const positionIndex = index * 3;\n\n        positions[positionIndex] = x;\n        positions[positionIndex + 1] = y;\n        positions[positionIndex + 2] = z;\n        pointSizes[index] = 0.42 + Math.min(1, Math.abs(z) / 88) * 0.72;\n        index += 1;\n      }\n    }\n  }\n};\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "wave-surface",
+    "tags": [
+      "formfield",
+      "geometry",
+      "wave-surface"
+    ]
+  }
+}

@@ -7,14 +7,14 @@
   "dependencies": [],
   "devDependencies": [],
   "registryDependencies": [
-    "form-field-runtime"
+    "geometry-sphere"
   ],
   "files": [
     {
       "path": "registry/particle-sphere/ParticleSphere.tsx",
       "target": "components/formfield/presets/ParticleSphere.tsx",
       "type": "registry:component",
-      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\n\nexport const ParticleSphereConfig = {\n  \"version\": 1,\n  \"shape\": \"sphere\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  }\n} satisfies FormFieldConfig;\n\nexport function ParticleSphere() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={ParticleSphereConfig} />\n    </div>\n  );\n}\n"
+      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { sphereGeometry } from \"@/components/formfield/geometries/sphere\";\n\nconst ParticleSphereGeometries = [sphereGeometry] as const;\n\nexport const ParticleSphereConfig = {\n  \"version\": 1,\n  \"shape\": \"sphere\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  }\n} satisfies FormFieldConfig;\n\nexport function ParticleSphere() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={ParticleSphereConfig} geometries={ParticleSphereGeometries} />\n    </div>\n  );\n}\n"
     }
   ],
   "meta": {

@@ -1,6 +1,6 @@
 {
   "name": "formfield",
-  "title": "形场实验室 / FORMFIELD LAB",
+  "title": "FormField Local Consumer Registry",
   "version": "2.0.0",
   "homepage": "https://formfield.dev",
   "items": [
@@ -20,201 +20,24 @@
       }
     },
     {
-      "name": "star-torus",
-      "title": "星环",
-      "description": "FORMFIELD LAB 的星环生成式视觉组件。",
-      "type": "registry:visual",
+      "name": "geometry-torus",
+      "title": "星环几何",
+      "description": "FORMFIELD LAB 的星环几何采样器。",
+      "type": "registry:geometry",
       "meta": {
-        "category": "field",
+        "category": "geometry",
         "shape": "torus",
         "tags": [
           "formfield",
-          "r3f",
-          "particles",
+          "geometry",
           "torus"
-        ]
-      }
-    },
-    {
-      "name": "particle-sphere",
-      "title": "粒子球体",
-      "description": "FORMFIELD LAB 的粒子球体生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "sphere",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "sphere"
-        ]
-      }
-    },
-    {
-      "name": "mobius-field",
-      "title": "莫比乌斯形场",
-      "description": "FORMFIELD LAB 的莫比乌斯形场生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "mobius",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "mobius"
-        ]
-      }
-    },
-    {
-      "name": "torus-knot",
-      "title": "三叶环面结",
-      "description": "FORMFIELD LAB 的三叶环面结生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "torus-knot",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "torus-knot"
-        ]
-      }
-    },
-    {
-      "name": "klein-bottle",
-      "title": "克莱因瓶",
-      "description": "FORMFIELD LAB 的克莱因瓶生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "klein",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "klein"
-        ]
-      }
-    },
-    {
-      "name": "superellipsoid",
-      "title": "超椭球",
-      "description": "FORMFIELD LAB 的超椭球生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "superellipsoid",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "superellipsoid"
-        ]
-      }
-    },
-    {
-      "name": "helicoid",
-      "title": "螺旋曲面",
-      "description": "FORMFIELD LAB 的螺旋曲面生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "helicoid",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "helicoid"
-        ]
-      }
-    },
-    {
-      "name": "double-helix",
-      "title": "双螺旋",
-      "description": "FORMFIELD LAB 的双螺旋生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "double-helix",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "double-helix"
-        ]
-      }
-    },
-    {
-      "name": "wave-surface",
-      "title": "波浪马鞍面",
-      "description": "FORMFIELD LAB 的波浪马鞍面生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "wave-surface",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "wave-surface"
-        ]
-      }
-    },
-    {
-      "name": "flow-ribbon",
-      "title": "流光丝带",
-      "description": "FORMFIELD LAB 的流光丝带生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "flow-ribbon",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "flow-ribbon"
-        ]
-      }
-    },
-    {
-      "name": "heart-surface",
-      "title": "心形曲面",
-      "description": "FORMFIELD LAB 的心形曲面生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "heart",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "heart"
-        ]
-      }
-    },
-    {
-      "name": "galaxy-vortex",
-      "title": "星系漩涡",
-      "description": "FORMFIELD LAB 的星系漩涡生成式视觉组件。",
-      "type": "registry:visual",
-      "meta": {
-        "category": "field",
-        "shape": "galaxy",
-        "tags": [
-          "formfield",
-          "r3f",
-          "particles",
-          "galaxy"
         ]
       }
     },
     {
       "name": "my-form-field",
       "title": "MyFormField",
-      "description": "FORMFIELD LAB 本地 CLI 消费端验证组件。",
+      "description": "FORMFIELD LAB 本地 CLI 按需安装验证组件。",
       "type": "registry:visual",
       "meta": {
         "category": "field",

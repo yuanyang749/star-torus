@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
@@ -6,8 +6,13 @@ import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import type { StarFieldConfig } from "@/components/formfield/domain";
 import { DustTrailLayer, StarPointLayer } from "@/components/formfield/effects/RenderLayers";
-import { getGeometryDefinition } from "@/components/formfield/geometries/registry";
-import { GRID_COLUMNS, GRID_ROWS, POINT_COUNT } from "@/components/formfield/geometries/types";
+import {
+  GRID_COLUMNS,
+  GRID_ROWS,
+  POINT_COUNT,
+  resolveGeometryDefinition,
+  type GeometryDefinition
+} from "@/components/formfield/geometries/types";
 import {
   ENERGY_WAVE_BAND_WIDTH,
   ENERGY_WAVE_COUNT,
@@ -23,6 +28,7 @@ const TRAIL_VISIBILITY_THRESHOLD = 0.04;
 
 interface StarParticlesProps {
   config: StarFieldConfig;
+  geometries: readonly GeometryDefinition[];
   runtime: StarRuntime;
 }
 
@@ -43,10 +49,14 @@ interface ParticleBuffers {
   morphProgress: number;
 }
 
-export function StarParticles({ config, runtime }: StarParticlesProps) {
+export function StarParticles({ config, geometries, runtime }: StarParticlesProps) {
   const { size, viewport } = useThree();
   const pointsRef = useRef<THREE.Points>(null);
-  const buffers = useMemo(() => createParticleBuffers(config.shape), []);
+  const [initialShape] = useState(config.shape);
+  const buffers = useMemo(
+    () => createParticleBuffers(resolveGeometryDefinition(geometries, initialShape)),
+    [geometries, initialShape]
+  );
   const waveData = useMemo(() => new Float32Array(ENERGY_WAVE_COUNT * 4), []);
   const waveVectors = useMemo(
     () => Array.from({ length: ENERGY_WAVE_COUNT }, () => new THREE.Vector4()),
@@ -81,12 +91,13 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
   }, [config.theme.glow, config.theme.star, glowTarget, starTarget, trailMaterial]);
 
   useEffect(() => {
-    if (buffers.activeShape === config.shape) return;
+    const nextShape = resolveGeometryDefinition(geometries, config.shape).id;
+    if (buffers.activeShape === nextShape) return;
     buffers.sourcePositions.set(buffers.basePositions);
     buffers.sourceSizes.set(buffers.baseSizes);
-    buffers.activeShape = config.shape;
+    buffers.activeShape = nextShape;
     buffers.morphProgress = 0;
-  }, [buffers, config.shape]);
+  }, [buffers, config.shape, geometries]);
 
   useEffect(() => () => {
     buffers.geometry.dispose();
@@ -100,7 +111,7 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
     runtime.step(delta, performance.now());
 
     const phase = runtime.simulationSeconds * FLOW_PHASE_PER_SECOND;
-    const definition = getGeometryDefinition(buffers.activeShape);
+    const definition = resolveGeometryDefinition(geometries, buffers.activeShape);
     definition.sample(buffers.targetPositions, buffers.targetSizes, {
       phase,
       columns: GRID_COLUMNS,
@@ -187,7 +198,7 @@ export function StarParticles({ config, runtime }: StarParticlesProps) {
   );
 }
 
-function createParticleBuffers(initialShape: StarFieldConfig["shape"]): ParticleBuffers {
+function createParticleBuffers(definition: GeometryDefinition): ParticleBuffers {
   const positions = new Float32Array(POINT_COUNT * 3);
   const basePositions = new Float32Array(POINT_COUNT * 3);
   const sourcePositions = new Float32Array(POINT_COUNT * 3);
@@ -198,8 +209,6 @@ function createParticleBuffers(initialShape: StarFieldConfig["shape"]): Particle
   const sourceSizes = new Float32Array(POINT_COUNT);
   const targetSizes = new Float32Array(POINT_COUNT);
   const trailPositions = new Float32Array(TRAIL_SEGMENT_COUNT * 6);
-  const definition = getGeometryDefinition(initialShape);
-
   definition.sample(basePositions, baseSizes, {
     phase: 0,
     columns: GRID_COLUMNS,
@@ -232,7 +241,7 @@ function createParticleBuffers(initialShape: StarFieldConfig["shape"]): Particle
     sourceSizes,
     targetSizes,
     trailPositions,
-    activeShape: initialShape,
+    activeShape: definition.id,
     morphProgress: 1
   };
 }

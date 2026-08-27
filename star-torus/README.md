@@ -9,7 +9,7 @@
 - **界面**：中文与英文即时切换，并在本地持久化语言偏好。
 - **形态**：星环、球体、莫比乌斯环、三叶结、克莱因瓶、超椭球、螺旋面、双螺旋、波浪面、流光丝带、心形面与星系漩涡。
 - **源码输出**：复制 TSX、配置 JSON、Registry JSON 与 CLI 安装命令。
-- **Registry**：构建可公开托管的组件源码注册表。
+- **Registry**：核心运行时与几何采样器独立分发，安装组件时只拉取所用形态。
 - **CLI**：递归解析组件依赖，并将源码写入 React 项目。
 
 ## 本地运行
@@ -37,6 +37,9 @@ import {
   DEFAULT_FORM_FIELD_CONFIG,
   type FormFieldConfig
 } from "@/components/star-field";
+import { torusGeometry } from "@/geometries/torus";
+
+const geometries = [torusGeometry] as const;
 
 const config = {
   ...DEFAULT_FORM_FIELD_CONFIG,
@@ -44,7 +47,7 @@ const config = {
 } satisfies FormFieldConfig;
 
 export function Example() {
-  return <FormField config={config} />;
+  return <FormField config={config} geometries={geometries} />;
 }
 ```
 
@@ -55,6 +58,7 @@ export function Example() {
 ```text
 public/r/index.json
 public/r/form-field-runtime.json
+public/r/geometry-torus.json
 public/r/star-torus.json
 public/r/torus-knot.json
 public/r/flow-ribbon.json
@@ -90,6 +94,7 @@ CLI 支持：
 
 - npm、pnpm、yarn、bun 自动检测
 - Registry 依赖递归安装
+- 按组件依赖安装核心运行时与所需几何采样器
 - React 项目路径别名适配
 - `--overwrite`
 - `--skip-install`

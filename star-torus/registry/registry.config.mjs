@@ -9,20 +9,22 @@ export const runtimeFiles = [
   ["src/domain/star-field.ts", "components/formfield/domain.ts", "registry:file"],
   ["src/effects/RenderLayers.tsx", "components/formfield/effects/RenderLayers.tsx", "registry:component"],
   ["src/effects/registry.ts", "components/formfield/effects/registry.ts", "registry:file"],
-  ["src/geometries/types.ts", "components/formfield/geometries/types.ts", "registry:file"],
-  ["src/geometries/registry.ts", "components/formfield/geometries/registry.ts", "registry:file"],
-  ["src/geometries/torus.ts", "components/formfield/geometries/torus.ts", "registry:file"],
-  ["src/geometries/sphere.ts", "components/formfield/geometries/sphere.ts", "registry:file"],
-  ["src/geometries/mobius.ts", "components/formfield/geometries/mobius.ts", "registry:file"],
-  ["src/geometries/torus-knot.ts", "components/formfield/geometries/torus-knot.ts", "registry:file"],
-  ["src/geometries/klein-bottle.ts", "components/formfield/geometries/klein-bottle.ts", "registry:file"],
-  ["src/geometries/superellipsoid.ts", "components/formfield/geometries/superellipsoid.ts", "registry:file"],
-  ["src/geometries/helicoid.ts", "components/formfield/geometries/helicoid.ts", "registry:file"],
-  ["src/geometries/double-helix.ts", "components/formfield/geometries/double-helix.ts", "registry:file"],
-  ["src/geometries/wave-surface.ts", "components/formfield/geometries/wave-surface.ts", "registry:file"],
-  ["src/geometries/flow-ribbon.ts", "components/formfield/geometries/flow-ribbon.ts", "registry:file"],
-  ["src/geometries/heart-surface.ts", "components/formfield/geometries/heart-surface.ts", "registry:file"],
-  ["src/geometries/galaxy-vortex.ts", "components/formfield/geometries/galaxy-vortex.ts", "registry:file"]
+  ["src/geometries/types.ts", "components/formfield/geometries/types.ts", "registry:file"]
+];
+
+export const geometryItems = [
+  { name: "geometry-torus", shape: "torus", title: "星环几何", moduleName: "torus", exportName: "torusGeometry" },
+  { name: "geometry-sphere", shape: "sphere", title: "球体几何", moduleName: "sphere", exportName: "sphereGeometry" },
+  { name: "geometry-mobius", shape: "mobius", title: "莫比乌斯几何", moduleName: "mobius", exportName: "mobiusGeometry" },
+  { name: "geometry-torus-knot", shape: "torus-knot", title: "三叶环面结几何", moduleName: "torus-knot", exportName: "torusKnotGeometry" },
+  { name: "geometry-klein-bottle", shape: "klein", title: "克莱因瓶几何", moduleName: "klein-bottle", exportName: "kleinBottleGeometry" },
+  { name: "geometry-superellipsoid", shape: "superellipsoid", title: "超椭球几何", moduleName: "superellipsoid", exportName: "superellipsoidGeometry" },
+  { name: "geometry-helicoid", shape: "helicoid", title: "螺旋曲面几何", moduleName: "helicoid", exportName: "helicoidGeometry" },
+  { name: "geometry-double-helix", shape: "double-helix", title: "双螺旋几何", moduleName: "double-helix", exportName: "doubleHelixGeometry" },
+  { name: "geometry-wave-surface", shape: "wave-surface", title: "波浪马鞍面几何", moduleName: "wave-surface", exportName: "waveSurfaceGeometry" },
+  { name: "geometry-flow-ribbon", shape: "flow-ribbon", title: "流光丝带几何", moduleName: "flow-ribbon", exportName: "flowRibbonGeometry" },
+  { name: "geometry-heart-surface", shape: "heart", title: "心形曲面几何", moduleName: "heart-surface", exportName: "heartSurfaceGeometry" },
+  { name: "geometry-galaxy-vortex", shape: "galaxy", title: "星系漩涡几何", moduleName: "galaxy-vortex", exportName: "galaxyVortexGeometry" }
 ];
 
 export const visualPresets = [

@@ -9,5 +9,5 @@ export {
   DEFAULT_FORM_FIELD_CONFIG,
   DEFAULT_STAR_FIELD_CONFIG
 } from "@/components/formfield/domain";
-export { GEOMETRY_DEFINITIONS } from "@/components/formfield/geometries/registry";
+export type { GeometryDefinition } from "@/components/formfield/geometries/types";
 export { EFFECT_DEFINITIONS } from "@/components/formfield/effects/registry";

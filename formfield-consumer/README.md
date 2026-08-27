@@ -12,7 +12,8 @@ node ../star-torus/packages/cli/bin/formfield.mjs add my-form-field
 
 安装结果：
 
-- `src/components/formfield/`：FormField 运行时与全部几何采样器
+- `src/components/formfield/`：FormField 核心运行时
+- `src/components/formfield/geometries/torus.ts`：当前组件使用的星环采样器
 - `src/components/formfield/MyFormField.tsx`：测试组件
 - `three`、`@react-three/fiber`、`@types/three`：自动安装的依赖
 
@@ -30,4 +31,5 @@ npm run lint
 npm run build
 ```
 
-本地 Registry 位于 `.formfield-registry/`，项目配置位于 `formfield.json`。
+本地 Registry 位于 `.formfield-registry/`，只包含核心运行时、星环几何和
+`my-form-field` 三个条目；项目配置位于 `formfield.json`。

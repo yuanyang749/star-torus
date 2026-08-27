@@ -2,6 +2,7 @@ import { useEffect, useMemo, type MutableRefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type { RuntimeStatus, StarFieldConfig } from "@/domain/star-field";
+import type { GeometryDefinition } from "@/geometries/types";
 import { StarParticles } from "@/components/star-field/StarParticles";
 import { StarRuntime } from "@/components/star-field/StarRuntime";
 
@@ -11,11 +12,17 @@ export interface StarFieldController {
 
 interface StarSceneProps {
   config: StarFieldConfig;
+  geometries: readonly GeometryDefinition[];
   controllerRef: MutableRefObject<StarFieldController | null>;
   onRuntimeStatusChange?: (status: RuntimeStatus) => void;
 }
 
-export function StarScene({ config, controllerRef, onRuntimeStatusChange }: StarSceneProps) {
+export function StarScene({
+  config,
+  geometries,
+  controllerRef,
+  onRuntimeStatusChange
+}: StarSceneProps) {
   const runtime = useMemo(() => new StarRuntime(config, onRuntimeStatusChange), []);
 
   useEffect(() => {
@@ -38,7 +45,7 @@ export function StarScene({ config, controllerRef, onRuntimeStatusChange }: Star
   return (
     <>
       <SceneBindings config={config} runtime={runtime} />
-      <StarParticles config={config} runtime={runtime} />
+      <StarParticles config={config} geometries={geometries} runtime={runtime} />
     </>
   );
 }
