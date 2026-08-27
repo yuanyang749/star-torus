@@ -17,7 +17,7 @@ node ../star-torus/packages/cli/bin/formfield.mjs add my-form-field
 - `src/components/formfield/MyFormField.tsx`：测试组件
 - `three`、`@react-three/fiber`、`@types/three`：自动安装的依赖
 
-当前测试组件保留跟随光照、拖拽旋转、滚轮缩放、点击脉冲和长按动作，便于验证导出时的交互选择结果。
+当前测试组件保留跟随光照、指针视差、拖拽旋转、滚轮缩放、点击脉冲和长按动作，便于验证导出时的交互选择结果。
 
 ## 本地运行
 

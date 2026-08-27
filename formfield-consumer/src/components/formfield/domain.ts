@@ -18,6 +18,7 @@ export type HoldMode = "magnet" | "freeze";
 
 export const INTERACTION_ACTION_IDS = [
   "hoverLight",
+  "pointerParallax",
   "dragRotate",
   "wheelZoom",
   "clickPulse",
@@ -71,6 +72,7 @@ export type FormFieldConfig = StarFieldConfig;
 
 export const DEFAULT_INTERACTION_ACTIONS: StarInteractionActions = {
   hoverLight: true,
+  pointerParallax: true,
   dragRotate: true,
   wheelZoom: true,
   clickPulse: true,

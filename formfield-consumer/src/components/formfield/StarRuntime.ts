@@ -10,6 +10,8 @@ const LONG_PRESS_DELAY_MS = 280;
 const DRAG_THRESHOLD_PX = 8;
 const DEFAULT_ROTATION_X = 0.5;
 const DEFAULT_ROTATION_Y = -0.5;
+const PARALLAX_ROTATION_X = 0.075;
+const PARALLAX_ROTATION_Y = 0.11;
 const ENERGY_WAVE_DURATION_SECONDS = 1.05;
 const ENERGY_WAVE_BAND_PX = 38;
 
@@ -28,6 +30,8 @@ export class StarRuntime {
   config: StarFieldConfig;
   rotationX = DEFAULT_ROTATION_X;
   rotationY = DEFAULT_ROTATION_Y;
+  parallaxX = 0;
+  parallaxY = 0;
   velocityX = 0;
   velocityY = 0;
   zoom = 1;
@@ -229,6 +233,24 @@ export class StarRuntime {
     const lightEase = 1 - Math.pow(lightTarget > this.lightStrength ? 0.45 : 0.82, deltaFrames);
     this.lightStrength += (lightTarget - this.lightStrength) * lightEase;
     this.burstScale *= Math.pow(0.84, deltaFrames);
+
+    const parallaxActive = this.config.interaction.enabled
+      && this.interactionActions.pointerParallax
+      && this.pointerInside
+      && !this.dragging;
+    const normalizedPointerX = parallaxActive
+      ? Math.min(1, Math.max(-1, this.pointerX / Math.max(1, this.viewportWidth) * 2 - 1))
+      : 0;
+    const normalizedPointerY = parallaxActive
+      ? Math.min(1, Math.max(-1, this.pointerY / Math.max(1, this.viewportHeight) * 2 - 1))
+      : 0;
+    const targetParallaxX = normalizedPointerY * PARALLAX_ROTATION_X;
+    const targetParallaxY = normalizedPointerX * PARALLAX_ROTATION_Y;
+    const parallaxEase = 1 - Math.pow(parallaxActive ? 0.72 : 0.82, deltaFrames);
+    this.parallaxX += (targetParallaxX - this.parallaxX) * parallaxEase;
+    this.parallaxY += (targetParallaxY - this.parallaxY) * parallaxEase;
+    if (!parallaxActive && Math.abs(this.parallaxX) < 0.0001) this.parallaxX = 0;
+    if (!parallaxActive && Math.abs(this.parallaxY) < 0.0001) this.parallaxY = 0;
 
     const zoomEase = 1 - Math.pow(0.76, deltaFrames);
     this.zoom += (this.targetZoom - this.zoom) * zoomEase;
@@ -481,7 +503,10 @@ export class StarRuntime {
 
   private hasCanvasInteraction(): boolean {
     return this.hasPressInteraction()
-      || (this.config.interaction.enabled && this.interactionActions.wheelZoom);
+      || (this.config.interaction.enabled && (
+        this.interactionActions.wheelZoom
+        || this.interactionActions.pointerParallax
+      ));
   }
 
   private setMagnetMode(mode: number): void {

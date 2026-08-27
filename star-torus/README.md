@@ -8,7 +8,7 @@
 - **预览**：TypedArray + Shader 驱动的实时粒子形场。
 - **界面**：中文与英文即时切换，并在本地持久化语言偏好。
 - **形态**：星环、球体、莫比乌斯环、三叶结、克莱因瓶、超椭球、螺旋面、双螺旋、波浪面、流光丝带、心形面与星系漩涡。
-- **源码输出**：复制 TSX、配置 JSON、Registry JSON 与 CLI 安装命令，并可逐项保留五类交互动作。
+- **源码输出**：复制 TSX、配置 JSON、Registry JSON 与 CLI 安装命令，并可逐项保留六类交互动作。
 - **Registry**：核心运行时与几何采样器独立分发，安装组件时只拉取所用形态。
 - **CLI**：递归解析组件依赖，并将源码写入 React 项目。
 
@@ -118,7 +118,7 @@ CLI 支持：
 4. 在 `registry/registry.config.mjs` 注册可分发预设。
 5. 执行 `npm run geometries:check && npm run registry:build`。
 
-注册后会自动获得连续变形、主题、Hover 光照、拖拽、冻结、尾迹、配置导出与 Registry 分发能力。
+注册后会自动获得连续变形、主题、Hover 光照、指针视差、拖拽、冻结、尾迹、配置导出与 Registry 分发能力。
 
 ## 代码边界
 

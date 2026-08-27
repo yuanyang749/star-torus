@@ -134,7 +134,12 @@ export function StarParticles({ config, geometries, runtime }: StarParticlesProp
       buffers.baseSizes.set(buffers.targetSizes);
     }
 
-    rotatePositions(buffers.basePositions, buffers.positions, runtime.rotationX, runtime.rotationY);
+    rotatePositions(
+      buffers.basePositions,
+      buffers.positions,
+      runtime.rotationX + runtime.parallaxX,
+      runtime.rotationY + runtime.parallaxY
+    );
     buffers.pointSizes.set(buffers.baseSizes);
     updateTrails(
       buffers,

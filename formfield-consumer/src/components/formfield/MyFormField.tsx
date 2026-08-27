@@ -29,7 +29,8 @@ export const MyFormFieldConfig = {
       "dragRotate": true,
       "wheelZoom": true,
       "clickPulse": true,
-      "holdAction": true
+      "holdAction": true,
+      "pointerParallax": true
     }
   }
 } satisfies FormFieldConfig;
