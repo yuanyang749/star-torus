@@ -1,4 +1,9 @@
-import type { RuntimeStatus, StarFieldConfig } from "@/components/formfield/domain";
+import {
+  resolveInteractionActions,
+  type RuntimeStatus,
+  type StarFieldConfig,
+  type StarInteractionActions
+} from "@/components/formfield/domain";
 
 const FRAME_DURATION_MS = 1000 / 60;
 const LONG_PRESS_DELAY_MS = 280;
@@ -43,6 +48,7 @@ export class StarRuntime {
   readonly wavePower = new Float32Array(ENERGY_WAVE_COUNT);
 
   private canvas: HTMLCanvasElement | null = null;
+  private interactionActions: StarInteractionActions;
   private statusListener?: StatusListener;
   private status: RuntimeStatus = "disabled";
   private pointerInside = false;
@@ -67,6 +73,7 @@ export class StarRuntime {
 
   constructor(config: StarFieldConfig, statusListener?: StatusListener) {
     this.config = config;
+    this.interactionActions = resolveInteractionActions(config.interaction);
     this.statusListener = statusListener;
     this.emitStatus(true);
   }
@@ -74,14 +81,24 @@ export class StarRuntime {
   setConfig(config: StarFieldConfig): void {
     const interactionWasEnabled = this.config.interaction.enabled;
     this.config = config;
+    this.interactionActions = resolveInteractionActions(config.interaction);
 
-    if (interactionWasEnabled && !config.interaction.enabled) {
+    if (
+      (interactionWasEnabled && !config.interaction.enabled)
+      || (this.dragging && !this.hasPressInteraction())
+    ) {
       this.cancelPointer();
+    }
+
+    if (!this.interactionActions.dragRotate) {
       this.velocityX = 0;
       this.velocityY = 0;
     }
 
-    if (config.interaction.holdMode === "freeze") {
+    if (!this.interactionActions.holdAction) {
+      this.setMagnetMode(0);
+      this.setFreezeEngaged(false);
+    } else if (config.interaction.holdMode === "freeze") {
       this.setMagnetMode(0);
     } else {
       this.setFreezeEngaged(false);
@@ -150,6 +167,7 @@ export class StarRuntime {
 
     if (
       this.config.interaction.enabled
+      && this.interactionActions.holdAction
       && this.dragging
       && this.pressCandidate
       && this.magnetMode === 0
@@ -183,7 +201,11 @@ export class StarRuntime {
         this.rotationY = DEFAULT_ROTATION_Y;
         this.resetting = false;
       }
-    } else if (this.config.interaction.enabled && !this.dragging) {
+    } else if (
+      this.config.interaction.enabled
+      && this.interactionActions.dragRotate
+      && !this.dragging
+    ) {
       this.rotationX += this.velocityX * deltaFrames * this.timeScale;
       this.rotationY += this.velocityY * deltaFrames * this.timeScale;
       const damping = Math.pow(0.9, deltaFrames * this.timeScale);
@@ -193,11 +215,17 @@ export class StarRuntime {
       if (Math.abs(this.velocityY) < 0.00002) this.velocityY = 0;
     }
 
-    const magnetTarget = this.config.interaction.enabled && this.dragging ? this.magnetMode : 0;
+    const magnetTarget = this.config.interaction.enabled
+      && this.interactionActions.holdAction
+      && this.dragging
+      ? this.magnetMode
+      : 0;
     const magnetEase = 1 - Math.pow(magnetTarget === 0 ? 0.78 : 0.66, deltaFrames);
     this.magnetStrength += (magnetTarget - this.magnetStrength) * magnetEase;
 
-    const lightTarget = this.pointerInside ? this.config.effects.hoverIntensity : 0;
+    const lightTarget = this.pointerInside && this.interactionActions.hoverLight
+      ? this.config.effects.hoverIntensity
+      : 0;
     const lightEase = 1 - Math.pow(lightTarget > this.lightStrength ? 0.45 : 0.82, deltaFrames);
     this.lightStrength += (lightTarget - this.lightStrength) * lightEase;
     this.burstScale *= Math.pow(0.84, deltaFrames);
@@ -210,7 +238,7 @@ export class StarRuntime {
     this.updateEnergyWaves();
 
     const motionSpeed = Math.hypot(this.velocityX, this.velocityY);
-    const normalizedSpeed = this.config.interaction.enabled
+    const normalizedSpeed = this.config.interaction.enabled && this.interactionActions.dragRotate
       ? clamp01((motionSpeed - 0.014) / 0.05)
       : 0;
     const easedSpeed = normalizedSpeed * normalizedSpeed * (3 - normalizedSpeed * 2);
@@ -229,7 +257,7 @@ export class StarRuntime {
   }
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
-    if (!this.config.interaction.enabled || event.button !== 0 || this.dragging) return;
+    if (!this.hasPressInteraction() || event.button !== 0 || this.dragging) return;
     event.preventDefault();
     this.activePointerId = event.pointerId;
     this.dragging = true;
@@ -260,7 +288,7 @@ export class StarRuntime {
       this.updatePointerPosition(event.clientX, event.clientY);
       return;
     }
-    if (event.pointerId !== this.activePointerId || !this.config.interaction.enabled) return;
+    if (event.pointerId !== this.activePointerId || !this.hasPressInteraction()) return;
 
     event.preventDefault();
     const coalescedEvents = event.getCoalescedEvents?.() ?? [];
@@ -268,7 +296,11 @@ export class StarRuntime {
 
     for (const sample of samples) {
       const bounds = this.updatePointerPosition(sample.clientX, sample.clientY);
-      if (this.pressCandidate && this.magnetMode === 0) {
+      if (
+        this.interactionActions.holdAction
+        && this.pressCandidate
+        && this.magnetMode === 0
+      ) {
         this.magnetPolarity = sample.shiftKey ? -1 : 1;
       }
 
@@ -288,7 +320,7 @@ export class StarRuntime {
         }
       }
 
-      if (!this.dragMoved) {
+      if (!this.dragMoved || !this.interactionActions.dragRotate) {
         this.updateLastPointerSample(sample);
         continue;
       }
@@ -320,7 +352,12 @@ export class StarRuntime {
   private readonly handlePointerEnter = (event: PointerEvent): void => {
     this.pointerInside = true;
     this.updatePointerPosition(event.clientX, event.clientY);
-    this.lightStrength = Math.max(this.lightStrength, this.config.effects.hoverIntensity * 0.55);
+    if (this.interactionActions.hoverLight) {
+      this.lightStrength = Math.max(
+        this.lightStrength,
+        this.config.effects.hoverIntensity * 0.55
+      );
+    }
   };
 
   private readonly handlePointerLeave = (): void => {
@@ -328,7 +365,7 @@ export class StarRuntime {
   };
 
   private readonly handleWheel = (event: WheelEvent): void => {
-    if (!this.config.interaction.enabled) return;
+    if (!this.config.interaction.enabled || !this.interactionActions.wheelZoom) return;
     event.preventDefault();
     this.updatePointerPosition(event.clientX, event.clientY);
     this.pointerInside = true;
@@ -336,17 +373,25 @@ export class StarRuntime {
       ? event.deltaY * 16
       : (event.deltaMode === 2 ? event.deltaY * this.viewportHeight : event.deltaY);
     this.targetZoom = Math.min(1.5, Math.max(0.62, this.targetZoom * Math.exp(-delta * 0.0014)));
-    this.lightStrength = Math.max(this.lightStrength, this.config.effects.hoverIntensity * 0.5);
+    if (this.interactionActions.hoverLight) {
+      this.lightStrength = Math.max(
+        this.lightStrength,
+        this.config.effects.hoverIntensity * 0.5
+      );
+    }
   };
 
   private readonly handleDoubleClick = (event: MouseEvent): void => {
-    if (!this.config.interaction.enabled) return;
+    if (
+      !this.config.interaction.enabled
+      || (!this.interactionActions.dragRotate && !this.interactionActions.wheelZoom)
+    ) return;
     event.preventDefault();
     this.resetView();
   };
 
   private readonly handleContextMenu = (event: MouseEvent): void => {
-    if (this.config.interaction.enabled) event.preventDefault();
+    if (this.hasCanvasInteraction()) event.preventDefault();
   };
 
   private readonly handleWindowBlur = (): void => {
@@ -361,10 +406,17 @@ export class StarRuntime {
     }
 
     const heldLongEnough = performance.now() - this.pressStartedAt >= LONG_PRESS_DELAY_MS;
-    const usedHoldAction = this.magnetMode !== 0
+    const usedHoldAction = this.interactionActions.holdAction && (
+      this.magnetMode !== 0
       || this.freezeEngaged
-      || (this.pressCandidate && heldLongEnough);
-    const shouldPulse = !cancelled && this.pressCandidate && !this.dragMoved && !usedHoldAction;
+      || (this.pressCandidate && heldLongEnough)
+    );
+    const completedDrag = this.dragMoved && this.interactionActions.dragRotate;
+    const shouldPulse = !cancelled
+      && this.interactionActions.clickPulse
+      && this.pressCandidate
+      && !this.dragMoved
+      && !usedHoldAction;
     const pointerId = this.activePointerId;
     this.dragging = false;
     this.pressCandidate = false;
@@ -375,7 +427,7 @@ export class StarRuntime {
 
     if (shouldPulse) {
       this.emitEnergyWave(this.pointerX, this.pointerY);
-    } else if (!cancelled) {
+    } else if (!cancelled && completedDrag) {
       this.burstScale = Math.max(
         this.burstScale,
         Math.min(0.035, Math.hypot(this.velocityX, this.velocityY) * 0.35)
@@ -417,6 +469,19 @@ export class StarRuntime {
     this.lastClientX = sample.clientX;
     this.lastClientY = sample.clientY;
     this.lastPointerAt = sample.timeStamp;
+  }
+
+  private hasPressInteraction(): boolean {
+    return this.config.interaction.enabled && (
+      this.interactionActions.dragRotate
+      || this.interactionActions.clickPulse
+      || this.interactionActions.holdAction
+    );
+  }
+
+  private hasCanvasInteraction(): boolean {
+    return this.hasPressInteraction()
+      || (this.config.interaction.enabled && this.interactionActions.wheelZoom);
   }
 
   private setMagnetMode(mode: number): void {
@@ -468,8 +533,14 @@ export class StarRuntime {
 
   private syncCanvasClasses(): void {
     if (!this.canvas) return;
-    this.canvas.classList.toggle("is-interactive", this.config.interaction.enabled);
-    this.canvas.classList.toggle("is-dragging", this.dragging && this.magnetMode === 0 && !this.freezeEngaged);
+    this.canvas.classList.toggle("is-interactive", this.hasCanvasInteraction());
+    this.canvas.classList.toggle(
+      "is-dragging",
+      this.interactionActions.dragRotate
+        && this.dragging
+        && this.magnetMode === 0
+        && !this.freezeEngaged
+    );
     this.canvas.classList.toggle("is-attracting", this.magnetMode > 0);
     this.canvas.classList.toggle("is-repelling", this.magnetMode < 0);
     this.canvas.classList.toggle("is-freezing", this.freezeEngaged);

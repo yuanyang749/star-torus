@@ -16,6 +16,16 @@ export type ShapeId = (typeof SHAPE_IDS)[number];
 
 export type HoldMode = "magnet" | "freeze";
 
+export const INTERACTION_ACTION_IDS = [
+  "hoverLight",
+  "dragRotate",
+  "wheelZoom",
+  "clickPulse",
+  "holdAction"
+] as const;
+export type InteractionActionId = (typeof INTERACTION_ACTION_IDS)[number];
+export type StarInteractionActions = Record<InteractionActionId, boolean>;
+
 export type RuntimeStatus =
   | "disabled"
   | "idle"
@@ -45,6 +55,7 @@ export interface StarEffectConfig {
 export interface StarInteractionConfig {
   enabled: boolean;
   holdMode: HoldMode;
+  actions?: Partial<StarInteractionActions>;
 }
 
 export interface StarFieldConfig {
@@ -57,6 +68,14 @@ export interface StarFieldConfig {
 }
 
 export type FormFieldConfig = StarFieldConfig;
+
+export const DEFAULT_INTERACTION_ACTIONS: StarInteractionActions = {
+  hoverLight: true,
+  dragRotate: true,
+  wheelZoom: true,
+  clickPulse: true,
+  holdAction: true
+};
 
 export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
   version: 1,
@@ -78,7 +97,8 @@ export const DEFAULT_STAR_FIELD_CONFIG: StarFieldConfig = {
   },
   interaction: {
     enabled: false,
-    holdMode: "magnet"
+    holdMode: "magnet",
+    actions: { ...DEFAULT_INTERACTION_ACTIONS }
   }
 };
 
@@ -91,8 +111,21 @@ export function cloneStarFieldConfig(config: StarFieldConfig): StarFieldConfig {
     theme: { ...config.theme },
     motion: { ...config.motion },
     effects: { ...config.effects },
-    interaction: { ...config.interaction }
+    interaction: {
+      enabled: config.interaction.enabled,
+      holdMode: config.interaction.holdMode,
+      actions: resolveInteractionActions(config.interaction)
+    }
   };
 }
 
 export const cloneFormFieldConfig = cloneStarFieldConfig;
+
+export function resolveInteractionActions(
+  interaction: StarInteractionConfig
+): StarInteractionActions {
+  return {
+    ...DEFAULT_INTERACTION_ACTIONS,
+    ...interaction.actions
+  };
+}

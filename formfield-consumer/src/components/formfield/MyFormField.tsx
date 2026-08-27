@@ -22,8 +22,15 @@ export const MyFormFieldConfig = {
     "trailIntensity": 1
   },
   "interaction": {
-    "enabled": false,
-    "holdMode": "magnet"
+    "enabled": true,
+    "holdMode": "magnet",
+    "actions": {
+      "hoverLight": true,
+      "dragRotate": true,
+      "wheelZoom": true,
+      "clickPulse": true,
+      "holdAction": true
+    }
   }
 } satisfies FormFieldConfig;
 
