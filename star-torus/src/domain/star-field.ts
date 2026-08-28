@@ -15,7 +15,8 @@ export const SHAPE_IDS = [
   "particle-logo",
   "light-tunnel",
   "lissajous-orbit",
-  "gyroid",
+  "celestial-gyro",
+  "singularity",
   "metaball",
   "particle-terrain",
   "dna-ring"

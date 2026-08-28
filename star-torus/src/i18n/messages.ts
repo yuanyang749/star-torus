@@ -173,7 +173,8 @@ export const MESSAGES = {
       "particle-logo": { label: "文字标志", ariaLabel: "由星点聚合形成的 FORMFIELD 三维文字标志" },
       "light-tunnel": { label: "光隧道", ariaLabel: "由连续粒子光环构成的纵深穿梭隧道" },
       "lissajous-orbit": { label: "星轨", ariaLabel: "由多组闭合利萨如轨道交错形成的三维星轨" },
-      gyroid: { label: "极小曲面", ariaLabel: "满足三周期极小曲面方程的粒子 Gyroid" },
+      "celestial-gyro": { label: "浑天仪", ariaLabel: "由三轴正交同心万向旋转星环与核心恒星核组成的浑天星仪" },
+      singularity: { label: "奇点", ariaLabel: "由引力透镜弯曲光子环、相对论吸积盘与双极喷流构成的时空奇点" },
       metaball: { label: "流体软体", ariaLabel: "多个柔性体融合并呼吸变形的粒子 Metaball" },
       "particle-terrain": { label: "粒子地形", ariaLabel: "由多频波场生成并缓慢流动的粒子山脉地形" },
       "dna-ring": { label: "DNA 环链", ariaLabel: "首尾相连并带有梯级连接的环形 DNA 双螺旋" }
@@ -292,7 +293,8 @@ export const MESSAGES = {
       "particle-logo": { label: "Particle Logo", ariaLabel: "A three-dimensional FORMFIELD wordmark assembled from particles" },
       "light-tunnel": { label: "Light Tunnel", ariaLabel: "A deep light tunnel assembled from continuous particle rings" },
       "lissajous-orbit": { label: "Star Orbits", ariaLabel: "Interwoven three-dimensional Lissajous particle orbits" },
-      gyroid: { label: "Gyroid", ariaLabel: "A particle gyroid based on a triply periodic minimal surface" },
+      "celestial-gyro": { label: "Celestial Gyro", ariaLabel: "An armillary sphere composed of triaxial orthogonal gimbal rings and a stellar core" },
+      singularity: { label: "Singularity", ariaLabel: "A spacetime singularity with warped photon rings, relativistic accretion disk, and bipolar jets" },
       metaball: { label: "Metaball", ariaLabel: "Breathing and merging particle metaballs" },
       "particle-terrain": { label: "Terrain", ariaLabel: "A flowing particle mountain terrain generated from layered waves" },
       "dna-ring": { label: "DNA Ring", ariaLabel: "A closed DNA double helix with particle rungs" }

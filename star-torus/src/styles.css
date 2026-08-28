@@ -70,14 +70,10 @@ button {
   top: 50%;
   right: max(18px, env(safe-area-inset-right));
   z-index: 4;
-  width: min(312px, calc(100vw - 82px));
+  width: min(344px, calc(100vw - 82px));
   color: rgb(var(--panel-ink-rgb));
   transform: translateY(-50%);
   transition: transform 460ms var(--ease-out);
-}
-
-.control-panel.is-english {
-  width: min(344px, calc(100vw - 82px));
 }
 
 .control-panel.is-collapsed {
@@ -974,17 +970,48 @@ button {
 .shape-mark--lissajous-orbit::before { transform: rotate(45deg); }
 .shape-mark--lissajous-orbit::after { transform: rotate(-45deg); }
 
-.shape-mark--gyroid {
+.shape-mark--celestial-gyro {
   border: 1px solid currentColor;
-  border-radius: 45% 55% 38% 62%;
-  transform: rotate(45deg);
+  border-radius: 50%;
 }
 
-.shape-mark--gyroid::after {
+.shape-mark--celestial-gyro::before {
+  position: absolute;
+  inset: 2px 0;
+  content: "";
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transform: rotate(60deg);
+}
+
+.shape-mark--celestial-gyro::after {
+  position: absolute;
+  inset: 4px;
+  content: "";
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.shape-mark--singularity {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transform: scaleY(0.55);
+}
+
+.shape-mark--singularity::before {
+  position: absolute;
+  inset: -3px 4px;
+  content: "";
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transform: scaleX(0.45);
+}
+
+.shape-mark--singularity::after {
   position: absolute;
   inset: 3px;
   content: "";
-  border: 1px solid currentColor;
+  background: currentColor;
   border-radius: 50%;
 }
 
@@ -1306,6 +1333,7 @@ button {
 }
 
 .panel-section--export {
+  border-bottom: none;
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--panel-accent) 6%, transparent), transparent 58%);
 }
@@ -1574,10 +1602,23 @@ button {
 }
 
 .panel-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
   display: grid;
-  padding: 14px 22px 20px;
+  padding: 13px 22px 18px;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--panel-rgb), 0.88) 0%,
+    rgba(var(--panel-rgb), 0.96) 28%,
+    rgba(var(--panel-rgb), 0.98) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(var(--panel-ink-rgb), 0.12);
+  border-radius: 0 0 24px 24px;
 }
 
 .panel-action {
@@ -1628,15 +1669,11 @@ button {
 @media (max-width: 600px) {
   .control-panel {
     right: max(12px, env(safe-area-inset-right));
-    width: min(286px, calc(100vw - 72px));
+    width: min(316px, calc(100vw - 72px));
   }
 
   .panel-toggle {
     left: -50px;
-  }
-
-  .control-panel.is-english {
-    width: min(316px, calc(100vw - 72px));
   }
 }
 

@@ -29,7 +29,8 @@ export const geometryItems = [
   { name: "geometry-particle-logo", shape: "particle-logo", title: "文字标志几何", moduleName: "particle-logo", exportName: "particleLogoGeometry" },
   { name: "geometry-light-tunnel", shape: "light-tunnel", title: "光隧道几何", moduleName: "light-tunnel", exportName: "lightTunnelGeometry" },
   { name: "geometry-lissajous-orbit", shape: "lissajous-orbit", title: "利萨如星轨几何", moduleName: "lissajous-orbit", exportName: "lissajousOrbitGeometry" },
-  { name: "geometry-gyroid", shape: "gyroid", title: "Gyroid 极小曲面几何", moduleName: "gyroid", exportName: "gyroidGeometry" },
+  { name: "geometry-celestial-gyro", shape: "celestial-gyro", title: "浑天星仪几何", moduleName: "celestial-gyro", exportName: "celestialGyroGeometry" },
+  { name: "geometry-singularity", shape: "singularity", title: "奇点形场几何", moduleName: "singularity", exportName: "singularityGeometry" },
   { name: "geometry-metaball", shape: "metaball", title: "流体软体几何", moduleName: "metaball", exportName: "metaballGeometry" },
   { name: "geometry-particle-terrain", shape: "particle-terrain", title: "粒子地形几何", moduleName: "particle-terrain", exportName: "particleTerrainGeometry" },
   { name: "geometry-dna-ring", shape: "dna-ring", title: "DNA 环链几何", moduleName: "dna-ring", exportName: "dnaRingGeometry" }
@@ -52,7 +53,8 @@ export const visualPresets = [
   ["particle-logo", "ParticleLogoField", "文字标志", "particle-logo"],
   ["light-tunnel", "LightTunnelField", "光隧道", "light-tunnel"],
   ["lissajous-orbit", "LissajousOrbitField", "利萨如星轨", "lissajous-orbit"],
-  ["gyroid", "GyroidField", "Gyroid 极小曲面", "gyroid"],
+  ["celestial-gyro", "CelestialGyroField", "浑天星仪", "celestial-gyro"],
+  ["singularity", "SingularityField", "时空奇点", "singularity"],
   ["metaball", "MetaballField", "流体软体", "metaball"],
   ["particle-terrain", "ParticleTerrainField", "粒子地形", "particle-terrain"],
   ["dna-ring", "DnaRingField", "DNA 环链", "dna-ring"]

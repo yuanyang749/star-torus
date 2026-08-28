@@ -13,7 +13,7 @@ const index = await readJson(resolve(registryDirectory, "index.json"));
 const itemNames = new Set(index.items.map((item) => item.name));
 
 assert.equal(index.name, "formfield");
-assert.equal(index.items.length, 41);
+assert.equal(index.items.length, 43);
 assert(itemNames.has("form-field-runtime"));
 assert(itemNames.has("geometry-torus"));
 assert(itemNames.has("geometry-galaxy-vortex"));
@@ -25,7 +25,8 @@ for (const name of [
   "particle-logo",
   "light-tunnel",
   "lissajous-orbit",
-  "gyroid",
+  "celestial-gyro",
+  "singularity",
   "metaball",
   "particle-terrain",
   "dna-ring"

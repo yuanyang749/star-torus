@@ -87,10 +87,15 @@ export const GEOMETRY_DISTRIBUTION = {
     moduleName: "lissajous-orbit",
     exportName: "lissajousOrbitGeometry"
   },
-  gyroid: {
-    registryName: "geometry-gyroid",
-    moduleName: "gyroid",
-    exportName: "gyroidGeometry"
+  "celestial-gyro": {
+    registryName: "geometry-celestial-gyro",
+    moduleName: "celestial-gyro",
+    exportName: "celestialGyroGeometry"
+  },
+  singularity: {
+    registryName: "geometry-singularity",
+    moduleName: "singularity",
+    exportName: "singularityGeometry"
   },
   metaball: {
     registryName: "geometry-metaball",

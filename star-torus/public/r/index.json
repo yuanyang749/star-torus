@@ -260,17 +260,32 @@
       }
     },
     {
-      "name": "geometry-gyroid",
-      "title": "Gyroid 极小曲面几何",
-      "description": "FORMFIELD LAB 的Gyroid 极小曲面几何采样器。",
+      "name": "geometry-celestial-gyro",
+      "title": "浑天星仪几何",
+      "description": "FORMFIELD LAB 的浑天星仪几何采样器。",
       "type": "registry:geometry",
       "meta": {
         "category": "geometry",
-        "shape": "gyroid",
+        "shape": "celestial-gyro",
         "tags": [
           "formfield",
           "geometry",
-          "gyroid"
+          "celestial-gyro"
+        ]
+      }
+    },
+    {
+      "name": "geometry-singularity",
+      "title": "奇点形场几何",
+      "description": "FORMFIELD LAB 的奇点形场几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "singularity",
+        "tags": [
+          "formfield",
+          "geometry",
+          "singularity"
         ]
       }
     },
@@ -576,18 +591,34 @@
       }
     },
     {
-      "name": "gyroid",
-      "title": "Gyroid 极小曲面",
-      "description": "FORMFIELD LAB 的Gyroid 极小曲面生成式视觉组件。",
+      "name": "celestial-gyro",
+      "title": "浑天星仪",
+      "description": "FORMFIELD LAB 的浑天星仪生成式视觉组件。",
       "type": "registry:visual",
       "meta": {
         "category": "field",
-        "shape": "gyroid",
+        "shape": "celestial-gyro",
         "tags": [
           "formfield",
           "r3f",
           "particles",
-          "gyroid"
+          "celestial-gyro"
+        ]
+      }
+    },
+    {
+      "name": "singularity",
+      "title": "时空奇点",
+      "description": "FORMFIELD LAB 的时空奇点生成式视觉组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "singularity",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "singularity"
         ]
       }
     },
