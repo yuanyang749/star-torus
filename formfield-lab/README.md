@@ -74,6 +74,29 @@ npm run registry:list
 
 Registry 配置位于 `registry/registry.config.mjs`，源码文件内容会在构建时写入每个组件 JSON。
 
+## Vercel 部署
+
+仓库是多项目结构，Vercel 项目的 Root Directory 设为 `formfield-lab`：
+
+```text
+Build Command: npm run build
+Output Directory: dist
+```
+
+正式域名通过构建环境变量写入 Registry 元数据：
+
+```bash
+FORMFIELD_PUBLIC_URL=https://formfield.dev npm run build
+```
+
+部署后的 Registry 入口为：
+
+```text
+https://formfield.dev/r/index.json
+```
+
+`vercel.json` 为 `/r/*` 开启跨域访问和 CDN 重验证缓存，`/r` 会跳转到 Registry 索引。国内镜像只需把同一份 `dist/r/` 同步到对象存储。
+
 ## CLI
 
 本地 Registry 安装：

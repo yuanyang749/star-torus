@@ -10,7 +10,9 @@ import {
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputDirectory = resolve(root, "public/r");
-const schemaUrl = "https://formfield.dev/r/schema/registry-item.json";
+const publicUrl = (process.env.FORMFIELD_PUBLIC_URL ?? "https://formfield.dev").replace(/\/+$/, "");
+const registryUrl = `${publicUrl}/r`;
+const schemaUrl = `${registryUrl}/schema/registry-item.json`;
 const packageJson = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 
 await rm(outputDirectory, { recursive: true, force: true });
@@ -100,7 +102,7 @@ const index = {
   name: "formfield",
   title: "形场实验室 / FORMFIELD LAB",
   version: packageJson.version,
-  homepage: "https://formfield.dev",
+  homepage: publicUrl,
   items: items.map(({ name, title, description, type, meta }) => ({
     name,
     title,
@@ -198,7 +200,7 @@ function createRegistrySchema() {
 function createProjectSchema() {
   return {
     $schema: "https://json-schema.org/draft/2020-12/schema",
-    $id: "https://formfield.dev/r/schema/project.json",
+    $id: `${registryUrl}/schema/project.json`,
     title: "FormField Project Configuration",
     type: "object",
     properties: {
