@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-flow-ribbon",
+  "title": "流光丝带几何",
+  "description": "FORMFIELD LAB 的流光丝带几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/flow-ribbon.ts",
+      "target": "components/formfield/geometries/flow-ribbon.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst TAU = Math.PI * 2;\nconst HALF_LENGTH = 230;\nconst MAX_HALF_WIDTH = 48;\nconst GOLDEN_RATIO_CONJUGATE = (Math.sqrt(5) - 1) / 2;\n\nexport const flowRibbonGeometry: GeometryDefinition = {\n  id: \"flow-ribbon\",\n  label: \"流光丝带\",\n  ariaLabel: \"由星点编织并持续流动的三维流光丝带\",\n  mark: \"flow-ribbon\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    let index = 0;\n\n    for (let column = 0; column < columns; column += 1) {\n      const progress = columns > 1 ? column / (columns - 1) : 0.5;\n      const pathProgress = progress * 2 - 1;\n      const primaryWave = pathProgress * Math.PI * 1.15 + phase * 0.9;\n      const secondaryWave = pathProgress * Math.PI * 3.4 - phase * 1.25;\n      const depthWave = pathProgress * Math.PI * 1.45 - phase * 0.72;\n      const twist = pathProgress * Math.PI * 1.3 + phase * 1.05;\n      const widthEnvelope = 0.38\n        + Math.pow(Math.sin(progress * Math.PI), 0.55) * 0.62;\n      const halfWidth = MAX_HALF_WIDTH * widthEnvelope;\n      const centerX = pathProgress * HALF_LENGTH;\n      const centerY = Math.sin(primaryWave) * 18 + Math.sin(secondaryWave) * 6;\n      const centerZ = Math.cos(depthWave) * 28;\n      const cosTwist = Math.cos(twist);\n      const sinTwist = Math.sin(twist);\n      const energy = 0.5\n        + Math.sin(pathProgress * TAU * 2.5 - phase * 3.6) * 0.5;\n      const rowOffset = fract((column + 1) * GOLDEN_RATIO_CONJUGATE);\n\n      for (let row = 0; row < rows; row += 1) {\n        const widthProgress = ((row + rowOffset) / rows) * 2 - 1;\n        const positionIndex = index * 3;\n        const longitudinalJitter = (\n          fract((row + 1) * GOLDEN_RATIO_CONJUGATE + column * 0.754877666) - 0.5\n        ) * HALF_LENGTH / columns;\n\n        positions[positionIndex] = centerX + longitudinalJitter;\n        positions[positionIndex + 1] = centerY\n          + widthProgress * halfWidth * cosTwist;\n        positions[positionIndex + 2] = centerZ\n          + widthProgress * halfWidth * sinTwist;\n        pointSizes[index] = 0.42\n          + (1 - Math.abs(widthProgress)) * 0.34\n          + energy * 0.28;\n        index += 1;\n      }\n    }\n  }\n};\n\nfunction fract(value: number): number {\n  return value - Math.floor(value);\n}\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "flow-ribbon",
+    "tags": [
+      "formfield",
+      "geometry",
+      "flow-ribbon"
+    ]
+  }
+}

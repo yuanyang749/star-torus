@@ -1,0 +1,35 @@
+.star-field {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transition: background-color 320ms ease;
+}
+
+.star-field canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: default;
+}
+
+.star-field canvas.is-interactive {
+  cursor: pointer;
+  touch-action: none;
+}
+
+.star-field canvas.is-dragging {
+  cursor: grabbing;
+}
+
+.star-field canvas.is-attracting {
+  cursor: zoom-in;
+}
+
+.star-field canvas.is-repelling {
+  cursor: zoom-out;
+}
+
+.star-field canvas.is-freezing {
+  cursor: cell;
+}

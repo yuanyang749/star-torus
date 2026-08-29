@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-helicoid",
+  "title": "螺旋曲面几何",
+  "description": "FORMFIELD LAB 的螺旋曲面几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/helicoid.ts",
+      "target": "components/formfield/geometries/helicoid.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst GOLDEN_RATIO_CONJUGATE = (Math.sqrt(5) - 1) / 2;\nconst HALF_WIDTH = 210;\nconst HALF_TURNS = Math.PI * 1.9;\nconst PITCH = 26;\n\nexport const helicoidGeometry: GeometryDefinition = {\n  id: \"helicoid\",\n  label: \"螺旋面\",\n  ariaLabel: \"由星点组成并持续旋转的螺旋曲面\",\n  mark: \"helicoid\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    let index = 0;\n\n    for (let row = 0; row < rows; row += 1) {\n      for (let column = 0; column < columns; column += 1) {\n        const radialJitter = fract(\n          (column + 1) * GOLDEN_RATIO_CONJUGATE + (row + 1) * 0.438289\n        );\n        const radialUnit = ((row + radialJitter) / rows) * 2 - 1;\n        const radial = Math.sign(radialUnit)\n          * Math.pow(Math.abs(radialUnit), 0.72)\n          * HALF_WIDTH;\n        const normalizedRadius = Math.abs(radial) / HALF_WIDTH;\n        const angularJitter = fract(\n          (row + 1) * 0.754877666 + (column + 1) * 0.569840296\n        );\n        const angularProgress = (column + angularJitter) / columns;\n        const baseAngle = (angularProgress * 2 - 1) * HALF_TURNS;\n        const angle = baseAngle + phase * 0.82;\n        const energy = 0.5 + Math.sin(\n          baseAngle * 1.7 - radialUnit * Math.PI * 1.2 - phase * 3.8\n        ) * 0.5;\n        const positionIndex = index * 3;\n\n        positions[positionIndex] = radial * Math.cos(angle);\n        positions[positionIndex + 1] = radial * Math.sin(angle);\n        positions[positionIndex + 2] = baseAngle * PITCH;\n        pointSizes[index] = 0.44 + normalizedRadius * 0.4 + energy * 0.25;\n        index += 1;\n      }\n    }\n  }\n};\n\nfunction fract(value: number): number {\n  return value - Math.floor(value);\n}\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "helicoid",
+    "tags": [
+      "formfield",
+      "geometry",
+      "helicoid"
+    ]
+  }
+}

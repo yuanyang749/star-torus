@@ -28,11 +28,24 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: formfield-lab/package-lock.json
+
+      - name: Build FormField Lab
+        working-directory: formfield-lab
+        run: |
+          npm ci
+          npm run build
+
       - name: Prepare Multi-Directory Site
         run: |
           mkdir -p _site
-          # 1. 根目录部署 star-torus
-          cp -r star-torus/* _site/
+          # 1. 根目录部署 FormField Lab 构建产物
+          cp -r formfield-lab/dist/. _site/
           # 2. 子目录部署 feature-cards
           mkdir -p _site/feature-cards
           cp -r feature-cards/* _site/feature-cards/

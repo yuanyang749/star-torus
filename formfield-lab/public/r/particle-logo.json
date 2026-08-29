@@ -1,0 +1,56 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "particle-logo",
+  "title": "文字标志",
+  "description": "FORMFIELD LAB 的文字标志生成式视觉组件。",
+  "type": "registry:visual",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "geometry-particle-logo"
+  ],
+  "files": [
+    {
+      "path": "registry/particle-logo/ParticleLogoField.tsx",
+      "target": "components/formfield/presets/ParticleLogoField.tsx",
+      "type": "registry:component",
+      "content": "import { FormField, type FormFieldConfig } from \"@/components/formfield\";\nimport { particleLogoGeometry } from \"@/components/formfield/geometries/particle-logo\";\n\nconst ParticleLogoFieldGeometries = [particleLogoGeometry] as const;\n\nexport const ParticleLogoFieldConfig = {\n  \"version\": 1,\n  \"shape\": \"particle-logo\",\n  \"theme\": {\n    \"background\": \"#000000\",\n    \"star\": \"#FFFFFF\",\n    \"glow\": \"#FFFFFF\"\n  },\n  \"motion\": {\n    \"flowSpeed\": 1,\n    \"pointScale\": 1,\n    \"morphDuration\": 1.35\n  },\n  \"effects\": {\n    \"hoverRadius\": 220,\n    \"hoverIntensity\": 1,\n    \"trailIntensity\": 1\n  },\n  \"interaction\": {\n    \"enabled\": false,\n    \"holdMode\": \"magnet\"\n  },\n  \"content\": {\n    \"text\": \"形场实验室\"\n  }\n} satisfies FormFieldConfig;\n\nexport function ParticleLogoField() {\n  return (\n    <div style={{ width: \"100%\", minHeight: 420, aspectRatio: \"1 / 1\" }}>\n      <FormField config={ParticleLogoFieldConfig} geometries={ParticleLogoFieldGeometries} />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "meta": {
+    "category": "field",
+    "shape": "particle-logo",
+    "tags": [
+      "formfield",
+      "r3f",
+      "particles",
+      "particle-logo"
+    ]
+  },
+  "config": {
+    "version": 1,
+    "shape": "particle-logo",
+    "theme": {
+      "background": "#000000",
+      "star": "#FFFFFF",
+      "glow": "#FFFFFF"
+    },
+    "motion": {
+      "flowSpeed": 1,
+      "pointScale": 1,
+      "morphDuration": 1.35
+    },
+    "effects": {
+      "hoverRadius": 220,
+      "hoverIntensity": 1,
+      "trailIntensity": 1
+    },
+    "interaction": {
+      "enabled": false,
+      "holdMode": "magnet"
+    },
+    "content": {
+      "text": "形场实验室"
+    }
+  }
+}

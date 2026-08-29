@@ -1,0 +1,36 @@
+{
+  "name": "formfield-lab",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run registry:build && tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "preview": "vite preview",
+    "registry:build": "node scripts/build-registry.mjs",
+    "registry:list": "node packages/cli/bin/formfield.mjs list --registry ./public/r",
+    "registry:smoke": "node scripts/smoke-registry.mjs",
+    "geometries:check": "node scripts/validate-geometries.mjs"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^9.3.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "three": "^0.179.1",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@types/three": "^0.179.0",
+    "@vitejs/plugin-react": "^5.0.2",
+    "esbuild": "^0.28.2",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.3"
+  }
+}

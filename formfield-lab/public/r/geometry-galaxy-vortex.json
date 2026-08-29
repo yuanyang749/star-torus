@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-galaxy-vortex",
+  "title": "星系漩涡几何",
+  "description": "FORMFIELD LAB 的星系漩涡几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/galaxy-vortex.ts",
+      "target": "components/formfield/geometries/galaxy-vortex.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst TAU = Math.PI * 2;\nconst ARM_COUNT = 4;\nconst MAX_RADIUS = 226;\n\nexport const galaxyVortexGeometry: GeometryDefinition = {\n  id: \"galaxy\",\n  label: \"星系漩涡\",\n  ariaLabel: \"由四条星点旋臂组成并持续旋转的星系漩涡\",\n  mark: \"galaxy\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    const lanesPerArm = Math.floor(columns / ARM_COUNT);\n    let index = 0;\n\n    for (let row = 0; row < rows; row += 1) {\n      for (let column = 0; column < columns; column += 1) {\n        const arm = column % ARM_COUNT;\n        const lane = Math.floor(column / ARM_COUNT);\n        const laneProgress = lanesPerArm > 1 ? lane / (lanesPerArm - 1) : 0.5;\n        const laneOffset = laneProgress - 0.5;\n        const radialProgress = (row + (lane + 0.5) / lanesPerArm) / rows;\n        const radius = 15 + radialProgress * (MAX_RADIUS - 15);\n        const angle = arm / ARM_COUNT * TAU\n          + radius * 0.0205\n          + laneOffset * 0.68\n          + phase * 0.82;\n        const centerLift = 1 - radialProgress;\n        const z = laneOffset * 25 * centerLift\n          + Math.sin(radius * 0.052 + lane * 1.67 + phase) * 8 * centerLift;\n        const positionIndex = index * 3;\n\n        positions[positionIndex] = radius * Math.cos(angle);\n        positions[positionIndex + 1] = radius * Math.sin(angle);\n        positions[positionIndex + 2] = z;\n        pointSizes[index] = 0.38\n          + Math.pow(centerLift, 1.45) * 1.18\n          + Math.abs(laneOffset) * 0.16;\n        index += 1;\n      }\n    }\n  }\n};\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "galaxy",
+    "tags": [
+      "formfield",
+      "geometry",
+      "galaxy"
+    ]
+  }
+}

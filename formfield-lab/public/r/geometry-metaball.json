@@ -1,0 +1,29 @@
+{
+  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "name": "geometry-metaball",
+  "title": "流体软体几何",
+  "description": "FORMFIELD LAB 的流体软体几何采样器。",
+  "type": "registry:geometry",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "form-field-runtime"
+  ],
+  "files": [
+    {
+      "path": "src/geometries/metaball.ts",
+      "target": "components/formfield/geometries/metaball.ts",
+      "type": "registry:file",
+      "content": "import type { GeometryDefinition } from \"@/components/formfield/geometries/types\";\n\nconst TAU = Math.PI * 2;\nconst ISO_LEVEL = 1;\nconst SEARCH_RADIUS = 230;\nconst BISECTION_STEPS = 12;\n\ninterface Blob {\n  x: number;\n  y: number;\n  z: number;\n  radiusSquared: number;\n}\n\nexport const metaballGeometry: GeometryDefinition = {\n  id: \"metaball\",\n  label: \"流体软体\",\n  ariaLabel: \"多个隐式球场融合并呼吸变形的粒子 Metaball\",\n  mark: \"metaball\",\n  sample(positions, pointSizes, { phase, columns, rows }) {\n    const blobs: readonly Blob[] = [\n      blob(78 + Math.sin(phase * 0.72) * 10, 20, 45, 56),\n      blob(-74, 50 + Math.cos(phase * 0.63) * 9, 12, 54),\n      blob(2, -76, -42 + Math.sin(phase * 0.51) * 8, 50),\n      blob(-20 + Math.cos(phase * 0.81) * 7, 5, 78, 48)\n    ];\n    let index = 0;\n\n    for (let column = 0; column < columns; column += 1) {\n      const longitude = column / columns * TAU;\n\n      for (let row = 0; row < rows; row += 1) {\n        const latitude = ((row + 0.5) / rows - 0.5) * Math.PI;\n        const cosLatitude = Math.cos(latitude);\n        const directionX = Math.cos(longitude) * cosLatitude;\n        const directionY = Math.sin(latitude);\n        const directionZ = Math.sin(longitude) * cosLatitude;\n        let inner = 0;\n        let outer = SEARCH_RADIUS;\n\n        for (let step = 0; step < BISECTION_STEPS; step += 1) {\n          const distance = (inner + outer) * 0.5;\n          const field = sampleField(\n            distance * directionX,\n            distance * directionY,\n            distance * directionZ,\n            blobs\n          );\n          if (field >= ISO_LEVEL) {\n            inner = distance;\n          } else {\n            outer = distance;\n          }\n        }\n\n        const radius = (inner + outer) * 0.5;\n        const positionIndex = index * 3;\n        positions[positionIndex] = directionX * radius;\n        positions[positionIndex + 1] = directionY * radius;\n        positions[positionIndex + 2] = directionZ * radius;\n        pointSizes[index] = 0.48 + Math.min(0.38, Math.abs(radius - 120) / 150)\n          + hash(index * 23) * 0.1;\n        index += 1;\n      }\n    }\n  }\n};\n\nfunction blob(x: number, y: number, z: number, radius: number): Blob {\n  return { x, y, z, radiusSquared: radius * radius };\n}\n\nfunction sampleField(x: number, y: number, z: number, blobs: readonly Blob[]): number {\n  let field = 0;\n  for (const item of blobs) {\n    const deltaX = x - item.x;\n    const deltaY = y - item.y;\n    const deltaZ = z - item.z;\n    field += item.radiusSquared / Math.max(\n      1,\n      deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ\n    );\n  }\n  return field;\n}\n\nfunction hash(value: number): number {\n  const result = Math.sin(value * 12.9898) * 43758.5453;\n  return result - Math.floor(result);\n}\n"
+    }
+  ],
+  "meta": {
+    "category": "geometry",
+    "shape": "metaball",
+    "tags": [
+      "formfield",
+      "geometry",
+      "metaball"
+    ]
+  }
+}

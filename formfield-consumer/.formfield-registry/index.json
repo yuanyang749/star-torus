@@ -1,0 +1,54 @@
+{
+  "name": "formfield",
+  "title": "FormField Local Consumer Registry",
+  "version": "2.0.0",
+  "homepage": "https://formfield.dev",
+  "items": [
+    {
+      "name": "form-field-runtime",
+      "title": "FormField Runtime",
+      "description": "FORMFIELD LAB 的 React Three Fiber 粒子形场运行时。",
+      "type": "registry:runtime",
+      "meta": {
+        "category": "field",
+        "tags": [
+          "formfield",
+          "runtime",
+          "r3f",
+          "particles"
+        ]
+      }
+    },
+    {
+      "name": "geometry-torus",
+      "title": "星环几何",
+      "description": "FORMFIELD LAB 的星环几何采样器。",
+      "type": "registry:geometry",
+      "meta": {
+        "category": "geometry",
+        "shape": "torus",
+        "tags": [
+          "formfield",
+          "geometry",
+          "torus"
+        ]
+      }
+    },
+    {
+      "name": "my-form-field",
+      "title": "MyFormField",
+      "description": "FORMFIELD LAB 本地 CLI 按需安装验证组件。",
+      "type": "registry:visual",
+      "meta": {
+        "category": "field",
+        "shape": "torus",
+        "tags": [
+          "formfield",
+          "r3f",
+          "particles",
+          "torus"
+        ]
+      }
+    }
+  ]
+}
