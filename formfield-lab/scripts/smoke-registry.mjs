@@ -88,6 +88,37 @@ try {
   assert(installedPreset.includes('from "@/components/formfield/geometries/dna-ring"'));
   assert(installedPreset.includes("geometries={DnaRingFieldGeometries}"));
 
+  const installedDomainPath = resolve(sandbox, "src/components/formfield/domain.ts");
+  await writeFile(installedDomainPath, "// stale runtime\n", "utf8");
+  await writeFile(
+    resolve(sandbox, "src/components/formfield/presets/DnaRingField.tsx"),
+    "// customized preset\n",
+    "utf8"
+  );
+
+  const updateResult = spawnSync(
+    process.execPath,
+    [
+      resolve(root, "packages/cli/bin/formfield.mjs"),
+      "add",
+      "singularity",
+      "--cwd",
+      sandbox,
+      "--registry",
+      registryDirectory,
+      "--skip-install"
+    ],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(updateResult.status, 0, updateResult.stderr || updateResult.stdout);
+  assert((await readFile(installedDomainPath, "utf8")).includes('"singularity"'));
+  assert.equal(
+    await readFile(resolve(sandbox, "src/components/formfield/presets/DnaRingField.tsx"), "utf8"),
+    "// customized preset\n"
+  );
+  assert(existsSync(resolve(sandbox, "src/components/formfield/presets/SingularityField.tsx")));
+
   await build({
     entryPoints: [resolve(sandbox, "src/components/formfield/presets/DnaRingField.tsx")],
     outdir: resolve(sandbox, ".build"),

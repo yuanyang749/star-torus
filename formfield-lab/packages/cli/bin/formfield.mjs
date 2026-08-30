@@ -40,17 +40,23 @@ async function addComponent({ positionals, flags }) {
 
   await resolveItem(componentName);
 
-  const files = resolvedItems.flatMap((item) => item.files ?? []);
-  for (const file of files) {
+  const files = resolvedItems.flatMap((item) =>
+    (item.files ?? []).map((file) => ({
+      file,
+      managedDependency: item.name !== componentName
+    }))
+  );
+  for (const { file, managedDependency } of files) {
     const destination = resolve(sourceRoot, file.target);
     assertInside(sourceRoot, destination);
     const exists = existsSync(destination);
-    if (exists && !overwrite) {
+    if (exists && !overwrite && !managedDependency) {
       process.stdout.write(`skip  ${relative(cwd, destination)} (already exists)\n`);
       continue;
     }
 
-    process.stdout.write(`${dryRun ? "plan" : "write"} ${relative(cwd, destination)}\n`);
+    const action = dryRun ? "plan" : exists ? "update" : "write";
+    process.stdout.write(`${action} ${relative(cwd, destination)}\n`);
     if (!dryRun) {
       await mkdir(dirname(destination), { recursive: true });
       await writeFile(destination, adaptAlias(String(file.content ?? ""), alias), "utf8");
