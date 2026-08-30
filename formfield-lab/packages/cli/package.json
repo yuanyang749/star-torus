@@ -1,5 +1,5 @@
 {
-  "name": "@formfield/cli",
+  "name": "@yuanyang749/formfield-cli",
   "version": "0.1.0",
   "description": "Install FORMFIELD LAB visual components as source code.",
   "type": "module",

@@ -110,7 +110,7 @@ node packages/cli/bin/formfield.mjs add star-torus \
 发布 CLI 与 Registry 后，对外命令为：
 
 ```bash
-npx @formfield/cli@latest add star-torus
+npx @yuanyang749/formfield-cli@latest add star-torus
 ```
 
 CLI 支持：
