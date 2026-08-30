@@ -1,17 +1,17 @@
-import { MyFormField } from '@/components/formfield/MyFormField'
+import { CelestialGyroField } from '@/components/formfield/presets/CelestialGyroField'
 import './App.css'
 
 function App() {
   return (
     <main className="consumer-shell">
       <header className="install-status">
-        <p>LOCAL CONSUMER / CLI VERIFIED</p>
-        <h1>MyFormField</h1>
-        <span><i aria-hidden="true" />已从本地 Registry 安装</span>
+        <p>CLOUD CONSUMER / CLI VERIFIED</p>
+        <h1>CelestialGyroField</h1>
+        <span><i aria-hidden="true" />已从云端 Registry 安装</span>
       </header>
 
-      <section className="field-preview" aria-label="MyFormField 组件预览">
-        <MyFormField />
+      <section className="field-preview" aria-label="浑天星仪组件预览">
+        <CelestialGyroField />
       </section>
     </main>
   )
