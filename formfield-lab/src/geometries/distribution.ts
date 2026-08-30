@@ -6,6 +6,30 @@ export interface GeometryDistribution {
   exportName: string;
 }
 
+export const VISUAL_PRESET_REGISTRY_NAMES = {
+  torus: "star-torus",
+  sphere: "particle-sphere",
+  mobius: "mobius-field",
+  "torus-knot": "torus-knot",
+  klein: "klein-bottle",
+  superellipsoid: "superellipsoid",
+  helicoid: "helicoid",
+  "double-helix": "double-helix",
+  "wave-surface": "wave-surface",
+  "flow-ribbon": "flow-ribbon",
+  heart: "heart-surface",
+  galaxy: "galaxy-vortex",
+  "network-globe": "network-globe",
+  "particle-logo": "particle-logo",
+  "light-tunnel": "light-tunnel",
+  "lissajous-orbit": "lissajous-orbit",
+  "celestial-gyro": "celestial-gyro",
+  singularity: "singularity",
+  metaball: "metaball",
+  "particle-terrain": "particle-terrain",
+  "dna-ring": "dna-ring"
+} satisfies Record<ShapeId, string>;
+
 export const GEOMETRY_DISTRIBUTION = {
   torus: {
     registryName: "geometry-torus",

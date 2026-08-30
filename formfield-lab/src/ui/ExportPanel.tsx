@@ -52,8 +52,8 @@ export function ExportPanel({ config, copy }: ExportPanelProps) {
     [componentName, exportConfig]
   );
   const installCommand = useMemo(
-    () => generateComponentInstallCommand(componentName),
-    [componentName]
+    () => generateComponentInstallCommand(config.shape),
+    [config.shape]
   );
 
   useEffect(() => {

@@ -1,6 +1,9 @@
 import type { StarFieldConfig } from "@/domain/star-field";
 import { createInstallCommand } from "@/domain/brand";
-import { GEOMETRY_DISTRIBUTION } from "@/geometries/distribution";
+import {
+  GEOMETRY_DISTRIBUTION,
+  VISUAL_PRESET_REGISTRY_NAMES
+} from "@/geometries/distribution";
 import {
   REGISTRY_SCHEMA,
   type FormFieldRegistryItem
@@ -93,6 +96,6 @@ export function generateRegistryJson(config: StarFieldConfig, requestedName: str
   return `${JSON.stringify(generateRegistryItem(config, requestedName), null, 2)}\n`;
 }
 
-export function generateComponentInstallCommand(requestedName: string): string {
-  return createInstallCommand(normalizeRegistryName(requestedName));
+export function generateComponentInstallCommand(shape: StarFieldConfig["shape"]): string {
+  return createInstallCommand(VISUAL_PRESET_REGISTRY_NAMES[shape]);
 }
