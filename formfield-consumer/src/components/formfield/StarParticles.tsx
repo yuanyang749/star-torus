@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
-import type { StarFieldConfig } from "@/components/formfield/domain";
+import { resolveParticleText, type StarFieldConfig } from "@/components/formfield/domain";
 import { DustTrailLayer, StarPointLayer } from "@/components/formfield/effects/RenderLayers";
 import {
   GRID_COLUMNS,
@@ -46,6 +46,7 @@ interface ParticleBuffers {
   targetSizes: Float32Array;
   trailPositions: Float32Array;
   activeShape: StarFieldConfig["shape"];
+  activeText: string;
   morphProgress: number;
 }
 
@@ -53,9 +54,13 @@ export function StarParticles({ config, geometries, runtime }: StarParticlesProp
   const { size, viewport } = useThree();
   const pointsRef = useRef<THREE.Points>(null);
   const [initialShape] = useState(config.shape);
+  const [initialText] = useState(() => resolveParticleText(config));
   const buffers = useMemo(
-    () => createParticleBuffers(resolveGeometryDefinition(geometries, initialShape)),
-    [geometries, initialShape]
+    () => createParticleBuffers(
+      resolveGeometryDefinition(geometries, initialShape),
+      initialShape === "particle-logo" ? initialText : ""
+    ),
+    [geometries, initialShape, initialText]
   );
   const waveData = useMemo(() => new Float32Array(ENERGY_WAVE_COUNT * 4), []);
   const waveVectors = useMemo(
@@ -92,12 +97,14 @@ export function StarParticles({ config, geometries, runtime }: StarParticlesProp
 
   useEffect(() => {
     const nextShape = resolveGeometryDefinition(geometries, config.shape).id;
-    if (buffers.activeShape === nextShape) return;
+    const nextText = nextShape === "particle-logo" ? resolveParticleText(config) : "";
+    if (buffers.activeShape === nextShape && buffers.activeText === nextText) return;
     buffers.sourcePositions.set(buffers.basePositions);
     buffers.sourceSizes.set(buffers.baseSizes);
     buffers.activeShape = nextShape;
+    buffers.activeText = nextText;
     buffers.morphProgress = 0;
-  }, [buffers, config.shape, geometries]);
+  }, [buffers, config, geometries]);
 
   useEffect(() => () => {
     buffers.geometry.dispose();
@@ -115,7 +122,8 @@ export function StarParticles({ config, geometries, runtime }: StarParticlesProp
     definition.sample(buffers.targetPositions, buffers.targetSizes, {
       phase,
       columns: GRID_COLUMNS,
-      rows: GRID_ROWS
+      rows: GRID_ROWS,
+      text: resolveParticleText(config)
     });
 
     if (buffers.morphProgress < 1) {
@@ -203,7 +211,7 @@ export function StarParticles({ config, geometries, runtime }: StarParticlesProp
   );
 }
 
-function createParticleBuffers(definition: GeometryDefinition): ParticleBuffers {
+function createParticleBuffers(definition: GeometryDefinition, initialText: string): ParticleBuffers {
   const positions = new Float32Array(POINT_COUNT * 3);
   const basePositions = new Float32Array(POINT_COUNT * 3);
   const sourcePositions = new Float32Array(POINT_COUNT * 3);
@@ -217,7 +225,8 @@ function createParticleBuffers(definition: GeometryDefinition): ParticleBuffers 
   definition.sample(basePositions, baseSizes, {
     phase: 0,
     columns: GRID_COLUMNS,
-    rows: GRID_ROWS
+    rows: GRID_ROWS,
+    text: initialText
   });
   positions.set(basePositions);
   sourcePositions.set(basePositions);
@@ -247,6 +256,7 @@ function createParticleBuffers(definition: GeometryDefinition): ParticleBuffers 
     targetSizes,
     trailPositions,
     activeShape: definition.id,
+    activeText: initialText,
     morphProgress: 1
   };
 }

@@ -1,5 +1,5 @@
 {
-  "registry": ".formfield-registry",
+  "registry": "https://temporary-spry-copper-io6ia77.vercel.app/r",
   "sourceRoot": "src",
   "alias": "@/"
 }
