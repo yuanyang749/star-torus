@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-particle-terrain",
   "title": "粒子地形几何",
   "description": "FORMFIELD LAB 的粒子地形几何采样器。",

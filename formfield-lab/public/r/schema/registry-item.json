@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://formfield.dev/r/schema/registry-item.json",
+  "$id": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "title": "FormField Registry Item",
   "type": "object",
   "required": [

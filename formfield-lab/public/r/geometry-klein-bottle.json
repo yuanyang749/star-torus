@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-klein-bottle",
   "title": "克莱因瓶几何",
   "description": "FORMFIELD LAB 的克莱因瓶几何采样器。",

@@ -6,7 +6,7 @@ import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
-const DEFAULT_REGISTRY = "https://temporary-spry-copper-io6ia77.vercel.app/r";
+const DEFAULT_REGISTRY = "https://formfield-lab.vercel.app/r";
 const args = process.argv.slice(2);
 const command = args.shift();
 const options = parseOptions(args);

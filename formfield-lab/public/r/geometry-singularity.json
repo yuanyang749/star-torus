@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-singularity",
   "title": "奇点形场几何",
   "description": "FORMFIELD LAB 的奇点形场几何采样器。",

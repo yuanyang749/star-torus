@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-flow-ribbon",
   "title": "流光丝带几何",
   "description": "FORMFIELD LAB 的流光丝带几何采样器。",

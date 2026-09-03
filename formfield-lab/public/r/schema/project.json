@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://formfield.dev/r/schema/project.json",
+  "$id": "https://formfield-lab.vercel.app/r/schema/project.json",
   "title": "FormField Project Configuration",
   "type": "object",
   "properties": {

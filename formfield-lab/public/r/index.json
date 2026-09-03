@@ -2,7 +2,7 @@
   "name": "formfield",
   "title": "形场实验室 / FORMFIELD LAB",
   "version": "2.0.0",
-  "homepage": "https://formfield.dev",
+  "homepage": "https://formfield-lab.vercel.app",
   "items": [
     {
       "name": "form-field-runtime",

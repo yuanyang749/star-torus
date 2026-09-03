@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/project.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/project.json",
   "registry": "./public/r",
   "sourceRoot": "src",
   "alias": "@/"

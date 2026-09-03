@@ -2,7 +2,7 @@
 
 基于 **React 19**、**TypeScript**、**React Three Fiber (Three.js)** 的高阶生成式 3D 粒子视觉组件创作、实时预览与源码分发生态平台。
 
-[在线体验](https://formfield.dev) · [Registry 索引](https://formfield.dev/r/index.json) · [CLI 文档](#cli-安装器)
+[在线体验](https://formfield-lab.vercel.app/) · [Registry 索引](https://formfield-lab.vercel.app/r/index.json) · [CLI 文档](#cli-安装器)
 
 ---
 
@@ -142,7 +142,7 @@ node packages/cli/bin/formfield.mjs add star-torus \
 
 ```json
 {
-  "registry": "https://formfield.dev/r",
+  "registry": "https://formfield-lab.vercel.app/r",
   "sourceRoot": "src",
   "alias": "@/"
 }
@@ -258,14 +258,15 @@ formfield-lab/
 ## 🌐 部署指南
 
 ### Vercel 部署
+- **体验地址**：[https://formfield-lab.vercel.app/](https://formfield-lab.vercel.app/)
 - **Root Directory**：`formfield-lab`
 - **Build Command**：`npm run build`
 - **Output Directory**：`dist`
-- **正式域名写入**：
+- **正式域名写入（可选环境变量）**：
   ```bash
-  FORMFIELD_PUBLIC_URL=https://formfield.dev npm run build
+  FORMFIELD_PUBLIC_URL=https://formfield-lab.vercel.app npm run build
   ```
-  `vercel.json` 已配置 CORS 跨域响应头和 CDN 重验证机制，确保外部 CLI 和项目可以通过 `https://formfield.dev/r/` 畅通访问 Registry。
+  `vercel.json` 已配置 CORS 跨域响应头和 CDN 重验证机制，确保外部 CLI 和项目可以通过 `https://formfield-lab.vercel.app/r/` 畅通访问 Registry。
 
 ### GitHub Pages / 多项目部署
 工作区根目录配置了 GitHub Actions (`.github/workflows/deploy.yml`)，会在主分支提交时自动执行构建并将 `formfield-lab/dist` 部署为全站主入口。

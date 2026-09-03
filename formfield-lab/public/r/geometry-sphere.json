@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-sphere",
   "title": "球体几何",
   "description": "FORMFIELD LAB 的球体几何采样器。",

@@ -1,6 +1,8 @@
 # FormField Consumer
 
 用于验证 FORMFIELD LAB 组件能否通过 CLI 安装进独立 React/Vite 项目并直接运行。
+形场实验室在线体验地址：[https://formfield-lab.vercel.app/](https://formfield-lab.vercel.app/)。
+线上 Registry 基础路径为：`https://formfield-lab.vercel.app/r`。
 
 ## 已验证安装
 

@@ -10,7 +10,7 @@ import {
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputDirectory = resolve(root, "public/r");
-const publicUrl = (process.env.FORMFIELD_PUBLIC_URL ?? "https://formfield.dev").replace(/\/+$/, "");
+const publicUrl = (process.env.FORMFIELD_PUBLIC_URL ?? "https://formfield-lab.vercel.app").replace(/\/+$/, "");
 const registryUrl = `${publicUrl}/r`;
 const schemaUrl = `${registryUrl}/schema/registry-item.json`;
 const packageJson = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));

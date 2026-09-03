@@ -1,6 +1,6 @@
 import type { ShapeId, StarFieldConfig } from "@/domain/star-field";
 
-export const REGISTRY_SCHEMA = "https://formfield.dev/r/schema/registry-item.json";
+export const REGISTRY_SCHEMA = "https://formfield-lab.vercel.app/r/schema/registry-item.json";
 
 export type RegistryItemType = "registry:visual" | "registry:runtime" | "registry:geometry";
 

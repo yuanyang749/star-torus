@@ -29,6 +29,7 @@
 - **21 种高等数学拓扑**：星环、球体、莫比乌斯环、三叶结、克莱因瓶、超椭球、双螺旋、星系漩涡、浑天星仪、时空奇点、文字粒子等。
 - **解耦的六大交互体系**：局部打光、指针视差、拖拽全景旋转、滚轮视距缩放、短按脉冲、长按磁吸/冻结。
 - **类 shadcn 源码级分发**：提供公开 Registry API 与官方 CLI 工具，按需拉取组件与核心算法源码，零臃肿黑盒依赖。
+- **在线体验 (Vercel)**：[https://formfield-lab.vercel.app/](https://formfield-lab.vercel.app/)
 - **详细文档**：查阅 [formfield-lab/README.md](./formfield-lab/README.md)。
 
 ### 2. [FormField Consumer](./formfield-consumer/README.md)

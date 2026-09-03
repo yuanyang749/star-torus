@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-torus-knot",
   "title": "三叶环面结几何",
   "description": "FORMFIELD LAB 的三叶环面结几何采样器。",

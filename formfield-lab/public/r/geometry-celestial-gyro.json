@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-celestial-gyro",
   "title": "浑天星仪几何",
   "description": "FORMFIELD LAB 的浑天星仪几何采样器。",

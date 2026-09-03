@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-light-tunnel",
   "title": "光隧道几何",
   "description": "FORMFIELD LAB 的光隧道几何采样器。",

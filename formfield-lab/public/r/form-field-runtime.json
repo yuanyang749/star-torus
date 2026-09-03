@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "form-field-runtime",
   "title": "FormField Runtime",
   "description": "FORMFIELD LAB 的 React Three Fiber 粒子形场运行时。",

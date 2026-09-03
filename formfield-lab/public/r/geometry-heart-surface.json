@@ -1,5 +1,5 @@
 {
-  "$schema": "https://formfield.dev/r/schema/registry-item.json",
+  "$schema": "https://formfield-lab.vercel.app/r/schema/registry-item.json",
   "name": "geometry-heart-surface",
   "title": "心形曲面几何",
   "description": "FORMFIELD LAB 的心形曲面几何采样器。",
