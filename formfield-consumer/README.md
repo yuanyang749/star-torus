@@ -7,7 +7,7 @@
 项目中的 `MyFormField` 通过本地打包 Registry 安装：
 
 ```bash
-node ../star-torus/packages/cli/bin/formfield.mjs add my-form-field
+node ../formfield-lab/packages/cli/bin/formfield.mjs add my-form-field
 ```
 
 安装结果：
