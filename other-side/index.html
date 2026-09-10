@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#eeede7">
+    <meta name="description"
+        content="A little curiosity changes everything. An interactive liquid portal by Other Side.">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='20' fill='%23ccff62'/%3E%3Cpath d='M10 20h20M20 10v20' stroke='%23191919' stroke-width='3'/%3E%3C/svg%3E">
+    <title>OTHER SIDE® — A little curiosity changes everything.</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #eeede7;
+            --ink: #272822;
+            --line: #d2d2c8;
+            --acid: #d4ff69
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'Helvetica Neue', Helvetica, sans-serif;
+            overflow: hidden
+        }
+
+        button {
+            font: inherit;
+            color: inherit
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid #58642e;
+            outline-offset: 5px
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        .stage {
+            position: fixed;
+            z-index: 0;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: none;
+            cursor: crosshair
+        }
+
+        .stage canvas {
+            display: block;
+            width: 100%;
+            height: 100%
+        }
+
+        header,
+        main,
+        footer {
+            position: relative;
+            z-index: 1;
+            pointer-events: none
+        }
+
+        header {
+            height: 104px;
+            padding: 0 4.2%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .wordmark {
+            font-size: 25px;
+            font-weight: 850;
+            letter-spacing: -1.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .wordmark sup {
+            font-size: 11px;
+            align-self: flex-start;
+            margin: 7px 0 0 -8px
+        }
+
+        .symbol {
+            width: 27px;
+            height: 27px;
+            border: 1.5px solid;
+            border-radius: 50%;
+            position: relative;
+            transform: rotate(-30deg)
+        }
+
+        .symbol:before,
+        .symbol:after {
+            content: '';
+            position: absolute;
+            border: 1px solid;
+            border-radius: 50%;
+            inset: 3px 8px
+        }
+
+        .symbol:after {
+            inset: 8px 3px
+        }
+
+        .edition {
+            font: 10px/1.7 'Courier New', monospace;
+            letter-spacing: 1.6px;
+            text-align: center
+        }
+
+        .availability {
+            font-size: 11px;
+            display: flex;
+            gap: 9px;
+            align-items: center
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #69754a;
+            border-radius: 50%
+        }
+
+        main {
+            height: calc(100dvh - 194px);
+            min-height: 300px;
+            margin: 0 4.2%;
+            isolation: isolate
+        }
+
+        .eyebrow {
+            position: absolute;
+            top: 35px;
+            left: 0;
+            font: 10px 'Courier New', monospace;
+            letter-spacing: 2px
+        }
+
+        .chapter {
+            position: absolute;
+            top: 34px;
+            right: 0;
+            display: flex;
+            gap: 9px;
+            align-items: center;
+            font: 10px 'Courier New', monospace
+        }
+
+        .chapter b {
+            font-size: 11px;
+            background: var(--acid);
+            padding: 7px 9px;
+            border-radius: 50%;
+            font-weight: 400
+        }
+
+        .caption {
+            position: absolute;
+            left: 0;
+            bottom: 34px;
+            font-size: 12px;
+            line-height: 1.65
+        }
+
+        .caption span {
+            color: #85877b
+        }
+
+        .coordinate {
+            position: absolute;
+            bottom: 37px;
+            right: 0;
+            font: 10px 'Courier New', monospace;
+            letter-spacing: 1px
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            font: 10px 'Courier New', monospace;
+            letter-spacing: 1px;
+            white-space: nowrap
+        }
+
+        .hint i {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #728052;
+            margin-right: 7px
+        }
+
+        .cursor {
+            position: fixed;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0;
+            mix-blend-mode: difference;
+            color: white;
+            will-change: transform
+        }
+
+        .cursor:before,
+        .cursor:after {
+            content: '';
+            position: absolute;
+            background: currentColor;
+            left: -8px;
+            top: 0;
+            width: 17px;
+            height: 1px
+        }
+
+        .cursor:after {
+            transform: rotate(90deg)
+        }
+
+        .cursor span {
+            position: absolute;
+            left: 18px;
+            top: 15px;
+            font: 9px 'Courier New', monospace;
+            letter-spacing: 1px;
+            white-space: nowrap
+        }
+
+        .stage:hover~main .cursor {
+            opacity: 1
+        }
+
+        footer {
+            height: 90px;
+            margin: 0 4.2%;
+            border-top: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px
+        }
+
+        .footer-label {
+            font: 10px/1.6 'Courier New', monospace;
+            letter-spacing: 1px
+        }
+
+        .footer-label span {
+            color: #8b8d81
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto
+        }
+
+        .controls button {
+            border: 1px solid #c7c9bc;
+            border-radius: 30px;
+            background: transparent;
+            padding: 12px 18px;
+            font-size: 11px;
+            transition: background .2s, transform .2s;
+            white-space: nowrap
+        }
+
+        .controls button:hover {
+            background: #e0e2d5;
+            transform: translateY(-2px)
+        }
+
+        .controls button[aria-pressed="true"] {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink)
+        }
+
+        .controls .hold {
+            background: var(--acid);
+            border-color: var(--acid)
+        }
+
+        .controls .hold:hover {
+            background: #c5ed64
+        }
+
+        .controls .icon {
+            margin-right: 7px
+        }
+
+        .right-note {
+            font-size: 11px;
+            letter-spacing: -.1px
+        }
+
+        .error {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-content: center;
+            padding: 24px;
+            text-align: center;
+            background: var(--paper);
+            z-index: 4;
+            pointer-events: auto
+        }
+
+        .error[hidden] {
+            display: none
+        }
+
+        .error p {
+            font-size: 13px;
+            line-height: 1.6
+        }
+
+        h1.sr {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%)
+        }
+
+        .clean header,
+        .clean footer,
+        .clean .eyebrow,
+        .clean .chapter,
+        .clean .caption,
+        .clean .coordinate,
+        .clean .hint {
+            opacity: 0;
+            pointer-events: none
+        }
+
+        .clean main {
+            height: calc(100dvh - 194px);
+            margin: 0 4.2%
+        }
+
+        .clean header,
+        .clean footer {
+            visibility: hidden
+        }
+
+        .clean .cursor {
+            display: none
+        }
+
+        .exit-clean {
+            display: none;
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            z-index: 5;
+            border: 1px solid #8d937a;
+            border-radius: 30px;
+            padding: 9px 14px;
+            background: #eeede7d9;
+            font-size: 10px
+        }
+
+        .clean .exit-clean {
+            display: block;
+            pointer-events: auto
+        }
+
+        @media(hover:hover) {
+            .clean .exit-clean {
+                opacity: 0;
+                transition: opacity .2s
+            }
+
+            .clean .exit-clean:hover,
+            .clean .exit-clean:focus-visible {
+                opacity: 1
+            }
+        }
+
+        @media(max-width:650px) {
+            header {
+                height: 80px;
+                padding: 0 6%
+            }
+
+            .wordmark {
+                font-size: 20px
+            }
+
+            .edition {
+                display: none
+            }
+
+            .availability {
+                font-size: 10px
+            }
+
+            main {
+                height: calc(100svh - 202px);
+                margin: 0 6%
+            }
+
+            .eyebrow {
+                top: 25px;
+                font-size: 8px;
+                letter-spacing: 1px
+            }
+
+            .chapter {
+                top: 21px
+            }
+
+            .chapter span {
+                display: none
+            }
+
+            .caption {
+                bottom: 55px;
+                font-size: 10px
+            }
+
+            .coordinate {
+                bottom: 57px;
+                font-size: 8px
+            }
+
+            .hint {
+                bottom: 20px;
+                font-size: 8px
+            }
+
+            footer {
+                height: 122px;
+                margin: 0 6%;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-content: center;
+                gap: 14px
+            }
+
+            .footer-label {
+                display: none
+            }
+
+            .right-note {
+                font-size: 10px
+            }
+
+            .controls button {
+                padding: 12px 14px;
+                font-size: 10px
+            }
+
+            .symbol {
+                width: 23px;
+                height: 23px
+            }
+        }
+
+        .dived .caption,
+        .dived .caption span,
+        .dived .hint,
+        .dived .coordinate,
+        .dived .eyebrow,
+        .dived .chapter>span {
+            color: #f3ffd3;
+            text-shadow: 0 1px 6px #0008
+        }
+
+        .dived .hint i {
+            background: #f3ffd3
+        }
+
+        @media(max-width:360px) {
+            .controls {
+                gap: 5px
+            }
+
+            .controls button {
+                padding: 11px 10px;
+                font-size: 9px
+            }
+
+            .availability {
+                max-width: 105px
+            }
+
+            .wordmark {
+                gap: 7px;
+                font-size: 18px
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            * {
+                transition: none !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stage" role="img"
+        aria-label="Interactive liquid portal: move your pointer to reveal a colorful world beneath Stay curious.">
+    </div>
+    <header>
+        <div class="wordmark"><span class="symbol" aria-hidden="true"></span>OTHER SIDE<sup>®</sup></div>
+        <div class="edition">INDEPENDENT EXPERIMENTS<br>IN DIGITAL FEELING</div>
+        <div class="availability"><span class="dot"></span>Reality is a suggestion.</div>
+    </header>
+    <main>
+        <h1 class="sr">Stay curious. Discover the other side.</h1>
+        <div class="eyebrow">A LITTLE CURIOSITY CHANGES EVERYTHING.</div>
+        <div class="chapter"><span>LIQUID REALITY</span><b>01</b></div>
+        <div class="caption">There’s more beneath the surface.<br><span>Go on. Break the ordinary.</span></div>
+        <div class="hint"><i></i><span id="hint">MOVE TO DISCOVER · HOLD TO DIVE IN</span></div>
+        <div class="coordinate">X <span id="x">0.500</span> &nbsp; Y <span id="y">0.500</span></div>
+        <div class="cursor"><span>DIG DEEPER ↗</span></div>
+        <div class="error" hidden role="alert">
+            <h2>The portal couldn’t open.</h2>
+            <p id="error-message"></p>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-label">AN EXERCISE IN WONDER<br><span>NO. 001 / OTHER SIDE STUDIO</span></div>
+        <div class="controls"><button id="auto" aria-pressed="true"><span class="icon">◉</span>Autopilot</button><button
+                id="hold" class="hold" aria-pressed="false"><span class="icon">↗</span>Enter the other
+                side</button><button id="clean" title="Clean view for recording. Press Escape to exit."><span
+                    class="icon">⛶</span>Clean view</button></div>
+        <div class="right-note">Made to make you feel something. ↗</div>
+    </footer>
+    <button class="exit-clean" id="exit-clean">Exit clean view ×</button>
+    <script type="module">
+        const errorBox = document.querySelector('.error');
+        function fail(message) { errorBox.hidden = false; document.querySelector('#error-message').textContent = message; }
+        try {
+            const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+            const stage = document.querySelector('.stage');
+            const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+            const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
+            renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+            stage.appendChild(renderer.domElement);
+            renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); fail('Graphics rendering was interrupted. Please reload to reopen the portal.'); });
+            const scene = new THREE.Scene(), camera = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 10); camera.position.z = 1;
+            const trailPoints = Array.from({ length: 12 }, () => new THREE.Vector2(.64, .47));
+            const uniforms = { u_imageOuter: { value: null }, u_imageInner: { value: null }, u_resolution: { value: new THREE.Vector2(1, 1) }, u_imageOuterRes: { value: new THREE.Vector2(1, 1) }, u_imageInnerRes: { value: new THREE.Vector2(1, 1) }, u_mouse: { value: new THREE.Vector2(.64, .47) }, u_time: { value: 0 }, u_visibility: { value: 1 }, u_trail: { value: trailPoints }, u_trailLength: { value: 1.05 }, u_trailTaper: { value: .8 }, u_radius: { value: .235 }, u_distortion: { value: .3 }, u_noiseScale: { value: 6.8 }, u_speed: { value: .19 }, u_edgeSoftness: { value: .007 }, u_refraction: { value: .07 }, u_parallax: { value: 0 }, u_open: { value: 0 } };
+            const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `;
+
+            const fragmentShader = `
+            uniform sampler2D u_imageOuter;
+            uniform sampler2D u_imageInner;
+            uniform vec2 u_resolution;
+            uniform vec2 u_imageOuterRes;
+            uniform vec2 u_imageInnerRes;
+            
+            uniform vec2 u_mouse;
+            uniform float u_time;
+            uniform float u_visibility;
+            uniform vec2 u_trail[12];
+            uniform float u_trailLength;
+            uniform float u_trailTaper;
+            
+            uniform float u_radius;
+            uniform float u_distortion;
+            uniform float u_noiseScale;
+            uniform float u_speed;
+            uniform float u_edgeSoftness;
+            uniform float u_refraction;
+            uniform float u_parallax;
+            uniform float u_open;
+
+            varying vec2 vUv;
+
+            // --- Noise & FBM Functions ---
+            float hash(vec2 p) {
+                p = fract(p * vec2(123.34, 456.21));
+                p += dot(p, p + 45.32);
+                return fract(p.x * p.y);
+            }
+
+            float noise(vec2 p) {
+                vec2 i = floor(p);
+                vec2 f = fract(p);
+                f = f * f * (3.0 - 2.0 * f);
+                float a = hash(i);
+                float b = hash(i + vec2(1.0, 0.0));
+                float c = hash(i + vec2(0.0, 1.0));
+                float d = hash(i + vec2(1.0, 1.0));
+                return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+            }
+
+            float fbm(vec2 p) {
+                float v = 0.0;
+                float a = 0.5;
+                // Rotate coordinates to hide blocky grid artifacts from basic noise
+                mat2 rot = mat2(0.87, -0.48, 0.48, 0.87); 
+                for (int i = 0; i < 4; i++) {
+                    v += a * noise(p);
+                    p = rot * p * 2.0;
+                    a *= 0.5;
+                }
+                return v;
+            }
+
+            // Exact tapered capsule distance and its continuous outward gradient.
+            vec3 taperedCapsule(vec2 p, vec2 a, vec2 b, float ra, float rb) {
+                vec2 segment = b - a;
+                float segmentLength = length(segment);
+                float radiusDelta = rb - ra;
+                if (segmentLength <= abs(radiusDelta) + 0.00001) {
+                    vec2 offset = p - (ra >= rb ? a : b);
+                    float distanceToCenter = length(offset);
+                    return vec3(distanceToCenter - max(ra, rb), offset / max(distanceToCenter, 0.00001));
+                }
+                vec2 axis = segment / segmentLength;
+                vec2 relative = p - a;
+                float along = dot(relative, axis);
+                vec2 perpendicular = relative - axis * along;
+                float slope = radiusDelta / segmentLength;
+                float tangent = sqrt(max(1.0 - slope * slope, 0.000001));
+                float h = clamp((along + slope * length(perpendicular) / tangent) / segmentLength, 0.0, 1.0);
+                vec2 offset = relative - segment * h;
+                float distanceToCenter = length(offset);
+                return vec3(distanceToCenter - mix(ra, rb, h), offset / max(distanceToCenter, 0.00001));
+            }
+
+            // Blend both distance and gradient to prevent refraction seams.
+            vec3 mergeFields(vec3 a, vec3 b, float width) {
+                if (width < 0.000001) return a.x < b.x ? a : b;
+                float h = clamp(0.5 + 0.5 * (b.x - a.x) / width, 0.0, 1.0);
+                return vec3(mix(b.x, a.x, h) - width * h * (1.0 - h), mix(b.yz, a.yz, h));
+            }
+
+            // --- Utility ---
+            vec2 getCoverUv(vec2 uv, vec2 res, vec2 texRes) {
+                vec2 ratio = res / texRes;
+                float coverRatio = max(ratio.x, ratio.y);
+                vec2 scaledRes = texRes * coverRatio;
+                vec2 offset = (scaledRes - res) * 0.5 / scaledRes;
+                return uv * (res / scaledRes) + offset;
+            }
+
+            void main() {
+                // Procedural background fallbacks if images fail to load
+                vec3 fallbackOut = mix(vec3(0.05, 0.05, 0.08), vec3(0.15, 0.2, 0.3), vUv.y);
+                vec3 fallbackIn = mix(vec3(0.9, 0.2, 0.4), vec3(0.1, 0.8, 0.9), vUv.x);
+
+                vec2 aspect = vec2(u_resolution.x / u_resolution.y, 1.0);
+                vec2 p = (vUv - u_mouse) * aspect;
+
+                // 1. Generate Liquid Noise
+                float n = fbm(p * u_noiseScale + u_time * u_speed);
+                
+                // Rounded taper caps meet segment sides tangentially.
+                vec3 liquidField = vec3(length(p) - u_radius, p / max(length(p), 0.00001));
+                for (int i = 0; i < 11; i++) {
+                    vec2 a = (u_trail[i] - u_mouse) * aspect * u_trailLength;
+                    vec2 b = (u_trail[i + 1] - u_mouse) * aspect * u_trailLength;
+                    float ra = u_radius * (1.0 - u_trailTaper * float(i) / 11.0);
+                    float rb = u_radius * (1.0 - u_trailTaper * float(i + 1) / 11.0);
+                    vec3 segmentField = taperedCapsule(p, a, b, ra, rb);
+                    float blendWidth = u_radius * 0.12 * smoothstep(0.0, u_radius * 0.15, length(b - a));
+                    liquidField = mergeFields(liquidField, segmentField, blendWidth);
+                }
+                float field = liquidField.x - u_radius * (n - 0.5) * u_distortion * 2.0;
+                float mask = 1.0 - smoothstep(-u_edgeSoftness, u_edgeSoftness, field);
+                float edgeProfile = smoothstep(0.0, 0.5, mask) * (1.0 - smoothstep(0.5, 1.0, mask));
+                // Preserve the blended gradient magnitude near overlapping segments.
+                vec2 refractionDir = liquidField.yz;
+                vec2 finalUvOffset = refractionDir * edgeProfile * u_refraction * u_visibility * (1.0 - u_open);
+
+                // 5. Texture Sampling
+                vec4 colOuter = vec4(fallbackOut, 1.0);
+                if (u_imageOuterRes.x > 0.0) {
+                    vec2 outerUv = getCoverUv(vUv + finalUvOffset, u_resolution, u_imageOuterRes);
+                    colOuter = texture2D(u_imageOuter, outerUv);
+                }
+
+                vec4 colInner = vec4(fallbackIn, 1.0);
+                if (u_imageInnerRes.x > 0.0) {
+                    vec2 parallaxOffset = (u_mouse - 0.5) * u_parallax;
+                    vec2 innerUv = getCoverUv(vUv - finalUvOffset, u_resolution, u_imageInnerRes) + parallaxOffset;
+                    colInner = texture2D(u_imageInner, innerUv);
+                }
+
+                // 6. Blend (Highlights removed as requested)
+                vec4 finalCol = mix(colOuter, colInner, mask * u_visibility);
+                
+                float rim = exp(-abs(field) * 180.0) * u_visibility * (1.0-u_open);
+                finalCol.rgb = mix(finalCol.rgb, vec3(0.95, 0.97, 0.81), rim * 0.48);
+                gl_FragColor = vec4(finalCol.rgb, 1.0);
+            }
+        `;
+
+
+            const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms, depthTest: false, depthWrite: false });
+            scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+            // Both artworks share a layout, so the type itself transforms through the liquid.
+            // Canvas textures keep the experiment independent of image services and CORS.
+            function artwork(w, h, inside, t = 0, canvas = null) {
+                const c = canvas || document.createElement('canvas');
+                if (c.width !== w) c.width = w; if (c.height !== h) c.height = h;
+                const g = c.getContext('2d');
+                g.fillStyle = inside ? '#391397' : '#eeede7'; g.fillRect(0, 0, w, h);
+                if (inside) {
+                    const drift = Math.sin(t * .22) * w * .09;
+                    const gradient = g.createLinearGradient(drift, h, w - drift, 0); gradient.addColorStop(0, '#291366'); gradient.addColorStop(.32, '#702bdf'); gradient.addColorStop(.62, '#fe471b'); gradient.addColorStop(1, '#faff77'); g.fillStyle = gradient; g.fillRect(0, 0, w, h);
+                    const orb = (x, y, r, colors) => { const a = g.createRadialGradient(x - r * (.3 + Math.sin(t * .55) * .10), y - r * (.4 + Math.cos(t * .42) * .08), 0, x, y, r); colors.forEach((color, i) => a.addColorStop(i / (colors.length - 1), color)); g.fillStyle = a; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); };
+                    const planetX = w * (.77 + Math.sin(t * .35) * .024), planetY = h * (.32 + Math.sin(t * .47) * .025);
+                    orb(planetX, planetY, h * (.38 + Math.sin(t * .65) * .006), ['#ffffc1', '#eaff71', '#c9eb45', '#fc6016', '#bc2a8b']);
+                    g.save(); g.translate(planetX, planetY); g.rotate(-.5 + Math.sin(t * .3) * .16); g.strokeStyle = '#efffa5'; g.lineWidth = Math.max(1, w * .0013); for (let i = 0; i < 9; i++) { g.beginPath(); g.ellipse(0, 0, h * (.38 + i * .015), h * (.12 + i * .006) * (1 + Math.sin(t * .4) * .12), 0, 0, Math.PI * 2); g.stroke(); }
+                    // Small satellites travel along the same ellipses as the orbit lines.
+                    for (let i = 0; i < 3; i++) { const a = t * (.42 + i * .12) + i * 2.1; const rx = h * (.395 + i * .045), ry = h * (.126 + i * .018) * (1 + Math.sin(t * .4) * .12); const x = Math.cos(a) * rx, y = Math.sin(a) * ry; g.shadowColor = '#f5ffbb'; g.shadowBlur = 14; g.fillStyle = '#f8ffd2'; g.beginPath(); g.arc(x, y, Math.max(2.5, h * .004), 0, Math.PI * 2); g.fill(); }
+                    g.restore();
+                    orb(w * (.18 + Math.sin(t * .4) * .018), h * (.78 + Math.sin(t * .32) * .027), h * (.23 + Math.sin(t * .5) * .005), ['#eafff6', '#84e6ff', '#6565f7', '#331778', '#1d1348']);
+                    g.lineWidth = .8; g.strokeStyle = '#ffffff35'; for (let i = 0; i < 28; i++) { g.beginPath(); for (let x = 0; x <= w; x += 12) { const y = h * .82 + i * 12 + Math.sin(x / w * 6 + i * .1 - t * .48) * h * .07; x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+                } else {
+                    g.strokeStyle = '#d5d6cc'; g.lineWidth = 1;
+                    const cx = w * .74, cy = h * .48, r = Math.min(w * .29, h * .43);
+                    g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
+                    g.beginPath(); g.ellipse(cx, cy, r, r * .36, -.5, 0, Math.PI * 2); g.stroke();
+                    g.beginPath(); g.ellipse(cx, cy, r * .36, r, .5, 0, Math.PI * 2); g.stroke();
+                    g.setLineDash([2, 5]); g.beginPath(); g.moveTo(cx - r - 30, cy); g.lineTo(cx + r + 30, cy); g.stroke(); g.setLineDash([]);
+                }
+                const mobile = w / h < 1.1;
+                const size = Math.min(w * (mobile ? .245 : .208), h * .37);
+                const left = mobile ? w * .045 : w * .105;
+                const baseline = h * .455;
+                g.fillStyle = inside ? '#f1ffba' : '#272822'; g.font = `${size}px Georgia, 'Times New Roman', serif`; g.textBaseline = 'alphabetic';
+                g.fillText(inside ? 'Get' : 'Stay', left, baseline);
+                g.font = `italic ${size}px Georgia, 'Times New Roman', serif`;
+                g.fillText(inside ? 'weird.' : 'curious.', left, baseline + size * .91);
+                const sx = mobile ? w * .82 : w * .80, sy = h * .69, sr = size * .18;
+                g.save(); g.translate(sx, sy); if (inside) g.rotate(t * .12); g.strokeStyle = inside ? '#f1ffba' : '#5f6951'; g.lineWidth = Math.max(1.5, size * .007); for (let i = 0; i < 8; i++) { g.rotate(Math.PI / 8); g.beginPath(); g.moveTo(-sr, 0); g.lineTo(sr, 0); g.stroke(); } g.restore();
+                if (inside) { g.font = `${Math.max(9, w * .008)}px monospace`; g.fillText('YOU WERE NEVER MEANT TO BE ORDINARY.', left, h * .86); }
+                // Cache the grain so it stays fixed while the world beneath it moves.
+                if (!c.grain || c.grain.width !== w || c.grain.height !== h) {
+                    c.grain = document.createElement('canvas'); c.grain.width = w; c.grain.height = h;
+                    const grain = c.grain.getContext('2d'); grain.fillStyle = inside ? '#ffffff0b' : '#252c190a';
+                    let seed = 29; for (let i = 0; i < w * h / 90; i++) { seed = (seed * 16807) % 2147483647; const x = seed % w; seed = (seed * 16807) % 2147483647; const y = seed % h; grain.fillRect(x, y, 1, 1); }
+                }
+                g.drawImage(c.grain, 0, 0);
+                return c;
+            }
+            let width = 1, height = 1, lastArtworkTime = -Infinity;
+            function resize() {
+                const box = stage.getBoundingClientRect(); width = box.width; height = box.height;
+                renderer.setSize(width, height); uniforms.u_resolution.value.set(width, height);
+                const scale = Math.min(devicePixelRatio, 1.5); const w = Math.round(width * scale), h = Math.round(height * scale);
+                for (const side of ['Outer', 'Inner']) { const canvas = artwork(w, h, side === 'Inner', time); const texture = new THREE.CanvasTexture(canvas); texture.minFilter = THREE.LinearFilter; texture.magFilter = THREE.LinearFilter; texture.generateMipmaps = false; uniforms['u_image' + side].value?.dispose(); uniforms['u_image' + side].value = texture; uniforms['u_image' + side + 'Res'].value.set(w, h); }
+            }
+            new ResizeObserver(resize).observe(stage);
+            const target = new THREE.Vector2(.64, .47), current = target.clone();
+            let lastReduced = reduced.matches;
+            let auto = !reduced.matches, inside = false, lastActivity = -Infinity, press = false, locked = false, time = 0, previous = performance.now();
+            const autoButton = document.querySelector('#auto'), holdButton = document.querySelector('#hold');
+            function sync() { autoButton.setAttribute('aria-pressed', String(auto)); holdButton.setAttribute('aria-pressed', String(locked)); document.querySelector('#hint').textContent = locked ? 'WELCOME TO THE OTHER SIDE' : 'MOVE TO DISCOVER · HOLD TO DIVE IN'; }
+            sync();
+            autoButton.addEventListener('click', () => { auto = !auto; sync(); });
+            holdButton.addEventListener('click', () => { locked = !locked; sync(); });
+            document.querySelector('#exit-clean').addEventListener('click', () => document.body.classList.remove('clean'));
+            document.querySelector('#clean').addEventListener('click', () => { document.body.classList.add('clean'); });
+            function pointer(e) { const b = stage.getBoundingClientRect(); target.set((e.clientX - b.left) / b.width, 1 - (e.clientY - b.top) / b.height); inside = true; lastActivity = performance.now(); document.querySelector('.cursor').style.transform = `translate(${e.clientX - b.left}px,${e.clientY - b.top}px)`; }
+            stage.addEventListener('pointermove', pointer); stage.addEventListener('pointerdown', e => { pointer(e); press = true; stage.setPointerCapture(e.pointerId); });
+            stage.addEventListener('pointerup', () => { press = false; }); stage.addEventListener('pointercancel', () => { press = false; inside = false; }); stage.addEventListener('lostpointercapture', () => { press = false; }); stage.addEventListener('pointerleave', () => { inside = false; });
+            window.addEventListener('blur', () => { press = false; inside = false; });
+            window.addEventListener('keydown', e => { if (e.code === 'Escape') { document.body.classList.remove('clean'); locked = false; press = false; sync(); } if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); press = true; } if (e.code === 'KeyH' && e.target === document.body) { document.body.classList.toggle('clean'); } });
+            window.addEventListener('keyup', e => { if (e.code === 'Space') press = false; });
+            function syncMotionPreference() { if (lastReduced !== reduced.matches) { lastReduced = reduced.matches; auto = !lastReduced; sync(); } }
+            reduced.addEventListener('change', syncMotionPreference);
+            document.addEventListener('visibilitychange', () => { previous = performance.now(); press = false; });
+            renderer.setAnimationLoop(now => {
+                const dt = Math.min((now - previous) / 1000, .05); previous = now; if (document.hidden) return;
+                syncMotionPreference();
+                if (!reduced.matches) time += dt;
+                // Repaint at 30 fps without reallocating textures; liquid rendering stays smooth.
+                const innerTexture = uniforms.u_imageInner.value;
+                if (!reduced.matches && innerTexture && time - lastArtworkTime >= 1 / 30) {
+                    const canvas = innerTexture.image;
+                    artwork(canvas.width, canvas.height, true, time, canvas);
+                    innerTexture.needsUpdate = true; lastArtworkTime = time;
+                }
+                const pilot = auto && (!inside || now - lastActivity > 2200);
+                if (pilot) target.set(.57 + Math.sin(time * .48) * .21, .49 + Math.sin(time * .71 + .5) * .16);
+                const alpha = 1 - Math.exp(-dt * 9); current.lerp(target, alpha); trailPoints[0].copy(current);
+                for (let i = 11; i > 0; i--)trailPoints[i].lerp(trailPoints[i - 1], 1 - Math.exp(-dt * 17));
+                uniforms.u_mouse.value.copy(current); uniforms.u_time.value = time;
+                uniforms.u_open.value += ((press || locked ? 1 : 0) - uniforms.u_open.value) * (1 - Math.exp(-dt * (reduced.matches ? 40 : 3)));
+                uniforms.u_radius.value = (width / height < 1 ? .18 : .235) + uniforms.u_open.value * Math.max(width / height, 1) * 1.3;
+                document.body.classList.toggle('dived', uniforms.u_open.value > .6);
+                document.querySelector('#x').textContent = current.x.toFixed(3); document.querySelector('#y').textContent = (1 - current.y).toFixed(3);
+                renderer.render(scene, camera);
+            });
+        } catch (error) { console.error(error); fail('Please check your connection and enable WebGL, then reload. ' + error.message); }
+    </script>
+</body>
+
+</html>
