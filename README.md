@@ -14,6 +14,7 @@
 │   └── src/                # Studio 创作界面、21 种几何数学拓扑与 R3F 渲染核心
 ├── formfield-consumer/     # CLI 源码分发验证工程（独立的 React/Vite 项目）
 ├── feature-cards/          # 基于 GSAP 的高交互特性卡片展示页面
+├── other-side/             # 基于 Three.js Shader 的液态传送门交互视觉页面
 ├── jianbihua.html          # 原生 Canvas 简笔画涂鸦交互演示
 └── .github/workflows/      # GitHub Pages 多项目自动部署流水线
 ```
@@ -39,8 +40,14 @@
 ### 3. Feature Cards
 
 基于 GSAP 动画引擎构建的现代风格特性卡片，展示微交互与平滑动画动效。
+- **在线体验 (GitHub Pages)**：[https://yuanyang749.github.io/star-torus/feature-cards/](https://yuanyang749.github.io/star-torus/feature-cards/)
 
-### 4. Jianbihua (简笔画)
+### 4. Other Side (液态传送门)
+
+基于 **Three.js** 与自定义 Fragment Shader 构建的高质感流体折射传送门页面，支持指针引力、拖拽沉浸、双面艺术画布无缝切换与 Clean View 纯净模式。
+- **在线体验 (GitHub Pages)**：[https://yuanyang749.github.io/star-torus/other-side/](https://yuanyang749.github.io/star-torus/other-side/)
+
+### 5. Jianbihua (简笔画)
 
 轻量级单文件 Web 交互工具，探索 Canvas 画布涂鸦与手绘轨迹的灵感体验。
 
@@ -71,7 +78,7 @@ npm run dev
 仓库配置了 GitHub Actions 自动化部署流水线 (`.github/workflows/deploy.yml`)：
 - 每次推送代码到 `main` 分支时，自动打包构建 `formfield-lab`。
 - 将 `formfield-lab/dist` 作为 GitHub Pages 根目录发布。
-- 同时将 `feature-cards` 与 `jianbihua.html` 作为子路径一并部署。
+- 同时将 `feature-cards`、`other-side` 与 `jianbihua.html` 作为子路径一并部署。
 
 ---
 

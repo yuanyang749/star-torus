@@ -49,7 +49,12 @@ jobs:
           # 2. 子目录部署 feature-cards
           mkdir -p _site/feature-cards
           cp -r feature-cards/* _site/feature-cards/
-          # 3. 添加 .nojekyll 防止静态文件被过滤
+          # 3. 子目录部署 other-side
+          mkdir -p _site/other-side
+          cp -r other-side/* _site/other-side/
+          # 4. 根路径附带 jianbihua.html
+          cp jianbihua.html _site/
+          # 5. 添加 .nojekyll 防止静态文件被过滤
           touch _site/.nojekyll
 
       - name: Upload artifact
