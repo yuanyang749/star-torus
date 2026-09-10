@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHROMA // Liquid Spectral Dissection [Twitter Demo]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- GSAP & ScrollTrigger for Exhibition Parallax Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+    <!-- Project Stylesheet -->
+    <link rel="stylesheet" href="./style.css" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="webgl"></canvas>
+
+    <!-- Fixed Gallery Top HUD -->
+    <header class="gallery-hud">
+      <div class="brand">
+        <div class="brand-tag">
+          <span class="pulse-dot"></span>
+          <span>CURATED EXHIBITION // 0x26F</span>
+        </div>
+        <h1 class="brand-title">CHROMA DISSECTION</h1>
+      </div>
+
+      <div class="status-pill">
+        <span class="badge-mode" id="badge-mode">PARALLAX GALLERY</span>
+        <span id="fps-counter">60 FPS</span>
+        <span style="opacity: 0.3">|</span>
+        <span id="status-title">Room 01: Cybernetic Antiquity</span>
+      </div>
+    </header>
+
+    <!-- Scrollable Parallax Gallery Rooms (GSAP & ScrollTrigger Driven) -->
+    <div class="scroll-gallery" id="scroll-gallery">
+      <!-- ROOM 01 -->
+      <section class="gallery-room" id="room-0" data-room-index="0">
+        <div class="editorial-container">
+          <div class="room-tag">
+            <span class="room-num">ROOM 01 //</span>
+            <span>CYBERNETIC ANTIQUITY</span>
+          </div>
+          <h2 class="editorial-headline">AESTHETICA</h2>
+          <p class="editorial-quote">
+            "Gliding across the membrane between classical reality and synthetic dimension."
+          </p>
+        </div>
+        <div class="scroll-cue" id="scroll-cue">
+          <span>SCROLL TO EXPLORE EXHIBITION</span>
+          <div class="scroll-line"></div>
+        </div>
+      </section>
+
+      <!-- ROOM 02 -->
+      <section class="gallery-room" id="room-1" data-room-index="1">
+        <div class="editorial-container">
+          <div class="room-tag">
+            <span class="room-num">ROOM 02 //</span>
+            <span>HIGH-FASHION CHROMATICS</span>
+          </div>
+          <h2 class="editorial-headline">SPECTRA</h2>
+          <p class="editorial-quote">
+            "Monochrome haute couture meeting the untamed turbulence of liquid prismatic mercury."
+          </p>
+        </div>
+      </section>
+
+      <!-- ROOM 03 -->
+      <section class="gallery-room" id="room-2" data-room-index="2">
+        <div class="editorial-container">
+          <div class="room-tag">
+            <span class="room-num">ROOM 03 //</span>
+            <span>MECHANICAL TRANSCENDENCE</span>
+          </div>
+          <h2 class="editorial-headline">VELOCITY</h2>
+          <p class="editorial-quote">
+            "Beneath the obsidian shell beats an immortal twin-turbo kinetic heart."
+          </p>
+        </div>
+      </section>
+
+      <!-- ROOM 04 -->
+      <section class="gallery-room" id="room-3" data-room-index="3">
+        <div class="editorial-container">
+          <div class="room-tag">
+            <span class="room-num">ROOM 04 //</span>
+            <span>CRYSTALLINE EVOLUTION</span>
+          </div>
+          <h2 class="editorial-headline">METAMORPHOSIS</h2>
+          <p class="editorial-quote">
+            "The fragile boundary where natural entomology crystallizes into quantum luminescence."
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Fixed Right-Side Gallery Navigation Dock -->
+    <nav class="gallery-nav" aria-label="Exhibition Navigation">
+      <div class="dock-container">
+        <button class="dock-btn active" data-target-room="0">
+          <span>⚡ 01 Cyber</span>
+        </button>
+        <button class="dock-btn" data-target-room="1">
+          <span>💎 02 Vogue</span>
+        </button>
+        <button class="dock-btn" data-target-room="2">
+          <span>🏎️ 03 Hypercar</span>
+        </button>
+        <button class="dock-btn" data-target-room="3">
+          <span>🦋 04 Butterfly</span>
+        </button>
+
+        <div class="dock-separator"></div>
+
+        <button class="dock-btn" id="btn-autopilot" title="Toggle Auto Exhibition Tour">
+          <span id="auto-icon">▶</span>
+          <span id="auto-label">Auto-Tour</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Shader & Interaction Script -->
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

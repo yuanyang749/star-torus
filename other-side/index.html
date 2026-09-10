@@ -124,6 +124,13 @@
             text-align: center
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            pointer-events: auto
+        }
+
         .availability {
             font-size: 11px;
             display: flex;
@@ -136,6 +143,73 @@
             height: 6px;
             background: #69754a;
             border-radius: 50%
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 10px 4px 5px;
+            border: 1px solid #c7c9bc;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            transition: all .2s ease
+        }
+
+        .github-link:hover {
+            background: #e0e2d5;
+            border-color: var(--ink);
+            transform: translateY(-1px)
+        }
+
+        .github-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: block;
+            object-fit: cover;
+            border: 1px solid #c7c9bc
+        }
+
+        .github-text {
+            font-weight: 700
+        }
+
+        .github-icon {
+            opacity: 0.75
+        }
+
+        .github-arrow {
+            font-size: 10px;
+            opacity: 0.6;
+            transition: transform .2s ease, opacity .2s ease
+        }
+
+        .github-link:hover .github-arrow {
+            opacity: 1;
+            transform: translate(1px, -1px)
+        }
+
+        .dived .github-link {
+            background: rgba(20, 24, 16, 0.65);
+            border-color: rgba(241, 255, 186, 0.4);
+            color: #f1ffba
+        }
+
+        .dived .github-link:hover {
+            background: rgba(35, 42, 28, 0.85);
+            border-color: #f1ffba
+        }
+
+        .dived .github-avatar {
+            border-color: rgba(241, 255, 186, 0.4)
         }
 
         main {
@@ -413,8 +487,21 @@
                 display: none
             }
 
+            .header-right {
+                gap: 8px
+            }
+
             .availability {
                 font-size: 10px
+            }
+
+            .github-text {
+                display: none
+            }
+
+            .github-link {
+                padding: 3px 6px 3px 4px;
+                gap: 5px
             }
 
             main {
@@ -528,7 +615,18 @@
     <header>
         <div class="wordmark"><span class="symbol" aria-hidden="true"></span>OTHER SIDE<sup>®</sup></div>
         <div class="edition">INDEPENDENT EXPERIMENTS<br>IN DIGITAL FEELING</div>
-        <div class="availability"><span class="dot"></span>Reality is a suggestion.</div>
+        <div class="header-right">
+            <div class="availability"><span class="dot"></span>Reality is a suggestion.</div>
+            <a href="https://github.com/yuanyang749/star-torus" target="_blank" rel="noopener noreferrer"
+                class="github-link" title="View yuanyang749/star-torus on GitHub" aria-label="GitHub Repository">
+                <img src="https://github.com/yuanyang749.png" alt="yuanyang749 avatar" class="github-avatar" />
+                <span class="github-text">yuanyang749</span>
+                <svg class="github-icon" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span class="github-arrow">↗</span>
+            </a>
+        </div>
     </header>
     <main>
         <h1 class="sr">Stay curious. Discover the other side.</h1>

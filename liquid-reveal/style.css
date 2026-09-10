@@ -1,0 +1,340 @@
+:root {
+        --accent: #00f0ff;
+        --accent-glow: rgba(0, 240, 255, 0.4);
+        --bg-glass: rgba(13, 16, 24, 0.72);
+        --border-glass: rgba(255, 255, 255, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #05070a;
+        font-family: "Plus Jakarta Sans", -apple-system, sans-serif;
+        color: #f1f5f9;
+        cursor: crosshair;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 240, 255, 0.35) rgba(5, 7, 10, 0.9);
+      }
+
+      html::-webkit-scrollbar {
+        width: 5px;
+      }
+      html::-webkit-scrollbar-track {
+        background: rgba(5, 7, 10, 0.9);
+      }
+      html::-webkit-scrollbar-thumb {
+        background: rgba(0, 240, 255, 0.35);
+        border-radius: 4px;
+      }
+
+      canvas#webgl {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        z-index: 1;
+        pointer-events: auto;
+      }
+
+      /* --- Fixed Gallery HUD & Brand Bar --- */
+      .gallery-hud {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        padding: 2.2rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        z-index: 30;
+        pointer-events: none;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .brand-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .pulse-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent);
+        animation: pulse 2s infinite ease-in-out;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.3; transform: scale(0.85); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+
+      .brand-title {
+        font-family: "Cinzel", serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        color: #ffffff;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      }
+
+      .status-pill {
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: var(--bg-glass);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-glass);
+        padding: 0.4rem 0.9rem;
+        border-radius: 100px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        color: #94a3b8;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      .badge-mode {
+        background: rgba(0, 240, 255, 0.15);
+        color: #38bdf8;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.65rem;
+      }
+
+      /* --- Scrollable Parallax Gallery Rooms --- */
+      .scroll-gallery {
+        position: relative;
+        z-index: 10;
+        width: 100vw;
+        pointer-events: none;
+      }
+
+      .gallery-room {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        pointer-events: none;
+      }
+
+      .editorial-container {
+        text-align: center;
+        width: 90%;
+        max-width: 1100px;
+        mix-blend-mode: difference;
+        pointer-events: none;
+        will-change: transform, opacity;
+      }
+
+      .room-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82rem;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+      }
+
+      .room-num {
+        color: rgba(255, 255, 255, 0.45);
+        font-weight: 600;
+      }
+
+      .editorial-headline {
+        font-family: "Cinzel", serif;
+        font-size: clamp(3.2rem, 8.5vw, 7.5rem);
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        line-height: 0.92;
+        text-transform: uppercase;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.35) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+      }
+
+      .editorial-quote {
+        margin-top: 1.5rem;
+        font-size: 1.05rem;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.68);
+        letter-spacing: 0.05em;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.65;
+      }
+
+      .scroll-cue {
+        position: absolute;
+        bottom: 5.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.35em;
+        color: rgba(255, 255, 255, 0.35);
+        pointer-events: none;
+      }
+
+      .scroll-line {
+        width: 1px;
+        height: 30px;
+        background: linear-gradient(to bottom, var(--accent), transparent);
+        animation: scrollLinePulse 2s infinite ease-in-out;
+      }
+
+      @keyframes scrollLinePulse {
+        0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+        50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+        51% { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+        100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+      }
+
+      /* --- Fixed Right-Side Gallery Navigation Dock --- */
+      .gallery-nav,
+      .gallery-footer {
+        position: fixed;
+        right: 1.8rem;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 30;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .dock-container {
+        pointer-events: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.45rem;
+        background: var(--bg-glass);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--border-glass);
+        padding: 0.75rem 0.65rem;
+        border-radius: 18px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 24px rgba(0, 240, 255, 0.08);
+      }
+
+      .dock-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: #cbd5e1;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .dock-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        transform: translateX(-2px);
+      }
+
+      .dock-btn.active {
+        background: rgba(0, 240, 255, 0.18);
+        color: #00f0ff;
+        border-color: rgba(0, 240, 255, 0.45);
+        box-shadow: 0 0 16px rgba(0, 240, 255, 0.28);
+      }
+
+      .dock-separator {
+        width: 100%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 0.25rem 0;
+      }
+
+      @media (max-width: 768px) {
+        .gallery-nav,
+        .gallery-footer {
+          right: 0.75rem;
+        }
+        .dock-container {
+          padding: 0.5rem 0.4rem;
+          border-radius: 14px;
+          gap: 0.35rem;
+        }
+        .dock-btn {
+          padding: 0.45rem 0.65rem;
+          font-size: 0.7rem;
+        }
+      }
+
+      /* Custom File Uploaders hidden */
+      .file-input {
+        display: none;
+      }
+
+      /* Minimal floating toast */
+      .toast {
+        position: fixed;
+        top: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid var(--accent);
+        color: #fff;
+        padding: 0.5rem 1.25rem;
+        border-radius: 100px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
