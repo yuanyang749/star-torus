@@ -151,15 +151,22 @@ import * as THREE from "three";
         }
       };
 
-      // --- Scene & Renderer ---
+      const getOptimalPixelRatio = () => {
+        const dpr = window.devicePixelRatio || 1;
+        return Math.min(dpr, 1.25);
+      };
+
       const canvas = document.getElementById("webgl");
       const renderer = new THREE.WebGLRenderer({
         canvas,
-        antialias: true,
+        antialias: false,
         powerPreference: "high-performance",
+        alpha: false,
+        depth: false,
+        stencil: false,
       });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(getOptimalPixelRatio());
 
       const scene = new THREE.Scene();
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
@@ -266,15 +273,12 @@ import * as THREE from "three";
         }
 
         float fbm(vec2 p) {
-          float v = 0.0;
-          float a = 0.5;
-          mat2 rot = mat2(0.87, -0.48, 0.48, 0.87);
-          for (int i = 0; i < 4; i++) {
-            v += a * noise(p);
-            p = rot * p * 2.02;
-            a *= 0.5;
-          }
-          return v;
+          float v = 0.5 * noise(p);
+          p = mat2(0.87, -0.48, 0.48, 0.87) * p * 2.02;
+          v += 0.25 * noise(p);
+          p = mat2(0.87, -0.48, 0.48, 0.87) * p * 2.02;
+          v += 0.125 * noise(p);
+          return v * 1.14;
         }
 
         // Tapered capsule distance & continuous gradient normal
@@ -339,37 +343,70 @@ import * as THREE from "three";
           vec2 aspect = vec2(u_resolution.x / u_resolution.y, 1.0);
           vec2 p = (vUv - u_mouse) * aspect;
 
-          // 1. Noise disturbance
-          float n = fbm(p * u_noiseScale + u_time * u_speed);
-
-          // 2. Holographic Rainbow Ring Pulse Dynamics (Slow-Motion Liquid Mercury Propagation)
+          // 1. Holographic Rainbow Ring Pulse Dynamics
           float pulseAmp = clamp(u_pulse, 0.0, 1.25);
-          
-          // 原全息折射环慢速优雅扩张至整屏约 80% 视野（半径达到约 0.82），然后丝滑回弹
           float targetMaxRadius = 0.82;
           float pulseExpand = smoothstep(0.0, 1.0, clamp(pulseAmp, 0.0, 1.0)) + max(pulseAmp - 1.0, 0.0) * 0.35;
           float currentRadius = mix(u_radius, targetMaxRadius, pulseExpand);
 
-          // 水银液体水波扩散：在扩张前锋附近激发出相干多层水银涟漪（Liquid Mercury Traveling Waves）
           float dist = length(p);
+          float trailBaseRadius = mix(u_radius, 0.30, pulseExpand);
+          float maxInfluence = max(currentRadius, trailBaseRadius) * 1.55 + 0.05;
+
+          // 核心性能飞跃：空间几何早退（覆盖 85%~95% 屏幕像素，直接走单次贴图采样，0 FBM 0 胶囊求解）
+          if (dist > maxInfluence && pulseAmp < 0.02) {
+            float t = clamp(u_transition, 0.0, 1.0);
+            bool hasRoomB = (t > 0.002);
+            bool hasRoomA = (t < 0.998);
+
+            float cutY = mix(-0.02, 1.02, t);
+            float feather = 0.008;
+            float verticalMix = 1.0 - smoothstep(cutY - feather, cutY + feather, vUv.y);
+            float shadowAbove = (1.0 - smoothstep(cutY, cutY + 0.08, vUv.y) * 0.35) * (1.0 - verticalMix) + verticalMix;
+
+            vec2 shiftOuterA = vec2(0.0, -t * 0.70);
+            vec2 shiftOuterB = vec2(0.0, (1.0 - t) * 0.70);
+
+            vec3 colOuter = vec3(0.0);
+            if (hasRoomA && hasRoomB) {
+              vec2 uvA = getCoverUv(vUv + shiftOuterA, u_resolution, u_imageOuterResA);
+              vec2 uvB = getCoverUv(vUv + shiftOuterB, u_resolution, u_imageOuterResB);
+              vec3 colA = (u_imageOuterResA.x > 0.0) ? texture2D(u_imageOuterA, uvA).rgb : getCyberProceduralOuter(vUv + shiftOuterA);
+              vec3 colB = (u_imageOuterResB.x > 0.0) ? texture2D(u_imageOuterB, uvB).rgb : colA;
+              colOuter = mix(colA * shadowAbove, colB, verticalMix);
+            } else if (hasRoomA) {
+              vec2 uvA = getCoverUv(vUv + shiftOuterA, u_resolution, u_imageOuterResA);
+              colOuter = (u_imageOuterResA.x > 0.0) ? texture2D(u_imageOuterA, uvA).rgb : getCyberProceduralOuter(vUv + shiftOuterA);
+            } else {
+              vec2 uvB = getCoverUv(vUv + shiftOuterB, u_resolution, u_imageOuterResB);
+              colOuter = (u_imageOuterResB.x > 0.0) ? texture2D(u_imageOuterB, uvB).rgb : vec3(0.0);
+            }
+
+            float vig = 1.0 - smoothstep(0.65, 1.4, length((vUv - 0.5) * aspect));
+            gl_FragColor = vec4(colOuter * mix(0.75, 1.0, vig), 1.0);
+            return;
+          }
+
+          // 2. 仅在液体透镜和水波影响区域内计算 Noise disturbance
+          float n = fbm(p * u_noiseScale + u_time * u_speed);
+
+          // 水银液体水波扩散
           float waveDist = dist - currentRadius;
           float waveFreq = 24.0;
           float waveSpeed = 2.2;
           float wavePhase = dist * waveFreq - u_time * waveSpeed;
-          // 水波高斯包络：紧密跟随正在扩散的水银折射环边缘
           float rippleBand = exp(-waveDist * waveDist * 36.0) * pulseAmp;
           float waveSlope = cos(wavePhase) * rippleBand * 0.7;
           
-          // 水银表面张力周向流动波动（慢速有机流体流动）
           float ringAngle = atan(p.y, p.x);
           float rimWobble = (sin(ringAngle * 6.0 - u_time * 2.2) * 0.03 + cos(ringAngle * 10.0 + u_time * 3.0) * 0.015) * pulseAmp;
 
           // 3. Fluid Distance Field calculation
           vec3 liquidField = vec3(dist - currentRadius, p / max(dist, 0.00001));
-          float trailBaseRadius = mix(u_radius, 0.30, pulseExpand);
           for (int i = 0; i < 13; i++) {
             vec2 a = (u_trail[i] - u_mouse) * aspect * u_trailLength;
             vec2 b = (u_trail[i + 1] - u_mouse) * aspect * u_trailLength;
+            if (dot(b - a, b - a) < 0.000001 && dot(a, a) < 0.000001) break;
             float ra = trailBaseRadius * (1.0 - u_trailTaper * float(i) / 13.0);
             float rb = trailBaseRadius * (1.0 - u_trailTaper * float(i + 1) / 13.0);
             vec3 segmentField = taperedCapsule(p, a, b, ra, rb);
@@ -406,98 +443,115 @@ import * as THREE from "three";
           float iridPhase = dot(surfNormal.xy, vec2(0.7, 0.7)) * 1.5 + u_time * 0.1;
           vec3 iridColor = rainbowPalette(iridPhase) * u_iridescence;
 
-          // 7. Spectral Chromatic Aberration Sampling (Pure Refractive Liquid Water Waves)
-          float currentRefract = u_refraction * (1.0 + pulseAmp * 0.5);
-          float currentAberration = u_chromaticAberration;
-          vec2 baseOffset = (liquidField.yz * edgeProfile + normDir * waveSlope * 0.05) * currentRefract * u_visibility;
-          vec2 offsetR = baseOffset * (1.0 + currentAberration * 2.0);
-          vec2 offsetG = baseOffset;
-          vec2 offsetB = baseOffset * (1.0 - currentAberration * 2.0);
-
-          // --- True Vertical Scroll Parallax Motion Engine ---
-          // Physical vertical translation: As scroll progresses, Room A slides up and out, Room B pushes up from bottom.
+          // --- True Vertical Scroll Parallax Motion Geometry ---
           float t = clamp(u_transition, 0.0, 1.0);
-          
-          // Multi-layer differential parallax: Inner layer moves with higher speed to produce realistic 3D depth
-          vec2 shiftOuterA = vec2(0.0, -t * 0.70);
-          vec2 shiftOuterB = vec2(0.0, (1.0 - t) * 0.70);
+          bool hasRoomB = (t > 0.002);
+          bool hasRoomA = (t < 0.998);
 
-          vec2 shiftInnerA = vec2(0.0, -t * 1.10);
-          vec2 shiftInnerB = vec2(0.0, (1.0 - t) * 1.10);
-
-          // 1. Sample Room A Outer (Moving Upwards)
-          vec3 colOuterA = vec3(0.0);
-          if (u_imageOuterResA.x > 0.0) {
-            vec2 uvR = getCoverUv(vUv + offsetR + shiftOuterA, u_resolution, u_imageOuterResA);
-            vec2 uvG = getCoverUv(vUv + offsetG + shiftOuterA, u_resolution, u_imageOuterResA);
-            vec2 uvB = getCoverUv(vUv + offsetB + shiftOuterA, u_resolution, u_imageOuterResA);
-            colOuterA.r = texture2D(u_imageOuterA, uvR).r;
-            colOuterA.g = texture2D(u_imageOuterA, uvG).g;
-            colOuterA.b = texture2D(u_imageOuterA, uvB).b;
-          } else {
-            colOuterA = getCyberProceduralOuter(vUv + offsetG + shiftOuterA);
-          }
-
-          // 2. Sample Room B Outer (Pushing Up from Viewport Bottom)
-          vec3 colOuterB = vec3(0.0);
-          if (u_imageOuterResB.x > 0.0) {
-            vec2 uvR = getCoverUv(vUv + offsetR + shiftOuterB, u_resolution, u_imageOuterResB);
-            vec2 uvG = getCoverUv(vUv + offsetG + shiftOuterB, u_resolution, u_imageOuterResB);
-            vec2 uvB = getCoverUv(vUv + offsetB + shiftOuterB, u_resolution, u_imageOuterResB);
-            colOuterB.r = texture2D(u_imageOuterB, uvR).r;
-            colOuterB.g = texture2D(u_imageOuterB, uvG).g;
-            colOuterB.b = texture2D(u_imageOuterB, uvB).b;
-          } else {
-            colOuterB = colOuterA;
-          }
-
-          // 3. Sample Room A Inner (With Deep Vertical Parallax)
-          vec2 parallaxOffset = (u_mouse - 0.5) * u_parallax;
-          vec3 colInnerA = vec3(0.0);
-          if (u_imageInnerResA.x > 0.0) {
-            vec2 inUvR = getCoverUv(vUv - offsetR + shiftInnerA, u_resolution, u_imageInnerResA) + parallaxOffset;
-            vec2 inUvG = getCoverUv(vUv - offsetG + shiftInnerA, u_resolution, u_imageInnerResA) + parallaxOffset;
-            vec2 inUvB = getCoverUv(vUv - offsetB + shiftInnerA, u_resolution, u_imageInnerResA) + parallaxOffset;
-            colInnerA.r = texture2D(u_imageInnerA, inUvR).r;
-            colInnerA.g = texture2D(u_imageInnerA, inUvG).g;
-            colInnerA.b = texture2D(u_imageInnerA, inUvB).b;
-          } else {
-            colInnerA = getCyberProceduralInner(vUv - offsetG + parallaxOffset + shiftInnerA, u_time);
-          }
-
-          // 4. Sample Room B Inner (With Deep Vertical Parallax)
-          vec3 colInnerB = vec3(0.0);
-          if (u_imageInnerResB.x > 0.0) {
-            vec2 inUvR = getCoverUv(vUv - offsetR + shiftInnerB, u_resolution, u_imageInnerResB) + parallaxOffset;
-            vec2 inUvG = getCoverUv(vUv - offsetG + shiftInnerB, u_resolution, u_imageInnerResB) + parallaxOffset;
-            vec2 inUvB = getCoverUv(vUv - offsetB + shiftInnerB, u_resolution, u_imageInnerResB) + parallaxOffset;
-            colInnerB.r = texture2D(u_imageInnerB, inUvR).r;
-            colInnerB.g = texture2D(u_imageInnerB, inUvG).g;
-            colInnerB.b = texture2D(u_imageInnerB, inUvB).b;
-          } else {
-            colInnerB = colInnerA;
-          }
-
-          // 5. Clean Solid Parallax Stacking Push (Zero overlap ghosting, pure black art exhibition)
-          // As t goes from 0 to 1, cutY pushes from below viewport bottom (-0.02) to above top (1.02)
           float cutY = mix(-0.02, 1.02, t);
-          float feather = 0.008; // Ultra-fine anti-aliasing edge, strictly preventing double-exposure ghosting
-          
-          // Strictly 0.0 at t=0 everywhere on screen, strictly 1.0 at t=1 everywhere on screen
+          float feather = 0.008;
           float verticalMix = 1.0 - smoothstep(cutY - feather, cutY + feather, vUv.y);
-
-          // Subtle natural card drop shadow cast on previous scene above the cut line
           float shadowAbove = (1.0 - smoothstep(cutY, cutY + 0.08, vUv.y) * 0.35) * (1.0 - verticalMix) + verticalMix;
 
-          vec3 colOuter = mix(colOuterA * shadowAbove, colOuterB, verticalMix);
-          vec3 colInner = mix(colInnerA * shadowAbove, colInnerB, verticalMix);
+          vec2 shiftOuterA = vec2(0.0, -t * 0.70);
+          vec2 shiftOuterB = vec2(0.0, (1.0 - t) * 0.70);
+          vec2 shiftInnerA = vec2(0.0, -t * 1.10);
+          vec2 shiftInnerB = vec2(0.0, (1.0 - t) * 1.10);
+          vec2 parallaxOffset = (u_mouse - 0.5) * u_parallax;
 
-          // 8. Final Composite
-          vec3 blended = mix(colOuter, colInner, mask * u_visibility);
-          
-          // 柔和水感边界：仅在静止时显示小环微光，点击扩散时完全隐去光圈，保持清澈通透
-          vec3 liquidRim = (iridColor * 0.8 + vec3(0.5)) * specular + iridColor * fresnel * mask * u_visibility;
-          vec3 finalColor = blended + liquidRim;
+          vec3 finalColor = vec3(0.0);
+
+          // 智能分流判定：当前像素是否处于需要折射或内部解剖的区域
+          bool inLiquid = (mask > 0.0005);
+          bool inRefraction = (edgeProfile > 0.0005) || (abs(waveSlope) > 0.002);
+
+          if (!inLiquid && !inRefraction) {
+            // === 极速背景通道（覆盖 85%~95% 屏幕像素，0 内部贴图采样，0 色散多余采样）===
+            vec3 colOuter = vec3(0.0);
+            if (hasRoomA && hasRoomB) {
+              vec2 uvA = getCoverUv(vUv + shiftOuterA, u_resolution, u_imageOuterResA);
+              vec2 uvB = getCoverUv(vUv + shiftOuterB, u_resolution, u_imageOuterResB);
+              vec3 colA = (u_imageOuterResA.x > 0.0) ? texture2D(u_imageOuterA, uvA).rgb : getCyberProceduralOuter(vUv + shiftOuterA);
+              vec3 colB = (u_imageOuterResB.x > 0.0) ? texture2D(u_imageOuterB, uvB).rgb : colA;
+              colOuter = mix(colA * shadowAbove, colB, verticalMix);
+            } else if (hasRoomA) {
+              vec2 uvA = getCoverUv(vUv + shiftOuterA, u_resolution, u_imageOuterResA);
+              colOuter = (u_imageOuterResA.x > 0.0) ? texture2D(u_imageOuterA, uvA).rgb : getCyberProceduralOuter(vUv + shiftOuterA);
+            } else {
+              vec2 uvB = getCoverUv(vUv + shiftOuterB, u_resolution, u_imageOuterResB);
+              colOuter = (u_imageOuterResB.x > 0.0) ? texture2D(u_imageOuterB, uvB).rgb : vec3(0.0);
+            }
+            finalColor = colOuter;
+          } else {
+            // === 完整高保真水银折射/透镜内部通道（仅在透镜和水银波区域执行，保留 100% 极致视觉品质）===
+            float currentRefract = u_refraction * (1.0 + pulseAmp * 0.5);
+            float currentAberration = u_chromaticAberration;
+            vec2 baseOffset = (liquidField.yz * edgeProfile + normDir * waveSlope * 0.05) * currentRefract * u_visibility;
+            vec2 offsetR = baseOffset * (1.0 + currentAberration * 2.0);
+            vec2 offsetG = baseOffset;
+            vec2 offsetB = baseOffset * (1.0 - currentAberration * 2.0);
+
+            // 1. Sample Outer (with full spectral chromatic aberration)
+            vec3 colOuterA = vec3(0.0);
+            if (hasRoomA && u_imageOuterResA.x > 0.0) {
+              vec2 uvR = getCoverUv(vUv + offsetR + shiftOuterA, u_resolution, u_imageOuterResA);
+              vec2 uvG = getCoverUv(vUv + offsetG + shiftOuterA, u_resolution, u_imageOuterResA);
+              vec2 uvB = getCoverUv(vUv + offsetB + shiftOuterA, u_resolution, u_imageOuterResA);
+              colOuterA.r = texture2D(u_imageOuterA, uvR).r;
+              colOuterA.g = texture2D(u_imageOuterA, uvG).g;
+              colOuterA.b = texture2D(u_imageOuterA, uvB).b;
+            } else if (hasRoomA) {
+              colOuterA = getCyberProceduralOuter(vUv + offsetG + shiftOuterA);
+            }
+
+            vec3 colOuterB = vec3(0.0);
+            if (hasRoomB && u_imageOuterResB.x > 0.0) {
+              vec2 uvR = getCoverUv(vUv + offsetR + shiftOuterB, u_resolution, u_imageOuterResB);
+              vec2 uvG = getCoverUv(vUv + offsetG + shiftOuterB, u_resolution, u_imageOuterResB);
+              vec2 uvB = getCoverUv(vUv + offsetB + shiftOuterB, u_resolution, u_imageOuterResB);
+              colOuterB.r = texture2D(u_imageOuterB, uvR).r;
+              colOuterB.g = texture2D(u_imageOuterB, uvG).g;
+              colOuterB.b = texture2D(u_imageOuterB, uvB).b;
+            } else if (hasRoomB) {
+              colOuterB = colOuterA;
+            }
+
+            vec3 colOuter = hasRoomB ? mix(colOuterA * shadowAbove, colOuterB, verticalMix) : colOuterA;
+
+            // 2. Sample Inner (only when inLiquid is true)
+            vec3 colInner = vec3(0.0);
+            if (inLiquid) {
+              vec3 colInnerA = vec3(0.0);
+              if (hasRoomA && u_imageInnerResA.x > 0.0) {
+                vec2 inUvR = getCoverUv(vUv - offsetR + shiftInnerA, u_resolution, u_imageInnerResA) + parallaxOffset;
+                vec2 inUvG = getCoverUv(vUv - offsetG + shiftInnerA, u_resolution, u_imageInnerResA) + parallaxOffset;
+                vec2 inUvB = getCoverUv(vUv - offsetB + shiftInnerA, u_resolution, u_imageInnerResA) + parallaxOffset;
+                colInnerA.r = texture2D(u_imageInnerA, inUvR).r;
+                colInnerA.g = texture2D(u_imageInnerA, inUvG).g;
+                colInnerA.b = texture2D(u_imageInnerA, inUvB).b;
+              } else if (hasRoomA) {
+                colInnerA = getCyberProceduralInner(vUv - offsetG + parallaxOffset + shiftInnerA, u_time);
+              }
+
+              vec3 colInnerB = vec3(0.0);
+              if (hasRoomB && u_imageInnerResB.x > 0.0) {
+                vec2 inUvR = getCoverUv(vUv - offsetR + shiftInnerB, u_resolution, u_imageInnerResB) + parallaxOffset;
+                vec2 inUvG = getCoverUv(vUv - offsetG + shiftInnerB, u_resolution, u_imageInnerResB) + parallaxOffset;
+                vec2 inUvB = getCoverUv(vUv - offsetB + shiftInnerB, u_resolution, u_imageInnerResB) + parallaxOffset;
+                colInnerB.r = texture2D(u_imageInnerB, inUvR).r;
+                colInnerB.g = texture2D(u_imageInnerB, inUvG).g;
+                colInnerB.b = texture2D(u_imageInnerB, inUvB).b;
+              } else if (hasRoomB) {
+                colInnerB = colInnerA;
+              }
+
+              colInner = hasRoomB ? mix(colInnerA * shadowAbove, colInnerB, verticalMix) : colInnerA;
+            }
+
+            vec3 blended = mix(colOuter, colInner, mask * u_visibility);
+            vec3 liquidRim = (iridColor * 0.8 + vec3(0.5)) * specular + iridColor * fresnel * mask * u_visibility;
+            finalColor = blended + liquidRim;
+          }
 
           // Cinematic subtle vignette
           float vig = 1.0 - smoothstep(0.65, 1.4, length((vUv - 0.5) * aspect));
@@ -592,7 +646,7 @@ import * as THREE from "three";
           statusEl.textContent = `Room 0${activeIdx + 1}: ${PRESETS[activeKey].name}`;
         }
 
-        document.querySelectorAll(".dock-btn[data-target-room]").forEach((btn) => {
+        document.querySelectorAll(".rail-item[data-target-room], .dock-btn[data-target-room]").forEach((btn) => {
           const roomIdx = parseInt(btn.dataset.targetRoom, 10);
           btn.classList.toggle("active", roomIdx === activeIdx);
         });
@@ -689,7 +743,7 @@ import * as THREE from "three";
         trigger: "#scroll-gallery",
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.4,
+        scrub: 0.2,
         onUpdate: (self) => {
           const progress = self.progress; // 0.0 ~ 1.0
           const scaled = progress * 3.0;  // 4 rooms -> 3 transition segments
@@ -700,14 +754,33 @@ import * as THREE from "three";
         }
       });
 
-      // Bottom Dock Direct Room Navigation
-      document.querySelectorAll(".dock-btn[data-target-room]").forEach((btn) => {
+      // Minimalist Index Rail Direct Room Navigation (Instant zero-delay response)
+      document.querySelectorAll(".rail-item[data-target-room], .dock-btn[data-target-room]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const targetIdx = parseInt(btn.dataset.targetRoom, 10);
+
+          // 1. 0ms 即时反馈：立即切换指示器高亮，消除视觉响应等待
+          document.querySelectorAll(".rail-item[data-target-room], .dock-btn[data-target-room]").forEach((b) => {
+            const rIdx = parseInt(b.dataset.targetRoom, 10);
+            b.classList.toggle("active", rIdx === targetIdx);
+          });
+          const targetKey = PRESET_KEYS[targetIdx];
+          const statusEl = document.getElementById("status-title");
+          if (statusEl && PRESETS[targetKey]) {
+            statusEl.textContent = `Room 0${targetIdx + 1}: ${PRESETS[targetKey].name}`;
+          }
+
+          // 2. 如果当前在巡展模式，点击后平滑中止巡展
+          if (isAutoTouring) {
+            toggleAutoTour();
+          }
+
+          // 3. 立即触发敏捷快速的物理平滑过渡（0.85s power2.out，杜绝 power3.inOut 的起步粘滞）
+          gsap.killTweensOf(window);
           gsap.to(window, {
-            duration: 1.4,
-            scrollTo: { y: `#room-${targetIdx}`, autoKill: false },
-            ease: "power3.inOut"
+            duration: 0.85,
+            scrollTo: { y: `#room-${targetIdx}`, autoKill: true },
+            ease: "power2.out"
           });
         });
       });
@@ -752,12 +825,23 @@ import * as THREE from "three";
         CONFIG.autoPilot = isAutoTouring;
         const btn = document.getElementById("btn-autopilot");
         const modeBadge = document.getElementById("badge-mode");
-        btn.classList.toggle("active", isAutoTouring);
-        document.getElementById("auto-icon").textContent = isAutoTouring ? "⏸" : "▶";
-        document.getElementById("auto-label").textContent = isAutoTouring ? "Touring..." : "Auto-Tour";
-        modeBadge.textContent = isAutoTouring ? "EXHIBITION TOUR" : "PARALLAX GALLERY";
-        modeBadge.style.color = isAutoTouring ? "#a855f7" : "#38bdf8";
-        modeBadge.style.background = isAutoTouring ? "rgba(168, 85, 247, 0.2)" : "rgba(0, 240, 255, 0.15)";
+        const autoLabel = document.getElementById("auto-label");
+
+        if (btn) {
+          btn.classList.toggle("active", isAutoTouring);
+          btn.classList.toggle("touring", isAutoTouring);
+        }
+
+        if (autoLabel) {
+          autoLabel.textContent = isAutoTouring ? "TOURING..." : "AUTO TOUR";
+        }
+
+        if (modeBadge) {
+          modeBadge.textContent = isAutoTouring ? "EXHIBITION TOUR" : "PARALLAX GALLERY";
+          modeBadge.style.color = isAutoTouring ? "#ffffff" : "#f1f5f9";
+          modeBadge.style.background = isAutoTouring ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.08)";
+          modeBadge.style.borderColor = isAutoTouring ? "rgba(255, 255, 255, 0.35)" : "rgba(255, 255, 255, 0.12)";
+        }
 
         if (isAutoTouring) {
           const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -781,6 +865,7 @@ import * as THREE from "three";
 
       // --- Resize Handling ---
       window.addEventListener("resize", () => {
+        renderer.setPixelRatio(getOptimalPixelRatio());
         renderer.setSize(window.innerWidth, window.innerHeight);
         uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
         ScrollTrigger.refresh();
@@ -816,7 +901,7 @@ import * as THREE from "three";
         uniforms.u_pulse.value = waveValue;
 
         uniforms.u_time.value += delta;
-        accumulator += delta;
+        accumulator = Math.min(accumulator + delta, 0.05);
 
         const mouseAlpha = 1 - Math.pow(1 - CONFIG.mouseSmoothness, fixedStep * 60);
         const trailAlpha = 1 - Math.exp((-fixedStep * (TRAIL_COUNT - 1)) / CONFIG.trailPersistence);

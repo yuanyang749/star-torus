@@ -110,30 +110,53 @@
       </section>
     </div>
 
-    <!-- Fixed Right-Side Gallery Navigation Dock -->
-    <nav class="gallery-nav" aria-label="Exhibition Navigation">
-      <div class="dock-container">
-        <button class="dock-btn active" data-target-room="0">
-          <span>⚡ 01 Cyber</span>
-        </button>
-        <button class="dock-btn" data-target-room="1">
-          <span>💎 02 Vogue</span>
-        </button>
-        <button class="dock-btn" data-target-room="2">
-          <span>🏎️ 03 Hypercar</span>
-        </button>
-        <button class="dock-btn" data-target-room="3">
-          <span>🦋 04 Butterfly</span>
-        </button>
-
-        <div class="dock-separator"></div>
-
-        <button class="dock-btn" id="btn-autopilot" title="Toggle Auto Exhibition Tour">
-          <span id="auto-icon">▶</span>
-          <span id="auto-label">Auto-Tour</span>
-        </button>
+    <!-- Minimalist Exhibition Index Rail (Right-Center) -->
+    <nav class="gallery-index-rail" aria-label="Exhibition Rooms Navigation">
+      <div class="rail-container">
+        <div class="rail-items">
+          <button class="rail-item active" data-target-room="0" title="Room 01: Cyber">
+            <span class="rail-indicator"></span>
+            <span class="rail-num">01</span>
+            <span class="rail-sep">/</span>
+            <span class="rail-name">CYBER</span>
+          </button>
+          <button class="rail-item" data-target-room="1" title="Room 02: Vogue">
+            <span class="rail-indicator"></span>
+            <span class="rail-num">02</span>
+            <span class="rail-sep">/</span>
+            <span class="rail-name">VOGUE</span>
+          </button>
+          <button class="rail-item" data-target-room="2" title="Room 03: Hypercar">
+            <span class="rail-indicator"></span>
+            <span class="rail-num">03</span>
+            <span class="rail-sep">/</span>
+            <span class="rail-name">HYPERCAR</span>
+          </button>
+          <button class="rail-item" data-target-room="3" title="Room 04: Butterfly">
+            <span class="rail-indicator"></span>
+            <span class="rail-num">04</span>
+            <span class="rail-sep">/</span>
+            <span class="rail-name">BUTTERFLY</span>
+          </button>
+        </div>
       </div>
     </nav>
+
+    <!-- Dedicated Auto-Tour Controller (Bottom-Right) -->
+    <div class="tour-dock">
+      <button class="tour-btn" id="btn-autopilot" title="Toggle Auto Exhibition Tour">
+        <span class="tour-icon-box" id="tour-icon-box">
+          <svg class="tour-svg svg-play" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 4.5V19.5L19 12L7 4.5Z" />
+          </svg>
+          <svg class="tour-svg svg-pause" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 5H10V19H6V5ZM14 5H18V19H14V5Z" />
+          </svg>
+        </span>
+        <span class="tour-text" id="auto-label">AUTO TOUR</span>
+        <span class="tour-dot" id="tour-dot"></span>
+      </button>
+    </div>
 
     <!-- Shader & Interaction Script -->
     <script type="module" src="./main.js"></script>
