@@ -206,6 +206,7 @@ import * as THREE from "three";
         u_fresnelRim: { value: CONFIG.fresnelRim },
         u_parallax: { value: CONFIG.parallax },
         u_pulse: { value: 0.0 },
+        u_trailBounds: { value: new THREE.Vector4(-0.1, -0.1, 1.1, 1.1) },
       };
 
       const vertexShader = `
@@ -236,6 +237,7 @@ import * as THREE from "three";
         uniform vec2 u_trail[14];
         uniform float u_trailLength;
         uniform float u_trailTaper;
+        uniform vec4 u_trailBounds;
         
         uniform float u_radius;
         uniform float u_distortion;
@@ -351,10 +353,9 @@ import * as THREE from "three";
 
           float dist = length(p);
           float trailBaseRadius = mix(u_radius, 0.30, pulseExpand);
-          float maxInfluence = max(currentRadius, trailBaseRadius) * 1.55 + 0.05;
-
-          // 核心性能飞跃：空间几何早退（覆盖 85%~95% 屏幕像素，直接走单次贴图采样，0 FBM 0 胶囊求解）
-          if (dist > maxInfluence && pulseAmp < 0.02) {
+          // 核心性能飞跃：动态空间包围盒早退（严密包络鼠标镜头与全部 14 节拖尾胶囊，彻底杜绝尾巴截断）
+          bool isOutsideBounds = (vUv.x < u_trailBounds.x || vUv.x > u_trailBounds.z || vUv.y < u_trailBounds.y || vUv.y > u_trailBounds.w);
+          if (isOutsideBounds && pulseAmp < 0.02) {
             float t = clamp(u_transition, 0.0, 1.0);
             bool hasRoomB = (t > 0.002);
             bool hasRoomA = (t < 0.998);
@@ -913,6 +914,37 @@ import * as THREE from "three";
             trailPoints[i].lerp(trailPoints[i - 1], trailAlpha);
           }
           accumulator -= fixedStep;
+        }
+
+        // 动态计算包含鼠标镜头与全部 14 节拖尾的屏幕空间包围盒 (AABB)，彻底解决拖尾截断问题
+        if (waveValue > 0.02) {
+          // 点击脉冲扩散期间覆盖整屏，避免扩散水银波被边缘截断
+          uniforms.u_trailBounds.value.set(-0.1, -0.1, 1.1, 1.1);
+        } else {
+          const aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+          const currentR = uniforms.u_radius.value || 0.18;
+          const maxRadius = Math.max(currentR, 0.22);
+          const padAspect = maxRadius + 0.22;
+          const padY = padAspect + 0.05;
+          const padX = padAspect / Math.max(aspect, 0.1) + 0.05;
+
+          let minX = currentMouse.x - padX;
+          let maxX = currentMouse.x + padX;
+          let minY = currentMouse.y - padY;
+          let maxY = currentMouse.y + padY;
+
+          const trailLen = uniforms.u_trailLength.value || 1.15;
+          for (let i = 0; i < TRAIL_COUNT; i++) {
+            const pt = trailPoints[i];
+            const effX = currentMouse.x + (pt.x - currentMouse.x) * trailLen;
+            const effY = currentMouse.y + (pt.y - currentMouse.y) * trailLen;
+            if (effX - padX < minX) minX = effX - padX;
+            if (effX + padX > maxX) maxX = effX + padX;
+            if (effY - padY < minY) minY = effY - padY;
+            if (effY + padY > maxY) maxY = effY + padY;
+          }
+
+          uniforms.u_trailBounds.value.set(minX, minY, maxX, maxY);
         }
 
         uniforms.u_mouse.value.copy(currentMouse);
