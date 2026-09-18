@@ -639,13 +639,8 @@ import * as THREE from "three";
         uniforms.u_iridescence.value = lerp(pA.iridescence, pB.iridescence, t);
         uniforms.u_fresnelRim.value = lerp(pA.fresnelRim, pB.fresnelRim, t);
 
-        // 同步顶栏状态与底部导航高亮
+        // 同步底部导航高亮
         const activeIdx = t < 0.5 ? idxA : idxB;
-        const activeKey = PRESET_KEYS[activeIdx];
-        const statusEl = document.getElementById("status-title");
-        if (statusEl) {
-          statusEl.textContent = `Room 0${activeIdx + 1}: ${PRESETS[activeKey].name}`;
-        }
 
         document.querySelectorAll(".rail-item[data-target-room], .dock-btn[data-target-room]").forEach((btn) => {
           const roomIdx = parseInt(btn.dataset.targetRoom, 10);
@@ -765,12 +760,6 @@ import * as THREE from "three";
             const rIdx = parseInt(b.dataset.targetRoom, 10);
             b.classList.toggle("active", rIdx === targetIdx);
           });
-          const targetKey = PRESET_KEYS[targetIdx];
-          const statusEl = document.getElementById("status-title");
-          if (statusEl && PRESETS[targetKey]) {
-            statusEl.textContent = `Room 0${targetIdx + 1}: ${PRESETS[targetKey].name}`;
-          }
-
           // 2. 如果当前在巡展模式，点击后平滑中止巡展
           if (isAutoTouring) {
             toggleAutoTour();
@@ -825,7 +814,6 @@ import * as THREE from "three";
         isAutoTouring = !isAutoTouring;
         CONFIG.autoPilot = isAutoTouring;
         const btn = document.getElementById("btn-autopilot");
-        const modeBadge = document.getElementById("badge-mode");
         const autoLabel = document.getElementById("auto-label");
 
         if (btn) {
@@ -837,12 +825,6 @@ import * as THREE from "three";
           autoLabel.textContent = isAutoTouring ? "TOURING..." : "AUTO TOUR";
         }
 
-        if (modeBadge) {
-          modeBadge.textContent = isAutoTouring ? "EXHIBITION TOUR" : "PARALLAX GALLERY";
-          modeBadge.style.color = isAutoTouring ? "#ffffff" : "#f1f5f9";
-          modeBadge.style.background = isAutoTouring ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.08)";
-          modeBadge.style.borderColor = isAutoTouring ? "rgba(255, 255, 255, 0.35)" : "rgba(255, 255, 255, 0.12)";
-        }
 
         if (isAutoTouring) {
           const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -876,21 +858,10 @@ import * as THREE from "three";
       let previousTime = performance.now();
       let accumulator = 0;
       const fixedStep = 1 / 60;
-      let frameCount = 0;
-      let lastFpsUpdate = performance.now();
-      const fpsElement = document.getElementById("fps-counter");
 
       renderer.setAnimationLoop((now) => {
         const delta = Math.min(Math.max((now - previousTime) / 1000, 0), 0.05);
         previousTime = now;
-
-        // FPS meter
-        frameCount++;
-        if (now - lastFpsUpdate >= 1000) {
-          fpsElement.textContent = `${frameCount} FPS`;
-          frameCount = 0;
-          lastFpsUpdate = now;
-        }
 
         // Auto pilot motion generator
         if (CONFIG.autoPilot) {

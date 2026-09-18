@@ -104,35 +104,6 @@ canvas#webgl {
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
 }
 
-.status-pill {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: var(--bg-glass);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border-glass);
-  padding: 0.4rem 0.95rem;
-  border-radius: 100px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.72rem;
-  color: #94a3b8;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-}
-
-.badge-mode {
-  background: rgba(255, 255, 255, 0.08);
-  color: #f1f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.18rem 0.5rem;
-  border-radius: 5px;
-  font-weight: 500;
-  font-size: 0.65rem;
-  letter-spacing: 0.06em;
-  transition: all 0.25s ease;
-}
-
 /* --- Scrollable Parallax Gallery Rooms --- */
 .scroll-gallery {
   position: relative;
@@ -446,10 +417,6 @@ canvas#webgl {
   }
   .brand-title {
     font-size: 1.3rem;
-  }
-  .status-pill {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.65rem;
   }
   .gallery-index-rail {
     right: 0.8rem;
