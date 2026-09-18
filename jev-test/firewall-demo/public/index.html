@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Gateway Benchmark: Prompt Injection Defense</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="benchmark-container">
+    <!-- Top Nav / System Header -->
+    <header class="benchmark-header">
+      <div class="header-main">
+        <div class="benchmark-meta">
+          <span class="system-status-pill">
+            <span class="status-indicator"></span>
+            SYSTEM EVALUATION BENCHMARK
+          </span>
+          <span class="meta-divider">/</span>
+          <span class="meta-tag">RESEARCH LAB</span>
+        </div>
+        <h1 class="benchmark-title">AI Gateway Defense Benchmark</h1>
+        <p class="benchmark-desc">
+          系统一非生成式概率决策 (TypeSafe Jev) 与自回归深度推理大模型 (<span id="topLlmModelName">Gemini 3.8 Flash High</span>) 提示词注入防御实测
+        </p>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-card">
+          <span class="spec-label">SYSTEM 1 (JEV)</span>
+          <span class="spec-value">Direct Logit Sampling</span>
+          <span class="spec-sub text-muted">Input $0.042/M · Output Free</span>
+        </div>
+        <div class="spec-card">
+          <span class="spec-label">AUTOREGRESSIVE (LLM)</span>
+          <span class="spec-value" id="specLlmModel">Gemini 3.8 Flash</span>
+          <span class="spec-sub text-muted">Input $0.75/M · Output $3.75/M</span>
+        </div>
+        <div class="spec-card">
+          <span class="spec-label">TEST ENVIRONMENT</span>
+          <span class="spec-value">Production Live APIs</span>
+          <span class="spec-sub text-muted">OpenRouter Decisions + Endpoint</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="benchmark-body">
+      <!-- Input & Harness Panel -->
+      <section class="panel test-harness-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-tag">PAYLOAD HARNESS</span>
+            <h2 class="panel-title">待审查的外来文本与潜在对抗载荷 (State Input)</h2>
+          </div>
+          <div class="segmented-control" role="tablist">
+            <button class="seg-btn active" data-preset="resume" role="tab">
+              <span class="seg-badge">ATTACK-01</span>
+              <span>简历指令覆写</span>
+            </button>
+            <button class="seg-btn" data-preset="webpage" role="tab">
+              <span class="seg-badge">ATTACK-02</span>
+              <span>爬虫隐蔽注入</span>
+            </button>
+            <button class="seg-btn" data-preset="leak" role="tab">
+              <span class="seg-badge">ATTACK-03</span>
+              <span>越狱窃取密钥</span>
+            </button>
+            <button class="seg-btn" data-preset="benign" role="tab">
+              <span class="seg-badge benign-badge">BASELINE</span>
+              <span>正常合规工单</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="editor-shell">
+          <div class="editor-header">
+            <span class="editor-filename">input_stream.txt</span>
+            <div class="editor-stats">
+              <span id="charCount">0 字符</span>
+              <span class="stat-sep">|</span>
+              <span class="editor-tag">Raw State</span>
+            </div>
+          </div>
+          <textarea id="inputText" spellcheck="false" placeholder="在此输入需要进行安全审查的内容..."></textarea>
+        </div>
+
+        <div class="action-bar">
+          <div class="action-left">
+            <button id="runRaceBtn" class="btn btn-primary">
+              <span class="btn-spinner" id="raceSpinner" style="display:none;"></span>
+              <span class="btn-text">执行双轨基准测试 (Jev vs <span id="llmModelBtnLabel">Gemini 3.8 Flash</span>)</span>
+            </button>
+            <button id="runJevOnlyBtn" class="btn btn-outline">
+              <span>仅评估 System 1 (Jev)</span>
+            </button>
+          </div>
+          <div class="action-hint">
+            <span>实测模式：两端并发向真实端点发起请求，实时记录物理耗时与真实 Token 开销</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Side-by-Side Dual Engine Arena -->
+      <section class="arena-columns">
+        <!-- Engine 1: TypeSafe Jev -->
+        <div class="engine-column" id="jevCard">
+          <div class="column-header">
+            <div class="engine-info">
+              <div class="engine-type-pill s1-pill">SYSTEM 1 DECISION</div>
+              <h3 class="engine-name">TypeSafe Jev</h3>
+              <p class="engine-sub">单次前向并行采样 · 零文本生成 · 零自回归开销</p>
+            </div>
+            <div class="status-badge" id="jevStatus">STANDBY</div>
+          </div>
+
+          <!-- Verdict Box -->
+          <div class="verdict-card" id="jevVerdictBanner">
+            <div class="verdict-content">
+              <div class="verdict-state-text">等待测试开始</div>
+              <div class="verdict-detail">点击上方按钮发起快速门禁评估</div>
+            </div>
+          </div>
+
+          <!-- Metrics Table -->
+          <div class="metrics-grid">
+            <div class="metric-cell">
+              <span class="metric-title">端到端时延</span>
+              <span class="metric-number" id="jevLatency">-- ms</span>
+              <span class="metric-sub">P50 物理往返耗时</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-title">单次评估成本</span>
+              <span class="metric-number text-success" id="jevCost">$--</span>
+              <span class="metric-sub">$0.042 / 1M tokens</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-title">注入置信度</span>
+              <span class="metric-number" id="jevConfidence">--%</span>
+              <span class="metric-sub">Noul 概率判定</span>
+            </div>
+          </div>
+
+          <!-- Probability & Decision Breakdown -->
+          <div class="telemetry-panel" id="jevDetails">
+            <div class="telemetry-empty">等待基准测试数据输入...</div>
+          </div>
+        </div>
+
+        <!-- Engine 2: Traditional LLM (Gemini 3.8 Flash) -->
+        <div class="engine-column" id="llmCard">
+          <div class="column-header">
+            <div class="engine-info">
+              <div class="engine-type-pill s2-pill">AUTOREGRESSIVE LLM</div>
+              <h3 class="engine-name" id="llmModelBadgeLabel">Gemini 3.8 Flash (High)</h3>
+              <p class="engine-sub">逐 Token 自回归生成 · 思考推理链 · JSON 序列化校验</p>
+            </div>
+            <div class="status-badge" id="llmStatus">STANDBY</div>
+          </div>
+
+          <!-- Verdict Box -->
+          <div class="verdict-card" id="llmVerdictBanner">
+            <div class="verdict-content">
+              <div class="verdict-state-text">等待测试开始</div>
+              <div class="verdict-detail">将与 Jev 并发执行相同安全审查任务</div>
+            </div>
+          </div>
+
+          <!-- Metrics Table -->
+          <div class="metrics-grid">
+            <div class="metric-cell">
+              <span class="metric-title">端到端时延</span>
+              <span class="metric-number" id="llmLatency">-- ms</span>
+              <span class="metric-sub">含思考与输出耗时</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-title">单次评估成本</span>
+              <span class="metric-number" id="llmCost">$--</span>
+              <span class="metric-sub">官方 $0.75 in / $3.75 out</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-title">Tokens 消耗拆解</span>
+              <span class="metric-number font-mono-sm" id="llmTokens">--</span>
+              <span class="metric-sub" id="llmTokenDetail">含思考 Tokens</span>
+            </div>
+          </div>
+
+          <!-- Telemetry / JSON Output -->
+          <div class="telemetry-panel" id="llmDetails">
+            <div class="telemetry-empty">等待基准测试数据输入...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Visual Comparison & Delta Bars -->
+      <section class="panel comparison-panel" id="summaryCard" style="display: none;">
+        <div class="panel-header border-bottom">
+          <div class="panel-title-group">
+            <span class="panel-tag">BENCHMARK EVALUATION</span>
+            <h2 class="panel-title">双轨实测对比分析 (Comparative Delta)</h2>
+          </div>
+          <div class="panel-actions">
+            <button id="copyTweetBtn" class="btn btn-secondary btn-sm">
+              <span>复制专业评测简报 (Markdown / X)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Delta Cards Grid -->
+        <div class="delta-grid">
+          <div class="delta-card">
+            <div class="delta-meta">LATENCY SPEEDUP</div>
+            <div class="delta-value" id="speedupVal">--x</div>
+            <div class="delta-desc">Jev 系统一速度相对优势</div>
+            <div class="bar-visual">
+              <div class="bar-row">
+                <span class="bar-label">Jev</span>
+                <div class="bar-track"><div class="bar-fill s1-bar" id="jevLatencyBar" style="width: 10%;"></div></div>
+                <span class="bar-val-text" id="jevLatencyText">--ms</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Gemini</span>
+                <div class="bar-track"><div class="bar-fill s2-bar" id="llmLatencyBar" style="width: 100%;"></div></div>
+                <span class="bar-val-text" id="llmLatencyText">--ms</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="delta-card">
+            <div class="delta-meta">COST EFFICIENCY</div>
+            <div class="delta-value text-success" id="savingsVal">--x</div>
+            <div class="delta-desc">每百万次门禁调用成本节省</div>
+            <div class="bar-visual">
+              <div class="bar-row">
+                <span class="bar-label">Jev</span>
+                <div class="bar-track"><div class="bar-fill s1-bar" id="jevCostBar" style="width: 2%;"></div></div>
+                <span class="bar-val-text" id="jevCostText">$--</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Gemini</span>
+                <div class="bar-track"><div class="bar-fill s2-bar" id="llmCostBar" style="width: 100%;"></div></div>
+                <span class="bar-val-text" id="llmCostText">$--</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="delta-card">
+            <div class="delta-meta">DETERMINISTIC ASSURANCE</div>
+            <div class="delta-value">100%</div>
+            <div class="delta-desc">Type-Safe 结构化输出保证</div>
+            <ul class="assurance-list">
+              <li>✓ 直接计算 Logit 概率矩阵</li>
+              <li>✓ 彻底消除 JSON 格式截断与解析崩溃</li>
+              <li>✓ 零自回归幻觉，避免越狱提示词诱导回答</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Benchmark Footer -->
+    <footer class="benchmark-footer">
+      <div class="footer-left">
+        <span>TypeSafe AI Jev Benchmark Harness</span>
+        <span class="footer-divider">·</span>
+        <span>OpenRouter Decisions API</span>
+      </div>
+      <div class="footer-right">
+        <span>Google Gemini 3.8 Flash High Integration</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
