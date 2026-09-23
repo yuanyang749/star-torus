@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <title>软乎乎挑水果 · Laya / Jev</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f6f1e8;
+      color: #2a2622;
+      font-family: "Avenir Next", "PingFang SC", "Helvetica Neue", sans-serif;
+    }
+
+    .fit {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .screen {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1600px;
+      height: 960px;
+      overflow: hidden;
+      transform-origin: center center;
+    }
+
+    .top {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: top 0.25s ease, gap 0.25s ease;
+    }
+
+    .top.summary-mode {
+      top: 10px;
+      gap: 8px;
+    }
+
+    .top-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top.summary-mode .top-action {
+      flex-direction: row;
+      gap: 16px;
+    }
+
+    .card {
+      width: 760px;
+      min-height: 64px;
+      padding: 16px 28px;
+      border-radius: 22px;
+      background: #fffdf8;
+      box-shadow: 0 10px 28px rgba(80, 60, 40, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.45;
+      font-size: 20px;
+      font-weight: 650;
+      transition: all 0.25s ease;
+    }
+
+    .card.summary {
+      width: 900px;
+      padding: 12px 28px 10px;
+      flex-direction: column;
+      gap: 6px;
+      border-radius: 20px;
+      background: #fffdf8;
+      box-shadow: 0 14px 36px rgba(80, 60, 40, 0.10);
+      border: 1px solid rgba(140, 120, 100, 0.12);
+    }
+
+    .summary-table {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-head,
+    .summary-row {
+      display: grid;
+      grid-template-columns: 140px 1.1fr 1.1fr 1.2fr 1.25fr;
+      align-items: center;
+      padding: 6px 16px;
+      border-radius: 12px;
+    }
+
+    .summary-head {
+      font-size: 15px;
+      font-weight: 750;
+      color: #8c8275;
+      letter-spacing: 0.04em;
+      padding-bottom: 2px;
+    }
+
+    .summary-row {
+      background: #fbf7ee;
+    }
+
+    .summary-row.laya-row {
+      background: rgba(255, 111, 145, 0.10);
+    }
+
+    .summary-row.jev-row {
+      background: rgba(62, 198, 143, 0.12);
+    }
+
+    .col-model {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      text-align: left;
+      font-size: 22px;
+    }
+
+    .model-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-laya {
+      background: #ff6f91;
+      box-shadow: 0 0 0 2.5px rgba(255, 111, 145, 0.3);
+    }
+
+    .dot-jev {
+      background: #3ec68f;
+      box-shadow: 0 0 0 2.5px rgba(62, 198, 143, 0.3);
+    }
+
+    .col-num {
+      text-align: center;
+      color: #3f3a34;
+    }
+
+    .col-num b {
+      font-size: 28px;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+    }
+
+    .col-num small {
+      font-size: 15px;
+      font-weight: 600;
+      color: #7a736a;
+      margin-left: 3px;
+    }
+
+    .col-rate {
+      text-align: center;
+      color: #2a2622;
+    }
+
+    .col-rate b {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+
+    .col-rate.highlight {
+      color: #1a7f37;
+    }
+
+    .col-speed {
+      text-align: center;
+      color: #5c564e;
+    }
+
+    .col-speed b {
+      font-size: 26px;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+    }
+
+    .col-speed small {
+      font-size: 15px;
+      font-weight: 600;
+      color: #7a736a;
+      margin-left: 3px;
+    }
+
+    .summary-verdict {
+      margin-top: 4px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(140, 130, 117, 0.25);
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      font-size: 16px;
+      font-weight: 750;
+      color: #2a2622;
+    }
+
+    .summary-verdict .tag {
+      padding: 3px 16px;
+      border-radius: 999px;
+      background: #f0eae1;
+      font-size: 15px;
+    }
+
+    .clock {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      transition: font-size 0.2s ease;
+    }
+
+    .top.summary-mode .clock {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    button {
+      border: 0;
+      background: #2a2622;
+      color: #fffdf8;
+      border-radius: 999px;
+      padding: 10px 22px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .top.summary-mode button {
+      padding: 7px 22px;
+      font-size: 15px;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .pick-badge {
+      position: absolute;
+      top: 340px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px 6px 10px;
+      border-radius: 999px;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 6px 18px rgba(40, 30, 20, 0.1);
+      pointer-events: none;
+      transform-origin: left center;
+    }
+
+    .laya-badge {
+      left: 485px;
+    }
+
+    .jev-badge {
+      left: 1325px;
+    }
+
+    .pick-badge.ok {
+      background: #eaf8ee;
+      color: #1a7f37;
+      border: 2px solid #2da44e;
+      animation: badge-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .pick-badge.bad {
+      background: #ffebe9;
+      color: #cf222e;
+      border: 2px solid #cf222e;
+      animation: badge-shake 0.35s ease;
+    }
+
+    .pick-badge .badge-svg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .pick-badge .badge-text {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 38px 14px;
+      background: rgba(255, 253, 248, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 999px;
+      box-shadow: 0 12px 36px rgba(80, 60, 40, 0.12);
+      border: 1.5px solid rgba(140, 120, 100, 0.18);
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .footer-title {
+      font-size: 24px;
+      font-weight: 850;
+      color: #24201c;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-rules {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #4a443c;
+    }
+
+    .rule-sep {
+      color: #c4b8ac;
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .rule-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rule-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .icon-clock {
+      color: #e07a1f;
+    }
+
+    .icon-target {
+      color: #2da44e;
+    }
+
+    .icon-zap {
+      color: #8a5cf6;
+    }
+
+    .icon-chip {
+      color: #0284c7;
+    }
+
+    @keyframes badge-pop {
+      0% {
+        transform: scale(0.4) rotate(-10deg);
+        opacity: 0;
+      }
+
+      60% {
+        transform: scale(1.15) rotate(4deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes badge-shake {
+      0% {
+        transform: scale(0.6);
+        opacity: 0;
+      }
+
+      25% {
+        transform: translateX(-6px) rotate(-6deg);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translateX(6px) rotate(6deg);
+      }
+
+      75% {
+        transform: translateX(-3px) rotate(-3deg);
+      }
+
+      100% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    .who {
+      position: absolute;
+      top: 196px;
+      margin: 0;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .who span {
+      font-weight: 500;
+      color: #7a736a;
+      font-size: 18px;
+      margin-left: 8px;
+    }
+
+    .laya-who {
+      left: 92px;
+    }
+
+    .jev-who {
+      left: 932px;
+    }
+
+    .score {
+      position: absolute;
+      top: 236px;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #5c564e;
+    }
+
+    .laya-score {
+      left: 92px;
+    }
+
+    .jev-score {
+      left: 932px;
+    }
+
+    .prompt {
+      position: absolute;
+      top: 272px;
+      width: 560px;
+      margin: 0;
+      min-height: 44px;
+      font-size: 18px;
+      font-weight: 650;
+      line-height: 1.4;
+      color: #3f3a34;
+    }
+
+    .laya-prompt {
+      left: 92px;
+    }
+
+    .jev-prompt {
+      left: 932px;
+    }
+
+    .keeper {
+      position: absolute;
+      top: 300px;
+      width: 210px;
+      height: auto;
+      z-index: 1;
+      transform-origin: 50% 80%;
+      animation: bob 2.6s ease-in-out infinite;
+    }
+
+    .laya-keeper {
+      left: 270px;
+    }
+
+    .jev-keeper {
+      left: 1110px;
+    }
+
+    .keeper.thinking {
+      animation: squish 0.42s ease-in-out infinite;
+    }
+
+    .keeper.happy {
+      animation: pop 0.45s ease;
+    }
+
+    .keeper.wrong {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes bob {
+      50% {
+        translate: 0 -8px;
+      }
+    }
+
+    @keyframes squish {
+      50% {
+        transform: scaleX(1.06) scaleY(0.94);
+      }
+    }
+
+    @keyframes pop {
+      40% {
+        transform: scale(1.08);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      25% {
+        transform: rotate(-4deg);
+      }
+
+      75% {
+        transform: rotate(4deg);
+      }
+    }
+
+    .counter {
+      position: absolute;
+      top: 530px;
+      width: 640px;
+      height: 176px;
+      border-radius: 28px 28px 36px 36px;
+      background: linear-gradient(#fff8ee, #f3e4d2);
+      box-shadow: 0 16px 0 #e7d3bc;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-evenly;
+      padding: 0 28px 18px;
+    }
+
+    .laya-counter {
+      left: 60px;
+    }
+
+    .jev-counter {
+      left: 900px;
+    }
+
+    .fruit {
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #3a342e;
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+    .fruit svg {
+      width: 78px;
+      height: 86px;
+    }
+
+    .fruit.picked svg {
+      filter: drop-shadow(0 0 0 #1c1b19);
+      transform: translateY(-8px) scale(1.08);
+    }
+
+    .fruit.bad {
+      color: #b4233a;
+    }
+
+    .result {
+      position: absolute;
+      top: 738px;
+      width: 280px;
+      min-height: 96px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 22px;
+      font-weight: 750;
+    }
+
+    .laya-result {
+      left: 210px;
+    }
+
+    .jev-result {
+      left: 1050px;
+    }
+
+    .result svg.fruit-img {
+      width: 84px;
+      height: 92px;
+    }
+
+    .result .mark {
+      color: #1a7f37;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result .mark.bad {
+      color: #cf222e;
+    }
+
+    .result .res-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .mode-nav {
+      position: fixed;
+      top: 14px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 999px;
+      background: rgba(255, 253, 248, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 16px rgba(80, 60, 40, 0.08);
+      border: 1px solid rgba(140, 120, 100, 0.16);
+    }
+
+    .mode-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 750;
+      text-decoration: none;
+      color: #6a6258;
+      transition: all 0.2s ease;
+    }
+
+    .mode-item:hover {
+      color: #2a2622;
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .mode-item.active {
+      background: #2a2622;
+      color: #fffdf8;
+    }
+
+    .mode-svg {
+      width: 14px;
+      height: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="mode-nav">
+    <a class="mode-item active" href="/">
+      <svg class="mode-svg"><use href="#icon-clock"/></svg>
+      1分钟极速对决
+    </a>
+    <a class="mode-item" href="/benchmark">
+      <svg class="mode-svg"><use href="#icon-target"/></svg>
+      100题基准测评
+    </a>
+  </nav>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="icon-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="12 7 12 12 15 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24">
+      <polygon points="13 2 4 13 11 13 10 22 20 11 13 11 14 2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-chip" viewBox="0 0 24 24">
+      <rect x="5" y="5" width="14" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <rect x="9" y="9" width="6" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M9 1.5v3M15 1.5v3M9 19.5v3M15 19.5v3M19.5 9h3M19.5 15h3M1.5 9h3M1.5 15h3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-cross" viewBox="0 0 24 24">
+      <line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+      <line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="fruit-strawberry" viewBox="0 0 80 96">
+      <path d="M40 90c-16 0-24-16-22-34 2-16 10-28 22-32 12 4 20 16 22 32 2 18-6 34-22 34z" fill="#ef3d4c"
+        stroke="#1c1b19" stroke-width="4" stroke-linejoin="round" />
+      <path d="M40 28c-2 8-8 12-16 12 6 2 10 8 10 14 2-8 8-12 16-12-6-4-10-10-10-14z" fill="#3fa34a" stroke="#1c1b19"
+        stroke-width="3" stroke-linejoin="round" />
+      <path d="M40 26c6 2 12 0 16 4-4 4-6 8-6 12-4-2-8-2-12 0 0-6-2-10 2-16z" fill="#57b35a" stroke="#1c1b19"
+        stroke-width="3" stroke-linejoin="round" />
+      <g fill="#ffe08a">
+        <circle cx="30" cy="52" r="2.3" />
+        <circle cx="42" cy="48" r="2.3" />
+        <circle cx="52" cy="56" r="2.3" />
+        <circle cx="34" cy="66" r="2.3" />
+        <circle cx="48" cy="68" r="2.3" />
+        <circle cx="40" cy="78" r="2.3" />
+      </g>
+    </symbol>
+    <symbol id="fruit-grape" viewBox="0 0 80 96">
+      <path d="M40 16c8 8 8 14 0 18" fill="none" stroke="#2f7a34" stroke-width="4" stroke-linecap="round" />
+      <ellipse cx="52" cy="18" rx="10" ry="6" fill="#4caf50" stroke="#1c1b19" stroke-width="3"
+        transform="rotate(20 52 18)" />
+      <g fill="#7a4ec4" stroke="#1c1b19" stroke-width="3">
+        <circle cx="40" cy="40" r="11" />
+        <circle cx="26" cy="50" r="11" />
+        <circle cx="54" cy="50" r="11" />
+        <circle cx="32" cy="66" r="11" />
+        <circle cx="48" cy="66" r="11" />
+        <circle cx="40" cy="80" r="11" />
+      </g>
+      <g fill="#c9b0f0">
+        <circle cx="36" cy="36" r="2.4" />
+        <circle cx="22" cy="46" r="2.2" />
+        <circle cx="50" cy="46" r="2.2" />
+      </g>
+    </symbol>
+    <symbol id="fruit-orange" viewBox="0 0 80 96">
+      <path d="M40 20c2 6 2 8 0 12" fill="none" stroke="#2f7a34" stroke-width="4" stroke-linecap="round" />
+      <ellipse cx="52" cy="22" rx="12" ry="7" fill="#4caf50" stroke="#1c1b19" stroke-width="3"
+        transform="rotate(24 52 22)" />
+      <circle cx="40" cy="58" r="28" fill="#f5a524" stroke="#1c1b19" stroke-width="4" />
+      <path d="M40 34c6 10 6 30 0 46M40 34c-6 10-6 30 0 46M22 50c10 4 26 4 36 0M24 68c8 4 24 4 32 0" fill="none"
+        stroke="#e08a12" stroke-width="2" stroke-linecap="round" />
+      <ellipse cx="30" cy="46" rx="6" ry="3.5" fill="#ffe3a8" opacity="0.9" />
+    </symbol>
+  </svg>
+
+  <div class="fit">
+    <div class="top">
+      <div class="card" id="card">一分钟。挑对算准确，挑得多算效率。</div>
+      <div class="top-action">
+        <p class="clock" id="clock">01:00</p>
+        <button id="start" type="button">开始</button>
+      </div>
+    </div>
+    <div class="screen" id="screen">
+
+      <p class="who laya-who">Laya <span>本地</span></p>
+      <p class="score laya-score" id="laya-score">挑了 0 · 对了 0</p>
+      <p class="prompt laya-prompt" id="laya-prompt"></p>
+      <img class="keeper laya-keeper" data-model="laya" src="slime-pink.png" alt="Laya">
+      <div class="pick-badge laya-badge" id="laya-badge" hidden></div>
+      <div class="counter laya-counter" data-model="laya"></div>
+      <div class="result laya-result" id="laya-result" hidden></div>
+
+      <p class="who jev-who">Jev <span>真实 API</span></p>
+      <p class="score jev-score" id="jev-score">挑了 0 · 对了 0</p>
+      <p class="prompt jev-prompt" id="jev-prompt"></p>
+      <img class="keeper jev-keeper" data-model="jev" src="slime-mint.png" alt="Jev">
+      <div class="pick-badge jev-badge" id="jev-badge" hidden></div>
+      <div class="counter jev-counter" data-model="jev"></div>
+      <div class="result jev-result" id="jev-result" hidden></div>
+    </div>
+    <div class="bottom-bar">
+      <div class="footer-title">软乎乎挑水果 · 端侧本地模型 VS 云端决策 API 性能对决</div>
+      <div class="footer-rules">
+        <span class="rule-item">
+          <svg class="rule-icon icon-clock"><use href="#icon-clock"/></svg>
+          限时 60 秒
+        </span>
+        <span class="rule-sep">/</span>
+        <span class="rule-item">
+          <svg class="rule-icon icon-target"><use href="#icon-target"/></svg>
+          准确率评测
+        </span>
+        <span class="rule-sep">/</span>
+        <span class="rule-item">
+          <svg class="rule-icon icon-zap"><use href="#icon-zap"/></svg>
+          吞吐效率对比
+        </span>
+        <span class="rule-sep">/</span>
+        <span class="rule-item">
+          <svg class="rule-icon icon-chip"><use href="#icon-chip"/></svg>
+          Laya 本地端侧 vs Jev 真实 API
+        </span>
+      </div>
+    </div>
+  </div>
+  <script>
+    const MINUTE = 60000;
+    const NAMES = { strawberry: "草莓", grape: "葡萄", orange: "橘子" };
+    const screen = document.querySelector("#screen");
+    const topContainer = document.querySelector(".top");
+    const card = document.querySelector("#card");
+    const clock = document.querySelector("#clock");
+    const start = document.querySelector("#start");
+
+    function fruitButton(model, flavor) {
+      const item = document.createElement("div");
+      item.className = "fruit";
+      item.dataset.model = model;
+      item.dataset.flavor = flavor;
+      item.innerHTML = `<svg viewBox="0 0 80 96"><use href="#fruit-${flavor}"/></svg><span>${NAMES[flavor]}</span>`;
+      return item;
+    }
+    for (const model of ["laya", "jev"]) {
+      const counter = document.querySelector(`.counter[data-model="${model}"]`);
+      for (const flavor of ["strawberry", "grape", "orange"]) counter.append(fruitButton(model, flavor));
+    }
+
+    const sides = {};
+    for (const model of ["laya", "jev"]) {
+      sides[model] = {
+        score: document.querySelector(`#${model}-score`),
+        prompt: document.querySelector(`#${model}-prompt`),
+        keeper: document.querySelector(`.keeper[data-model="${model}"]`),
+        badge: document.querySelector(`#${model}-badge`),
+        fruits: [...document.querySelectorAll(`.fruit[data-model="${model}"]`)],
+        result: document.querySelector(`#${model}-result`),
+        picked: 0,
+        hit: 0,
+        totalMs: 0,
+      };
+    }
+
+    function fit() {
+      const scale = Math.min(innerWidth / 1600, innerHeight / 960);
+      screen.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+    addEventListener("resize", fit);
+    fit();
+
+    function formatClock(ms) {
+      const total = Math.ceil(ms / 1000);
+      const minutes = Math.floor(total / 60);
+      const seconds = total % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function resetSide(model) {
+      const side = sides[model];
+      side.picked = 0;
+      side.hit = 0;
+      side.totalMs = 0;
+      side.score.textContent = "挑了 0 · 对了 0";
+      side.prompt.textContent = "";
+      side.result.hidden = true;
+      side.result.innerHTML = "";
+      if (side.badge) {
+        side.badge.hidden = true;
+        side.badge.innerHTML = "";
+        side.badge.className = `pick-badge ${model}-badge`;
+      }
+      side.keeper.classList.remove("press", "thinking", "happy", "wrong");
+      for (const fruit of side.fruits) fruit.classList.remove("picked", "bad");
+    }
+
+    function showPick(model, choice, correct) {
+      const side = sides[model];
+      const known = Object.hasOwn(NAMES, choice);
+      const flavor = known ? choice : "orange";
+      for (const fruit of side.fruits) {
+        const mine = fruit.dataset.flavor === flavor;
+        fruit.classList.toggle("picked", mine);
+        fruit.classList.toggle("bad", mine && !correct);
+      }
+      side.score.textContent = `挑了 ${side.picked} · 对了 ${side.hit}`;
+      if (side.badge) {
+        side.badge.hidden = false;
+        side.badge.className = `pick-badge ${model}-badge`;
+        void side.badge.offsetWidth;
+        side.badge.className = `pick-badge ${model}-badge ${correct ? "ok" : "bad"}`;
+        side.badge.innerHTML = `
+          <svg class="badge-svg"><use href="#${correct ? "icon-check" : "icon-cross"}"/></svg>
+          <span class="badge-text">${correct ? "对了" : "错了"}</span>
+        `;
+      }
+      side.result.hidden = false;
+      side.result.innerHTML = `
+        <svg class="fruit-img" viewBox="0 0 80 96"><use href="#fruit-${flavor}"/></svg>
+        <span class="mark${correct ? "" : " bad"}">
+          <svg class="res-icon"><use href="#${correct ? "icon-check" : "icon-cross"}"/></svg>
+          ${known ? NAMES[flavor] : choice} · ${correct ? "挑对了" : "选错了"}
+        </span>
+      `;
+    }
+
+    function verdict(laya, jev) {
+      const layaRateNum = laya.picked ? (laya.hit / laya.picked) : 0;
+      const jevRateNum = jev.picked ? (jev.hit / jev.picked) : 0;
+      const layaRate = laya.picked ? (layaRateNum * 100).toFixed(1) + "%" : "0.0%";
+      const jevRate = jev.picked ? (jevRateNum * 100).toFixed(1) + "%" : "0.0%";
+
+      const layaAvg = laya.picked ? Math.round(laya.totalMs / laya.picked) : 0;
+      const jevAvg = jev.picked ? Math.round(jev.totalMs / jev.picked) : 0;
+
+      const more = laya.picked === jev.picked ? "挑的一样多" : `${laya.picked > jev.picked ? "Laya" : "Jev"} 挑得更多`;
+      const accurate = Math.abs(layaRateNum - jevRateNum) < 0.001
+        ? "准头一样"
+        : `${layaRateNum > jevRateNum ? "Laya" : "Jev"} 挑得更准`;
+
+      return `
+        <div class="summary-table">
+          <div class="summary-head">
+            <span class="col-model">模型</span>
+            <span class="col-num">挑了</span>
+            <span class="col-num">对了</span>
+            <span class="col-rate">准确率</span>
+            <span class="col-speed">平均每次耗时</span>
+          </div>
+          <div class="summary-row laya-row">
+            <span class="col-model"><span class="model-dot dot-laya"></span>Laya</span>
+            <span class="col-num"><b>${laya.picked}</b><small>次</small></span>
+            <span class="col-num"><b>${laya.hit}</b><small>次</small></span>
+            <span class="col-rate ${layaRateNum >= 1 ? "highlight" : ""}"><b>${layaRate}</b></span>
+            <span class="col-speed"><b>${layaAvg}</b><small>ms</small></span>
+          </div>
+          <div class="summary-row jev-row">
+            <span class="col-model"><span class="model-dot dot-jev"></span>Jev</span>
+            <span class="col-num"><b>${jev.picked}</b><small>次</small></span>
+            <span class="col-num"><b>${jev.hit}</b><small>次</small></span>
+            <span class="col-rate ${jevRateNum >= 1 ? "highlight" : ""}"><b>${jevRate}</b></span>
+            <span class="col-speed"><b>${jevAvg}</b><small>ms</small></span>
+          </div>
+        </div>
+        <div class="summary-verdict">
+          <span class="tag">${more}</span>
+          <span class="tag">${accurate}</span>
+        </div>
+      `;
+    }
+
+    let busy = false;
+    let running = false;
+    start.addEventListener("click", async () => {
+      if (busy) return;
+      busy = true;
+      start.disabled = true;
+      start.hidden = true;
+      topContainer.classList.remove("summary-mode");
+      card.classList.remove("summary");
+      card.textContent = "一分钟。挑对算准确，挑得多算效率。";
+      try {
+        const listed = await fetch("/api/rounds").then((response) => response.json());
+        const rounds = listed.rounds;
+        resetSide("laya");
+        resetSide("jev");
+        const endsAt = performance.now() + MINUTE;
+        running = true;
+        const ticker = setInterval(() => {
+          const left = endsAt - performance.now();
+          clock.textContent = formatClock(Math.max(0, left));
+          if (left <= 0) {
+            running = false;
+            clearInterval(ticker);
+          }
+        }, 100);
+
+        async function loop(model) {
+          const side = sides[model];
+          let index = 0;
+          while (performance.now() < endsAt) {
+            const round = rounds[index % rounds.length];
+            index += 1;
+            side.prompt.textContent = round.text;
+            side.keeper.classList.remove("happy", "wrong");
+            side.keeper.classList.add("press", "thinking");
+            const t0 = performance.now();
+            try {
+              const response = await fetch("/api/decide", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ round: (index - 1) % rounds.length, model }),
+              });
+              const data = await response.json();
+              const reqMs = Math.round(performance.now() - t0);
+              side.keeper.classList.remove("press", "thinking");
+              if (!data.ok) {
+                side.result.hidden = false;
+                side.result.innerHTML = `<span class="mark bad">没有回来</span>`;
+                continue;
+              }
+              const correct = data.choice === data.gold;
+              side.keeper.classList.add(correct ? "happy" : "wrong");
+              side.picked += 1;
+              if (correct) side.hit += 1;
+              const ms = (typeof data.ms === "number" && data.ms > 0) ? data.ms : reqMs;
+              side.totalMs += ms;
+              showPick(model, data.choice, correct);
+            } catch (error) {
+              side.keeper.classList.remove("press", "thinking");
+              side.keeper.classList.add("wrong");
+              side.result.hidden = false;
+              side.result.innerHTML = `<span class="mark bad">没有回来</span>`;
+            }
+          }
+        }
+
+        await Promise.all([loop("laya"), loop("jev")]);
+        running = false;
+        clock.textContent = "00:00";
+        topContainer.classList.add("summary-mode");
+        card.classList.add("summary");
+        card.innerHTML = verdict(sides.laya, sides.jev);
+        start.hidden = false;
+        start.textContent = "再来一分钟";
+      } catch (error) {
+        card.textContent = "这一分钟中断了";
+        start.hidden = false;
+      } finally {
+        start.disabled = false;
+        busy = false;
+      }
+    });
+  </script>
+</body>
+
+</html>

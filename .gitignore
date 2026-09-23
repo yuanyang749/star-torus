@@ -25,3 +25,10 @@ out
 .vite
 **/.vite
 ref-image
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+**/.venv/

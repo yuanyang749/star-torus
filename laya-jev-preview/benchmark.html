@@ -1,0 +1,2485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <title>软乎乎大模型评测实验室 · 100题同题基准测评 (Laya vs Jev)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f6f1e8;
+      color: #2a2622;
+      font-family: "Avenir Next", "PingFang SC", "Helvetica Neue", -apple-system, sans-serif;
+    }
+
+    .fit {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 顶部导航 */
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 253, 248, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1.5px solid rgba(140, 120, 100, 0.14);
+      z-index: 1000;
+    }
+
+    .nav-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 850;
+      color: #2a2622;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-tag {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #2a2622;
+      color: #fffdf8;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 750;
+      text-decoration: none;
+      color: #5c564e;
+      background: #efe8dc;
+      border: 1px solid rgba(140, 120, 100, 0.18);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      background: #e5dcce;
+      color: #2a2622;
+    }
+
+    .nav-btn.active {
+      background: #2a2622;
+      color: #fffdf8;
+      border-color: #2a2622;
+    }
+
+    .nav-btn .btn-svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* 顶部控制与双模型实时战报卡片 */
+    .dashboard-top {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1080px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .control-card {
+      width: 100%;
+      padding: 10px 24px;
+      border-radius: 18px;
+      background: #fffdf8;
+      box-shadow: 0 8px 24px rgba(80, 60, 40, 0.08);
+      border: 1.5px solid rgba(140, 120, 100, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .ctrl-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .progress-text {
+      font-size: 16px;
+      font-weight: 800;
+      color: #2a2622;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      min-width: 150px;
+    }
+
+    .progress-text b {
+      font-size: 24px;
+      font-variant-numeric: tabular-nums;
+      color: #1c1917;
+    }
+
+    .progress-bar-wrap {
+      width: 320px;
+      height: 10px;
+      background: #efe7db;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff6f91, #3ec68f);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .ctrl-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #5c564e;
+    }
+
+    .select-wrap select {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(140, 120, 100, 0.25);
+      background: #fbf7ee;
+      font-size: 14px;
+      font-weight: 750;
+      color: #2a2622;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-action {
+      border: 0;
+      background: #2a2622;
+      color: #fffdf8;
+      border-radius: 999px;
+      padding: 8px 20px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 750;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: #423b35;
+      transform: translateY(-1px);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-action.stop {
+      background: #cf222e;
+    }
+
+    .score-board {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 180px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .model-card {
+      padding: 12px 22px;
+      border-radius: 18px;
+      background: #fffdf8;
+      box-shadow: 0 8px 24px rgba(80, 60, 40, 0.08);
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+    }
+
+    .model-card.laya {
+      border-color: rgba(255, 111, 145, 0.35);
+      background: linear-gradient(135deg, #fffdf8, #fff6f8);
+    }
+
+    .model-card.jev {
+      border-color: rgba(62, 198, 143, 0.4);
+      background: linear-gradient(135deg, #fffdf8, #f4fcf8);
+    }
+
+    .model-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .model-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .model-badge-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .dot-laya {
+      background: #ff6f91;
+      box-shadow: 0 0 0 2.5px rgba(255, 111, 145, 0.3);
+    }
+
+    .dot-jev {
+      background: #3ec68f;
+      box-shadow: 0 0 0 2.5px rgba(62, 198, 143, 0.3);
+    }
+
+    .model-desc {
+      font-size: 13px;
+      font-weight: 600;
+      color: #7a736a;
+    }
+
+    .model-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #8c8275;
+    }
+
+    .stat-val {
+      font-size: 26px;
+      font-weight: 900;
+      color: #2a2622;
+      line-height: 1.1;
+    }
+
+    .stat-val small {
+      font-size: 14px;
+      font-weight: 700;
+      color: #7a736a;
+      margin-left: 2px;
+    }
+
+    .stat-val.rate {
+      color: #1a7f37;
+    }
+
+    .vs-capsule {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(255, 253, 248, 0.95);
+      border: 1.5px solid rgba(140, 120, 100, 0.16);
+      box-shadow: 0 6px 18px rgba(80, 60, 40, 0.06);
+      text-align: center;
+    }
+
+    .vs-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #8c8275;
+      letter-spacing: 0.04em;
+    }
+
+    .vs-delta {
+      font-size: 16px;
+      font-weight: 900;
+      color: #2a2622;
+      white-space: nowrap;
+    }
+
+    .vs-speed {
+      font-size: 12px;
+      font-weight: 750;
+      color: #8a5cf6;
+    }
+
+    /* 画布与打擂擂台 */
+    .screen {
+      position: absolute;
+      left: 50%;
+      top: 54%;
+      width: 1600px;
+      height: 960px;
+      transform-origin: center center;
+      pointer-events: auto;
+    }
+
+    /* 当前题目聚光灯卡片 */
+    .question-panel {
+      position: absolute;
+      top: 170px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1040px;
+      padding: 18px 32px;
+      border-radius: 22px;
+      background: #fffdf8;
+      box-shadow: 0 12px 32px rgba(80, 60, 40, 0.09);
+      border: 1.5px solid rgba(140, 120, 100, 0.16);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      z-index: 20;
+    }
+
+    .q-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .q-index {
+      font-size: 14px;
+      font-weight: 850;
+      color: #7a736a;
+      letter-spacing: 0.05em;
+    }
+
+    .q-category-tag {
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      background: #efe7db;
+      color: #4a443c;
+    }
+
+    .tag-feature {
+      background: rgba(2, 132, 199, 0.12);
+      color: #0284c7;
+    }
+
+    .tag-negation {
+      background: rgba(207, 34, 46, 0.12);
+      color: #cf222e;
+    }
+
+    .tag-distraction {
+      background: rgba(224, 122, 31, 0.14);
+      color: #d97706;
+    }
+
+    .tag-conversational {
+      background: rgba(138, 92, 246, 0.14);
+      color: #7c3aed;
+    }
+
+    .q-zh {
+      font-size: 23px;
+      font-weight: 850;
+      color: #1c1917;
+      line-height: 1.35;
+      letter-spacing: 0.01em;
+    }
+
+    .q-en {
+      font-size: 15px;
+      font-weight: 600;
+      color: #7a736a;
+      font-style: italic;
+      line-height: 1.35;
+    }
+
+    /* 角色与状态 */
+    .who {
+      position: absolute;
+      top: 310px;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .who span {
+      font-weight: 600;
+      color: #7a736a;
+      font-size: 16px;
+      margin-left: 6px;
+    }
+
+    .laya-who {
+      left: 120px;
+    }
+
+    .jev-who {
+      left: 960px;
+    }
+
+    .keeper {
+      position: absolute;
+      top: 340px;
+      width: 200px;
+      height: auto;
+      z-index: 10;
+      transform-origin: 50% 80%;
+      animation: bob 2.6s ease-in-out infinite;
+    }
+
+    .laya-keeper {
+      left: 270px;
+    }
+
+    .jev-keeper {
+      left: 1110px;
+    }
+
+    .keeper.thinking {
+      animation: squish 0.42s ease-in-out infinite;
+    }
+
+    .keeper.happy {
+      animation: pop 0.45s ease;
+    }
+
+    .keeper.wrong {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes bob {
+      50% {
+        translate: 0 -8px;
+      }
+    }
+
+    @keyframes squish {
+      50% {
+        transform: scaleX(1.06) scaleY(0.94);
+      }
+    }
+
+    @keyframes pop {
+      40% {
+        transform: scale(1.08);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      25% {
+        transform: rotate(-4deg);
+      }
+
+      75% {
+        transform: rotate(4deg);
+      }
+    }
+
+    /* 实时对错徽标 */
+    .pick-badge {
+      position: absolute;
+      top: 375px;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px 6px 10px;
+      border-radius: 999px;
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 6px 18px rgba(40, 30, 20, 0.1);
+      pointer-events: none;
+      transform-origin: left center;
+    }
+
+    .laya-badge {
+      left: 485px;
+    }
+
+    .jev-badge {
+      left: 1325px;
+    }
+
+    .pick-badge.waiting {
+      background: #fbf7ee;
+      color: #7a736a;
+      border: 2px solid #b8aba0;
+    }
+
+    .pick-badge.ok {
+      background: #eaf8ee;
+      color: #1a7f37;
+      border: 2px solid #2da44e;
+      animation: badge-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .pick-badge.bad {
+      background: #ffebe9;
+      color: #cf222e;
+      border: 2px solid #cf222e;
+      animation: badge-shake 0.35s ease;
+    }
+
+    .pick-badge .badge-svg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .pick-badge .badge-text {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .pick-badge small {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.8;
+      margin-left: 2px;
+    }
+
+    @keyframes badge-pop {
+      0% {
+        transform: scale(0.4) rotate(-10deg);
+        opacity: 0;
+      }
+
+      60% {
+        transform: scale(1.15) rotate(4deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes badge-shake {
+      0% {
+        transform: scale(0.6);
+        opacity: 0;
+      }
+
+      25% {
+        transform: translateX(-6px) rotate(-6deg);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translateX(6px) rotate(6deg);
+      }
+
+      75% {
+        transform: translateX(-3px) rotate(-3deg);
+      }
+
+      100% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    /* 水果托盘与柜台 */
+    .counter {
+      position: absolute;
+      top: 550px;
+      width: 640px;
+      height: 170px;
+      border-radius: 28px 28px 36px 36px;
+      background: linear-gradient(#fff8ee, #f3e4d2);
+      box-shadow: 0 16px 0 #e7d3bc;
+      z-index: 5;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-evenly;
+      padding: 0 28px 18px;
+    }
+
+    .laya-counter {
+      left: 60px;
+    }
+
+    .jev-counter {
+      left: 900px;
+    }
+
+    .fruit {
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #3a342e;
+      font-size: 16px;
+      font-weight: 750;
+      transition: all 0.25s ease;
+    }
+
+    .fruit svg {
+      width: 78px;
+      height: 86px;
+      transition: all 0.25s ease;
+    }
+
+    .fruit.picked svg {
+      transform: translateY(-10px) scale(1.12);
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+    }
+
+    .fruit.bad {
+      color: #cf222e;
+    }
+
+    .result {
+      position: absolute;
+      top: 750px;
+      width: 320px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .laya-result {
+      left: 220px;
+    }
+
+    .jev-result {
+      left: 1060px;
+    }
+
+    .result svg.fruit-img {
+      width: 72px;
+      height: 80px;
+    }
+
+    .result .mark {
+      color: #1a7f37;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result .mark.bad {
+      color: #cf222e;
+    }
+
+    .result .res-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    /* 报告结算弹窗 (全景分析) */
+    .report-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(42, 38, 34, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .report-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .report-modal {
+      width: 80%;
+      max-height: 88vh;
+      background: #fffdf8;
+      border-radius: 24px;
+      box-shadow: 0 24px 64px rgba(40, 30, 20, 0.22);
+      border: 1.5px solid rgba(140, 120, 100, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modal-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modal-up {
+      0% {
+        transform: translateY(30px) scale(0.96);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .report-header {
+      padding: 20px 32px 16px;
+      border-bottom: 1.5px solid rgba(140, 120, 100, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .report-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .report-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #1c1917;
+      letter-spacing: 0.02em;
+    }
+
+    .report-subtitle {
+      font-size: 14px;
+      font-weight: 600;
+      color: #7a736a;
+    }
+
+    .report-close-btn {
+      border: 0;
+      background: #f0eae1;
+      color: #2a2622;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .report-close-btn:hover {
+      background: #e2d8cb;
+    }
+
+    .report-body {
+      padding: 24px 32px 32px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 红色警示框：说明本地与云端延迟不具可比性 */
+    .speed-warning-box {
+      padding: 14px 20px;
+      border-radius: 14px;
+      background: #fff2f0;
+      border: 1.5px solid #ff7875;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .warning-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 850;
+      color: #cf1322;
+      letter-spacing: 0.02em;
+    }
+
+    .warning-svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      color: #cf1322;
+    }
+
+    .warning-text {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #a8071a;
+      font-weight: 650;
+    }
+
+    .warning-text b {
+      color: #820014;
+      font-weight: 850;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .table-footnote {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 750;
+      color: #cf1322;
+      line-height: 1.45;
+    }
+
+    /* 4 类分类对比表 */
+    .category-section-title {
+      font-size: 17px;
+      font-weight: 850;
+      color: #2a2622;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .cat-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(140, 120, 100, 0.15);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cat-table th,
+    .cat-table td {
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .cat-table th {
+      background: #f5ede1;
+      font-weight: 800;
+      color: #6a6258;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+
+    .cat-table td {
+      background: #fffdf8;
+      border-top: 1px solid rgba(140, 120, 100, 0.1);
+      font-weight: 700;
+    }
+
+    .cat-table tr:hover td {
+      background: #fbf7ee;
+    }
+
+    .cat-table td.cat-name-col {
+      text-align: left;
+      font-weight: 850;
+      color: #2a2622;
+    }
+
+    .cat-table .rate-highlight {
+      color: #1a7f37;
+      font-weight: 900;
+    }
+
+    .cat-table .delta-tag {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .delta-tag.win-jev {
+      background: rgba(62, 198, 143, 0.2);
+      color: #0d8457;
+    }
+
+    .delta-tag.win-laya {
+      background: rgba(255, 111, 145, 0.2);
+      color: #c92a54;
+    }
+
+    .delta-tag.tie {
+      background: #eee6db;
+      color: #7a736a;
+    }
+
+    /* 分歧题目筛选栏 */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .filter-tab {
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 750;
+      color: #5c564e;
+      background: #f0eae1;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-tab:hover {
+      background: #e5dcce;
+    }
+
+    .filter-tab.active {
+      background: #2a2622;
+      color: #fffdf8;
+    }
+
+    .case-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .case-item {
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #fcf9f2;
+      border: 1.5px solid rgba(140, 120, 100, 0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .case-item.diff-case {
+      border-color: rgba(224, 122, 31, 0.35);
+      background: #fffcf7;
+    }
+
+    .case-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .case-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .case-id {
+      font-size: 13px;
+      font-weight: 850;
+      color: #8c8275;
+    }
+
+    .case-prompt {
+      font-size: 15px;
+      font-weight: 750;
+      color: #2a2622;
+      line-height: 1.35;
+    }
+
+    .case-choices {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .choice-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .choice-badge.ok {
+      background: #eaf8ee;
+      color: #1a7f37;
+    }
+
+    .choice-badge.bad {
+      background: #ffebe9;
+      color: #cf222e;
+    }
+
+    .gold-indicator {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7a736a;
+    }
+
+    /* 导出长图按钮与海报样式 */
+    .report-export-btn {
+      border: 0;
+      background: linear-gradient(135deg, #2a2622, #443c35);
+      color: #fffdf8;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 4px 14px rgba(40, 30, 20, 0.16);
+      transition: all 0.2s ease;
+    }
+
+    .report-export-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(40, 30, 20, 0.22);
+      background: #1c1917;
+    }
+
+    .report-export-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+    }
+
+    /* 离屏超清导出长图容器 (专为社交媒体长图发文优化，1080px 宽度，Retina 2x 导出) */
+    .export-poster-wrap {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 1080px;
+      background: #f7f4ee;
+      padding: 42px 46px 46px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: #2a2622;
+      box-sizing: border-box;
+      line-height: 1.45;
+    }
+
+    .poster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2.5px solid rgba(140, 120, 100, 0.25);
+      padding-bottom: 18px;
+    }
+
+    .poster-title {
+      font-size: 29px;
+      font-weight: 900;
+      color: #1a1715;
+      letter-spacing: 0.02em;
+    }
+
+    .poster-sub {
+      font-size: 14.5px;
+      font-weight: 650;
+      color: #70685e;
+      margin-top: 5px;
+    }
+
+    .poster-tag {
+      padding: 6px 16px;
+      background: #23201d;
+      color: #faf6f0;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+    }
+
+    /* 顶部精炼战报摘要横幅 (取代原占用巨大空间的模型卡片) */
+    .poster-summary-strip {
+      display: grid;
+      grid-template-columns: 1.15fr 1.15fr 1.1fr;
+      gap: 16px;
+      background: #ffffff;
+      border: 1.5px solid rgba(140, 120, 100, 0.2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 12px rgba(40, 30, 20, 0.04);
+    }
+
+    .poster-summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .poster-summary-label {
+      font-size: 12px;
+      font-weight: 750;
+      color: #8c8275;
+      letter-spacing: 0.03em;
+    }
+
+    .poster-summary-value {
+      font-size: 21px;
+      font-weight: 900;
+      color: #1f1d1a;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .poster-summary-sub {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #8c8275;
+    }
+
+    .poster-section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .poster-section-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: #1f1d1a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .poster-section-sub {
+      font-size: 13px;
+      font-weight: 650;
+      color: #8c8275;
+    }
+
+    /* 全量实测对决逐题明细大表格 */
+    .full-ledger-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #ffffff;
+      border: 1.5px solid rgba(140, 120, 100, 0.22);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    .full-ledger-table th {
+      background: #ede6da;
+      color: #3b352e;
+      font-weight: 850;
+      padding: 11px 10px;
+      text-align: center;
+      border-bottom: 2px solid rgba(140, 120, 100, 0.25);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .full-ledger-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(140, 120, 100, 0.12);
+      vertical-align: middle;
+      color: #2a2622;
+    }
+
+    .full-ledger-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .full-ledger-table tr:nth-child(even) {
+      background: #faf8f4;
+    }
+
+    /* 分歧行特殊背景与边框高亮 */
+    .full-ledger-table tr.row-diff {
+      background: #fff8e6 !important;
+    }
+
+    .full-ledger-table tr.row-both-bad {
+      background: #fff1f0 !important;
+    }
+
+    .col-idx {
+      font-weight: 900;
+      color: #8c8275;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-align: center;
+      width: 44px;
+      font-size: 12px;
+    }
+
+    .col-cat {
+      width: 108px;
+      text-align: center;
+    }
+
+    .col-prompt {
+      text-align: left;
+      line-height: 1.38;
+      max-width: 410px;
+    }
+
+    .prompt-zh {
+      font-weight: 750;
+      color: #1a1715;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .prompt-en {
+      font-size: 11.5px;
+      color: #8c8275;
+      font-style: italic;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .col-gold {
+      width: 72px;
+      text-align: center;
+      font-weight: 850;
+      color: #1a1715;
+    }
+
+    .col-model-res {
+      width: 145px;
+      text-align: center;
+    }
+
+    .col-verdict {
+      width: 95px;
+      text-align: center;
+    }
+
+    .ledger-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+      min-width: 100px;
+      box-sizing: border-box;
+    }
+
+    .ledger-badge.ok {
+      background: #eaf8ee;
+      color: #137333;
+      border: 1px solid rgba(19, 115, 51, 0.2);
+    }
+
+    .ledger-badge.bad {
+      background: #ffebe9;
+      color: #cf222e;
+      border: 1px solid rgba(207, 34, 46, 0.2);
+    }
+
+    .ledger-badge small {
+      font-weight: 600;
+      opacity: 0.85;
+      font-size: 10.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .verdict-chip {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .verdict-chip.both-ok {
+      background: #eef2f5;
+      color: #57606a;
+    }
+
+    .verdict-chip.win-jev {
+      background: #e6f7eb;
+      color: #0b6b2c;
+      border: 1px solid rgba(11, 107, 44, 0.35);
+    }
+
+    .verdict-chip.win-laya {
+      background: #fff0f2;
+      color: #cf1322;
+      border: 1px solid rgba(207, 19, 34, 0.35);
+    }
+
+    .verdict-chip.both-bad {
+      background: #fde8e8;
+      color: #991b1b;
+      border: 1px solid rgba(153, 27, 27, 0.35);
+    }
+
+    .cat-mini-chip {
+      display: inline-block;
+      padding: 2.5px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .cat-mini-feature { background: #e6f4ea; color: #137333; }
+    .cat-mini-negation { background: #feefe3; color: #b06000; }
+    .cat-mini-distraction { background: #e8f0fe; color: #1a73e8; }
+    .cat-mini-conversational { background: #f3e8fd; color: #7b1fa2; }
+
+    .poster-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #8c8275;
+      padding-top: 16px;
+      border-top: 1.5px dashed rgba(140, 120, 100, 0.3);
+    }
+  </style>
+  <script src="html2canvas.min.js"></script>
+</head>
+
+<body>
+  <!-- 矢量图标符号定义 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="icon-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <polyline points="12 7 12 12 15 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    </symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24">
+      <polygon points="13 2 4 13 11 13 10 22 20 11 13 11 14 2" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="icon-chip" viewBox="0 0 24 24">
+      <rect x="5" y="5" width="14" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2" />
+      <rect x="9" y="9" width="6" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="M9 1.5v3M15 1.5v3M9 19.5v3M15 19.5v3M19.5 9h3M19.5 15h3M1.5 9h3M1.5 15h3" fill="none"
+        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="icon-cross" viewBox="0 0 24 24">
+      <line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+      <line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="icon-report" viewBox="0 0 24 24">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor"
+        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      <polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <line x1="16" y1="13" x2="8" y2="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      <line x1="16" y1="17" x2="8" y2="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="13" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/>
+    </symbol>
+    <symbol id="fruit-strawberry" viewBox="0 0 80 96">
+      <path d="M40 90c-16 0-24-16-22-34 2-16 10-28 22-32 12 4 20 16 22 32 2 18-6 34-22 34z" fill="#ef3d4c"
+        stroke="#1c1b19" stroke-width="4" stroke-linejoin="round" />
+      <path d="M40 28c-2 8-8 12-16 12 6 2 10 8 10 14 2-8 8-12 16-12-6-4-10-10-10-14z" fill="#3fa34a" stroke="#1c1b19"
+        stroke-width="3" stroke-linejoin="round" />
+      <path d="M40 26c6 2 12 0 16 4-4 4-6 8-6 12-4-2-8-2-12 0 0-6-2-10 2-16z" fill="#57b35a" stroke="#1c1b19"
+        stroke-width="3" stroke-linejoin="round" />
+      <g fill="#ffe08a">
+        <circle cx="30" cy="52" r="2.3" />
+        <circle cx="42" cy="48" r="2.3" />
+        <circle cx="52" cy="56" r="2.3" />
+        <circle cx="34" cy="66" r="2.3" />
+        <circle cx="48" cy="68" r="2.3" />
+        <circle cx="40" cy="78" r="2.3" />
+      </g>
+    </symbol>
+    <symbol id="fruit-grape" viewBox="0 0 80 96">
+      <path d="M40 16c8 8 8 14 0 18" fill="none" stroke="#2f7a34" stroke-width="4" stroke-linecap="round" />
+      <ellipse cx="52" cy="18" rx="10" ry="6" fill="#4caf50" stroke="#1c1b19" stroke-width="3"
+        transform="rotate(20 52 18)" />
+      <g fill="#7a4ec4" stroke="#1c1b19" stroke-width="3">
+        <circle cx="40" cy="40" r="11" />
+        <circle cx="26" cy="50" r="11" />
+        <circle cx="54" cy="50" r="11" />
+        <circle cx="32" cy="66" r="11" />
+        <circle cx="48" cy="66" r="11" />
+        <circle cx="40" cy="80" r="11" />
+      </g>
+      <g fill="#c9b0f0">
+        <circle cx="36" cy="36" r="2.4" />
+        <circle cx="22" cy="46" r="2.2" />
+        <circle cx="50" cy="46" r="2.2" />
+      </g>
+    </symbol>
+    <symbol id="fruit-orange" viewBox="0 0 80 96">
+      <path d="M40 20c2 6 2 8 0 12" fill="none" stroke="#2f7a34" stroke-width="4" stroke-linecap="round" />
+      <ellipse cx="52" cy="22" rx="12" ry="7" fill="#4caf50" stroke="#1c1b19" stroke-width="3"
+        transform="rotate(24 52 22)" />
+      <circle cx="40" cy="58" r="28" fill="#f5a524" stroke="#1c1b19" stroke-width="4" />
+      <path d="M40 34c6 10 6 30 0 46M40 34c-6 10-6 30 0 46M22 50c10 4 26 4 36 0M24 68c8 4 24 4 32 0" fill="none"
+        stroke="#e08a12" stroke-width="2" stroke-linecap="round" />
+      <ellipse cx="30" cy="46" rx="6" ry="3.5" fill="#ffe3a8" opacity="0.9" />
+    </symbol>
+  </svg>
+
+  <div class="fit">
+    <!-- 顶部导航 -->
+    <header class="nav-bar">
+      <div class="nav-title">
+        <span>软乎乎大模型评测实验室</span>
+        <span class="nav-tag">BENCHMARK</span>
+      </div>
+      <div class="nav-links">
+        <a class="nav-btn" href="/">
+          <svg class="btn-svg">
+            <use href="#icon-clock" />
+          </svg>
+          1分钟极速对决
+        </a>
+        <a class="nav-btn active" href="/benchmark">
+          <svg class="btn-svg">
+            <use href="#icon-target" />
+          </svg>
+          100题同题基准测评
+        </a>
+      </div>
+    </header>
+
+    <!-- 顶部控制与双模型实时战报 -->
+    <div class="dashboard-top">
+      <div class="control-card">
+        <div class="ctrl-left">
+          <div class="progress-text">
+            进度 <b id="progress-cur">0</b> / <span id="progress-total">100</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+          </div>
+        </div>
+        <div class="ctrl-right">
+          <div class="select-wrap">
+            <span>样本量:</span>
+            <select id="sample-select">
+              <option value="100">全部 100 题 (4类完整)</option>
+              <option value="40">精选 40 题 (每类10题)</option>
+              <option value="20">快速抽样 20 题</option>
+            </select>
+          </div>
+          <button class="btn-action" id="btn-start" type="button">
+            <svg class="btn-svg" style="width:14px;height:14px">
+              <use href="#icon-zap" />
+            </svg>
+            开始评测
+          </button>
+          <button class="btn-action stop" id="btn-stop" type="button" style="display:none">
+            暂停
+          </button>
+          <button class="nav-btn" id="btn-show-report" type="button" style="display:none">
+            <svg class="btn-svg">
+              <use href="#icon-report" />
+            </svg>
+            查看分析报告
+          </button>
+        </div>
+      </div>
+
+      <!-- 实时战报仪表卡 -->
+      <div class="score-board">
+        <!-- Laya 卡片 -->
+        <div class="model-card laya">
+          <div class="model-meta">
+            <div class="model-name">
+              <span class="model-badge-dot dot-laya"></span>
+              Laya
+            </div>
+            <div class="model-desc">本地端侧 · ModernBERT</div>
+          </div>
+          <div class="model-stats">
+            <div class="stat-item">
+              <span class="stat-label">准确率</span>
+              <span class="stat-val rate" id="laya-rate">0.0<small>%</small></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">答对 / 已测</span>
+              <span class="stat-val" id="laya-hit">0<small id="laya-total">/0</small></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">平均耗时</span>
+              <span class="stat-val" id="laya-avg">0<small>ms</small></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 居中差距指示 -->
+        <div class="vs-capsule">
+          <span class="vs-title">胜负差距指标</span>
+          <span class="vs-delta" id="vs-delta">等待开测</span>
+          <span class="vs-speed" id="vs-speed">速度对比计算中</span>
+        </div>
+
+        <!-- Jev 卡片 -->
+        <div class="model-card jev">
+          <div class="model-meta">
+            <div class="model-name">
+              <span class="model-badge-dot dot-jev"></span>
+              Jev
+            </div>
+            <div class="model-desc">云端 API · System One</div>
+          </div>
+          <div class="model-stats">
+            <div class="stat-item">
+              <span class="stat-label">准确率</span>
+              <span class="stat-val rate" id="jev-rate">0.0<small>%</small></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">答对 / 已测</span>
+              <span class="stat-val" id="jev-hit">0<small id="jev-total">/0</small></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">平均耗时</span>
+              <span class="stat-val" id="jev-avg">0<small>ms</small></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 舞台擂台 -->
+    <div class="screen" id="screen">
+      <!-- 题目聚光灯 -->
+      <div class="question-panel" id="q-panel">
+        <div class="q-header">
+          <span class="q-index" id="q-index">题号 #0</span>
+          <span class="q-category-tag tag-feature" id="q-category">属性特征描述</span>
+        </div>
+        <div class="q-zh" id="q-zh">点击上方“开始评测”，开始 100 题同题基准对决</div>
+        <div class="q-en" id="q-en">Click Start to evaluate Laya and Jev across 4 semantic categories.</div>
+      </div>
+
+      <!-- 左侧 Laya -->
+      <p class="who laya-who">Laya <span>本地端侧</span></p>
+      <img class="keeper laya-keeper" data-model="laya" src="slime-pink.png" alt="Laya">
+      <div class="pick-badge laya-badge" id="laya-badge" hidden></div>
+      <div class="counter laya-counter" data-model="laya"></div>
+      <div class="result laya-result" id="laya-result" hidden></div>
+
+      <!-- 右侧 Jev -->
+      <p class="who jev-who">Jev <span>云端 API</span></p>
+      <img class="keeper jev-keeper" data-model="jev" src="slime-mint.png" alt="Jev">
+      <div class="pick-badge jev-badge" id="jev-badge" hidden></div>
+      <div class="counter jev-counter" data-model="jev"></div>
+      <div class="result jev-result" id="jev-result" hidden></div>
+    </div>
+
+    <!-- 最终详细分析报告弹窗 -->
+    <div class="report-overlay" id="report-modal">
+      <div class="report-modal">
+        <div class="report-header">
+          <div class="report-title-wrap">
+            <div class="report-title">100 题同题基准测评报告</div>
+            <div class="report-subtitle" id="report-subtitle">全维度真实能力对比：端侧 Laya vs 云端 Jev</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button class="report-export-btn" id="btn-export-image" type="button">
+              <svg class="btn-svg" style="width:16px;height:16px"><use href="#icon-camera" /></svg>
+              <span>保存战报长图 (PNG)</span>
+            </button>
+            <button class="report-close-btn" id="btn-close-report" type="button">关闭报告</button>
+          </div>
+        </div>
+        <div class="report-body">
+          <!-- 红色警示框：说明本地与云端延迟不具可比性 -->
+          <div class="speed-warning-box">
+            <div class="warning-title">
+              <svg class="warning-svg">
+                <use href="#icon-cross" />
+              </svg>
+              【技术声明】响应耗时不可作为两款模型底层计算效率的对比依据！
+            </div>
+            <div class="warning-text">
+              本次评测中，<b>Laya</b> 部署于本地 Apple Silicon GPU（MLX 框架），耗时为纯本地模型推理时间（无任何网络开销）；而 <b>Jev</b> 是通过公网调用位于海外的 TypeSafe
+              官方 API，其整体耗时（约 700~1000ms）绝大部分由 <b>公网 TCP 建连、TLS 握手及跨国网络传输延迟 (RTT)</b> 导致，并非模型单步计算缓慢。<b>两者耗时差异主要源于“本地端侧 vs
+                远程云端”的网络架构物理差异，速度不具备直接可比性，请勿据此衡量两者的纯计算算力效率。</b>
+            </div>
+          </div>
+
+          <!-- 4 分类深度对比 -->
+          <div>
+            <div class="category-section-title">
+              <svg style="width:18px;height:18px;color:#2a2622">
+                <use href="#icon-target" />
+              </svg>
+              四大语义能力分项对比
+            </div>
+            <table class="cat-table">
+              <thead>
+                <tr>
+                  <th style="text-align:left">能力分类</th>
+                  <th>样本量</th>
+                  <th>Laya 准确率</th>
+                  <th>Jev 准确率</th>
+                  <th>准确率差距 (Δ)</th>
+                  <th>Laya 耗时 (本地)</th>
+                  <th>Jev 耗时 (含网络)</th>
+                  <th>时延比 (仅供参考)*</th>
+                </tr>
+              </thead>
+              <tbody id="cat-table-body">
+                <!-- JS 动态填充 -->
+              </tbody>
+            </table>
+            <div class="table-footnote">
+              * 提示：Jev 耗时含海外公网传输 RTT，非同等物理网络环境下测量，两者的响应速度没有可比性，不能作为模型真实算力效率的对比依据。
+            </div>
+          </div>
+
+          <!-- 分歧题目过滤器 -->
+          <div>
+            <div class="category-section-title">
+              <svg style="width:18px;height:18px;color:#e07a1f">
+                <use href="#icon-zap" />
+              </svg>
+              题目溯源与分歧案例透视 (Discrepancy Cases)
+            </div>
+            <div class="filter-bar">
+              <button class="filter-tab active" data-filter="all" type="button">全部题目 (<span
+                  id="count-all">0</span>)</button>
+              <button class="filter-tab" data-filter="diff" type="button">★ 双方分歧题 (<span
+                  id="count-diff">0</span>)</button>
+              <button class="filter-tab" data-filter="jev-win" type="button">Jev对 / Laya错 (<span
+                  id="count-jev-win">0</span>)</button>
+              <button class="filter-tab" data-filter="laya-win" type="button">Laya对 / Jev错 (<span
+                  id="count-laya-win">0</span>)</button>
+              <button class="filter-tab" data-filter="both-wrong" type="button">高难双错题 (<span
+                  id="count-both-wrong">0</span>)</button>
+            </div>
+            <div class="case-list" id="case-list-container" style="margin-top:12px;">
+              <!-- JS 动态填充 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const NAMES = { strawberry: "草莓", grape: "葡萄", orange: "橘子" };
+    const screenEl = document.querySelector("#screen");
+    const sampleSelect = document.querySelector("#sample-select");
+    const btnStart = document.querySelector("#btn-start");
+    const btnStop = document.querySelector("#btn-stop");
+    const btnShowReport = document.querySelector("#btn-show-report");
+    const reportModal = document.querySelector("#report-modal");
+    const btnCloseReport = document.querySelector("#btn-close-report");
+
+    // 进度与统计元素
+    const progressCur = document.querySelector("#progress-cur");
+    const progressTotal = document.querySelector("#progress-total");
+    const progressBar = document.querySelector("#progress-bar");
+    const layaRateEl = document.querySelector("#laya-rate");
+    const layaHitEl = document.querySelector("#laya-hit");
+    const layaAvgEl = document.querySelector("#laya-avg");
+    const jevRateEl = document.querySelector("#jev-rate");
+    const jevHitEl = document.querySelector("#jev-hit");
+    const jevAvgEl = document.querySelector("#jev-avg");
+    const vsDeltaEl = document.querySelector("#vs-delta");
+    const vsSpeedEl = document.querySelector("#vs-speed");
+
+    // 题目卡元素
+    const qIndexEl = document.querySelector("#q-index");
+    const qCategoryEl = document.querySelector("#q-category");
+    const qZhEl = document.querySelector("#q-zh");
+    const qEnEl = document.querySelector("#q-en");
+
+    // 创建水果托盘
+    function fruitButton(model, flavor) {
+      const item = document.createElement("div");
+      item.className = "fruit";
+      item.dataset.model = model;
+      item.dataset.flavor = flavor;
+      item.innerHTML = `<svg viewBox="0 0 80 96"><use href="#fruit-${flavor}"/></svg><span>${NAMES[flavor]}</span>`;
+      return item;
+    }
+    for (const model of ["laya", "jev"]) {
+      const counter = document.querySelector(`.counter[data-model="${model}"]`);
+      for (const flavor of ["strawberry", "grape", "orange"]) counter.append(fruitButton(model, flavor));
+    }
+
+    const sides = {};
+    for (const model of ["laya", "jev"]) {
+      sides[model] = {
+        keeper: document.querySelector(`.keeper[data-model="${model}"]`),
+        badge: document.querySelector(`#${model}-badge`),
+        fruits: [...document.querySelectorAll(`.fruit[data-model="${model}"]`)],
+        result: document.querySelector(`#${model}-result`),
+        picked: 0,
+        hit: 0,
+        totalMs: 0,
+      };
+    }
+
+    // 画面自适应缩放
+    function fit() {
+      const scale = Math.min(innerWidth / 1600, innerHeight / 960);
+      screenEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+    addEventListener("resize", fit);
+    fit();
+
+    // 评测全局数据
+    let allRounds = [];
+    let benchmarkLog = []; // 存放所有答题记录
+    let isRunning = false;
+    let shouldStop = false;
+
+    // 拉取 100 道题目元数据
+    async function loadBenchmarkRounds() {
+      try {
+        const res = await fetch("/api/benchmark/rounds");
+        const data = await res.json();
+        allRounds = data.rounds || [];
+      } catch (err) {
+        console.error("加载题目失败:", err);
+      }
+    }
+    loadBenchmarkRounds();
+
+    function resetUI() {
+      benchmarkLog = [];
+      for (const model of ["laya", "jev"]) {
+        const side = sides[model];
+        side.picked = 0;
+        side.hit = 0;
+        side.totalMs = 0;
+        side.result.hidden = true;
+        side.badge.hidden = true;
+        side.keeper.classList.remove("thinking", "happy", "wrong");
+        for (const fruit of side.fruits) fruit.classList.remove("picked", "bad");
+      }
+      updateStats();
+    }
+
+    function updateStats() {
+      const totalTested = sides.laya.picked;
+      const targetTotal = parseInt(sampleSelect.value, 10) || 100;
+      progressCur.textContent = totalTested;
+      progressTotal.textContent = targetTotal;
+      const pct = targetTotal ? Math.min(100, (totalTested / targetTotal) * 100) : 0;
+      progressBar.style.width = pct.toFixed(1) + "%";
+
+      const layaRate = totalTested ? ((sides.laya.hit / totalTested) * 100).toFixed(1) : "0.0";
+      const jevRate = totalTested ? ((sides.jev.hit / totalTested) * 100).toFixed(1) : "0.0";
+      layaRateEl.innerHTML = `${layaRate}<small>%</small>`;
+      jevRateEl.innerHTML = `${jevRate}<small>%</small>`;
+      layaHitEl.innerHTML = `${sides.laya.hit}<small>/${totalTested}</small>`;
+      jevHitEl.innerHTML = `${sides.jev.hit}<small>/${totalTested}</small>`;
+
+      const layaAvg = totalTested ? Math.round(sides.laya.totalMs / totalTested) : 0;
+      const jevAvg = totalTested ? Math.round(sides.jev.totalMs / totalTested) : 0;
+      layaAvgEl.innerHTML = `${layaAvg}<small>ms</small>`;
+      jevAvgEl.innerHTML = `${jevAvg}<small>ms</small>`;
+
+      if (totalTested > 0) {
+        const lRateNum = parseFloat(layaRate);
+        const jRateNum = parseFloat(jevRate);
+        const diff = (jRateNum - lRateNum).toFixed(1);
+        if (Math.abs(diff) < 0.05) {
+          vsDeltaEl.textContent = "准确率持平";
+          vsDeltaEl.style.color = "#7a736a";
+        } else if (diff > 0) {
+          vsDeltaEl.textContent = `Jev 领先 +${diff}%`;
+          vsDeltaEl.style.color = "#0d8457";
+        } else {
+          vsDeltaEl.textContent = `Laya 领先 +${Math.abs(diff)}%`;
+          vsDeltaEl.style.color = "#c92a54";
+        }
+
+        if (layaAvg > 0 && jevAvg > 0) {
+          vsSpeedEl.textContent = `Laya 本地免网络 · Jev 含公网延迟`;
+        }
+      } else {
+        vsDeltaEl.textContent = "等待开测";
+        vsSpeedEl.textContent = "端侧直出 vs 云端网络";
+      }
+    }
+
+    // 核心并发答题控制循环
+    async function runBenchmark() {
+      if (isRunning) return;
+      if (!allRounds.length) await loadBenchmarkRounds();
+
+      const sampleSize = parseInt(sampleSelect.value, 10) || 100;
+      const roundsToRun = allRounds.slice(0, sampleSize);
+
+      resetUI();
+      isRunning = true;
+      shouldStop = false;
+      btnStart.style.display = "none";
+      btnStop.style.display = "inline-flex";
+      btnShowReport.style.display = "none";
+      sampleSelect.disabled = true;
+
+      for (let i = 0; i < roundsToRun.length; i++) {
+        if (shouldStop) break;
+
+        const round = roundsToRun[i];
+        const roundIdx = i;
+
+        // 1. 更新当前题目聚光灯卡片
+        qIndexEl.textContent = `题号 #${round.id} (${i + 1}/${roundsToRun.length})`;
+        qCategoryEl.className = `q-category-tag tag-${round.category}`;
+        qCategoryEl.textContent = round.category_zh;
+        qZhEl.textContent = round.zh;
+        qEnEl.textContent = round.text;
+
+        // 2. 重置上一轮的角色动效和水果托盘
+        for (const model of ["laya", "jev"]) {
+          const side = sides[model];
+          side.result.hidden = true;
+          side.badge.hidden = true;
+          side.keeper.classList.remove("happy", "wrong");
+          side.keeper.classList.add("thinking");
+          for (const f of side.fruits) f.classList.remove("picked", "bad");
+        }
+
+        // 3. 并发发起两边请求：Laya 本地(~25ms) vs Jev 云端(~750ms)
+        const t0 = performance.now();
+        let layaRes = null;
+        let jevRes = null;
+
+        // Laya 极速返回后先亮起选定状态
+        const layaPromise = fetch("/api/benchmark/decide", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "laya", round: roundIdx }),
+        })
+          .then((r) => r.json())
+          .catch((err) => ({ ok: false, choice: "error", ms: Math.round(performance.now() - t0), error: err.message }))
+          .then((data) => {
+            const ms = Number.isFinite(data?.ms) ? data.ms : Math.round(performance.now() - t0);
+            const choice = data?.choice || "error";
+            layaRes = { ok: !!data?.ok, choice, ms, error: data?.error };
+
+            // Laya 毫秒级返回，史莱姆停止思考并亮起“已选定”等待徽标
+            sides.laya.keeper.classList.remove("thinking");
+            sides.laya.badge.hidden = false;
+            sides.laya.badge.className = "pick-badge laya-badge waiting";
+            const choiceLabel = NAMES[choice] || (choice === "error" ? "异常" : choice);
+            sides.laya.badge.innerHTML = `
+              <svg class="badge-svg"><use href="#icon-clock"/></svg>
+              <span class="badge-text">${choiceLabel}</span>
+              <small>(${ms}ms 选定)</small>
+            `;
+            // 高亮水果
+            for (const f of sides.laya.fruits) {
+              f.classList.toggle("picked", f.dataset.flavor === choice);
+            }
+            return layaRes;
+          });
+
+        const jevPromise = fetch("/api/benchmark/decide", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "jev", round: roundIdx }),
+        })
+          .then((r) => r.json())
+          .catch((err) => ({ ok: false, choice: "error", ms: Math.round(performance.now() - t0), error: err.message }))
+          .then((data) => {
+            const ms = Number.isFinite(data?.ms) ? data.ms : Math.round(performance.now() - t0);
+            const choice = data?.choice || "error";
+            jevRes = { ok: !!data?.ok, choice, ms, error: data?.error };
+            return jevRes;
+          });
+
+        // 关键原则：必须等 Jev 云端答完题，双方同时揭晓最终对错！
+        await Promise.all([layaPromise, jevPromise]);
+
+        // 4. 双方同时揭晓最终结果与对错
+        sides.jev.keeper.classList.remove("thinking");
+
+        const layaCorrect = !!layaRes.ok && layaRes.choice === round.gold;
+        const jevCorrect = !!jevRes.ok && jevRes.choice === round.gold;
+
+        sides.laya.picked += 1;
+        if (layaCorrect) sides.laya.hit += 1;
+        sides.laya.totalMs += Number.isFinite(layaRes.ms) ? layaRes.ms : 25;
+
+        sides.jev.picked += 1;
+        if (jevCorrect) sides.jev.hit += 1;
+        sides.jev.totalMs += Number.isFinite(jevRes.ms) ? jevRes.ms : 750;
+
+        // 展示 Laya 结果
+        const layaLabel = NAMES[layaRes.choice] || (layaRes.choice === "error" ? "异常" : layaRes.choice);
+        sides.laya.keeper.classList.add(layaCorrect ? "happy" : "wrong");
+        sides.laya.badge.className = `pick-badge laya-badge ${layaCorrect ? "ok" : "bad"}`;
+        sides.laya.badge.innerHTML = `
+          <svg class="badge-svg"><use href="#${layaCorrect ? "icon-check" : "icon-cross"}"/></svg>
+          <span class="badge-text">${layaCorrect ? "答对了" : "选错了"}</span>
+          <small>(${layaRes.ms}ms)</small>
+        `;
+        for (const f of sides.laya.fruits) {
+          f.classList.toggle("picked", f.dataset.flavor === layaRes.choice);
+          f.classList.toggle("bad", f.dataset.flavor === layaRes.choice && !layaCorrect);
+        }
+        sides.laya.result.hidden = false;
+        sides.laya.result.innerHTML = `
+          <svg class="fruit-img" viewBox="0 0 80 96"><use href="#fruit-${layaRes.choice}"/></svg>
+          <span class="mark${layaCorrect ? "" : " bad"}">
+            <svg class="res-icon"><use href="#${layaCorrect ? "icon-check" : "icon-cross"}"/></svg>
+            ${layaLabel} · ${layaCorrect ? "对了" : "错了"}
+          </span>
+        `;
+
+        // 展示 Jev 结果
+        const jevLabel = NAMES[jevRes.choice] || (jevRes.choice === "error" ? "网络异常" : jevRes.choice);
+        sides.jev.keeper.classList.add(jevCorrect ? "happy" : "wrong");
+        sides.jev.badge.hidden = false;
+        sides.jev.badge.className = `pick-badge jev-badge ${jevCorrect ? "ok" : "bad"}`;
+        sides.jev.badge.innerHTML = `
+          <svg class="badge-svg"><use href="#${jevCorrect ? "icon-check" : "icon-cross"}"/></svg>
+          <span class="badge-text">${jevCorrect ? "答对了" : "选错了"}</span>
+          <small>(${jevRes.ms}ms)</small>
+        `;
+        for (const f of sides.jev.fruits) {
+          f.classList.toggle("picked", f.dataset.flavor === jevRes.choice);
+          f.classList.toggle("bad", f.dataset.flavor === jevRes.choice && !jevCorrect);
+        }
+        sides.jev.result.hidden = false;
+        sides.jev.result.innerHTML = `
+          <svg class="fruit-img" viewBox="0 0 80 96"><use href="#fruit-${jevRes.choice}"/></svg>
+          <span class="mark${jevCorrect ? "" : " bad"}">
+            <svg class="res-icon"><use href="#${jevCorrect ? "icon-check" : "icon-cross"}"/></svg>
+            ${jevLabel} · ${jevCorrect ? "对了" : "错了"}
+          </span>
+        `;
+
+        // 记录单题详细战报
+        benchmarkLog.push({
+          id: round.id,
+          category: round.category,
+          category_zh: round.category_zh,
+          zh: round.zh,
+          text: round.text,
+          gold: round.gold,
+          laya: { choice: layaRes.choice, correct: layaCorrect, ms: layaRes.ms },
+          jev: { choice: jevRes.choice, correct: jevCorrect, ms: jevRes.ms },
+          isDiff: layaCorrect !== jevCorrect,
+        });
+
+        // 刷新顶部实时仪表板
+        updateStats();
+
+        // 停顿 360ms 让人眼舒适观察结果，然后进入下一题
+        await new Promise((r) => setTimeout(r, 360));
+      }
+
+      // 结束评测
+      isRunning = false;
+      btnStart.style.display = "inline-flex";
+      btnStart.textContent = "重新评测";
+      btnStop.style.display = "none";
+      btnShowReport.style.display = "inline-flex";
+      sampleSelect.disabled = false;
+
+      // 评测跑完自动打开报告弹窗
+      renderReport();
+      reportModal.classList.add("open");
+    }
+
+    // 生成深度评测报告
+    function renderReport() {
+      const catStats = {
+        feature: { name: "属性特征描述", total: 0, layaHit: 0, jevHit: 0, layaMs: 0, jevMs: 0 },
+        negation: { name: "否定排除逻辑", total: 0, layaHit: 0, jevHit: 0, layaMs: 0, jevMs: 0 },
+        distraction: { name: "背景干扰消歧", total: 0, layaHit: 0, jevHit: 0, layaMs: 0, jevMs: 0 },
+        conversational: { name: "口语闲聊提取", total: 0, layaHit: 0, jevHit: 0, layaMs: 0, jevMs: 0 },
+      };
+
+      for (const item of benchmarkLog) {
+        const cat = catStats[item.category];
+        if (cat) {
+          cat.total += 1;
+          if (item.laya.correct) cat.layaHit += 1;
+          if (item.jev.correct) cat.jevHit += 1;
+          cat.layaMs += Number.isFinite(item.laya.ms) ? item.laya.ms : 0;
+          cat.jevMs += Number.isFinite(item.jev.ms) ? item.jev.ms : 0;
+        }
+      }
+
+      // 渲染表格
+      const tbody = document.querySelector("#cat-table-body");
+      tbody.innerHTML = "";
+      for (const key of ["feature", "negation", "distraction", "conversational"]) {
+        const c = catStats[key];
+        if (!c.total) continue;
+        const lRate = ((c.layaHit / c.total) * 100).toFixed(1);
+        const jRate = ((c.jevHit / c.total) * 100).toFixed(1);
+        const lAvg = Math.round(c.layaMs / c.total) || 0;
+        const jAvg = Math.round(c.jevMs / c.total) || 0;
+        const diff = (parseFloat(jRate) - parseFloat(lRate)).toFixed(1);
+        const speedRatio = lAvg > 0 && jAvg > 0 ? (jAvg / lAvg).toFixed(0) : "1";
+
+        let deltaHtml = `<span class="delta-tag tie">持平</span>`;
+        if (diff > 0) deltaHtml = `<span class="delta-tag win-jev">Jev +${diff}%</span>`;
+        else if (diff < 0) deltaHtml = `<span class="delta-tag win-laya">Laya +${Math.abs(diff)}%</span>`;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="cat-name-col">${c.name}</td>
+          <td>${c.total} 题</td>
+          <td class="${parseFloat(lRate) >= parseFloat(jRate) ? "rate-highlight" : ""}">${lRate}% (${c.layaHit}/${c.total})</td>
+          <td class="${parseFloat(jRate) >= parseFloat(lRate) ? "rate-highlight" : ""}">${jRate}% (${c.jevHit}/${c.total})</td>
+          <td>${deltaHtml}</td>
+          <td><b>${lAvg}</b> ms</td>
+          <td><b>${jAvg}</b> ms</td>
+          <td><span style="color:#cf1322;font-weight:850;">${speedRatio}x*</span></td>
+        `;
+        tbody.append(tr);
+      }
+
+      // 统计数字
+      const countAll = benchmarkLog.length;
+      const countDiff = benchmarkLog.filter((x) => x.isDiff).length;
+      const countJevWin = benchmarkLog.filter((x) => x.jev.correct && !x.laya.correct).length;
+      const countLayaWin = benchmarkLog.filter((x) => x.laya.correct && !x.jev.correct).length;
+      const countBothWrong = benchmarkLog.filter((x) => !x.laya.correct && !x.jev.correct).length;
+
+      document.querySelector("#count-all").textContent = countAll;
+      document.querySelector("#count-diff").textContent = countDiff;
+      document.querySelector("#count-jev-win").textContent = countJevWin;
+      document.querySelector("#count-laya-win").textContent = countLayaWin;
+      document.querySelector("#count-both-wrong").textContent = countBothWrong;
+
+      renderFilteredCases("all");
+    }
+
+    // 辅助格式化模型选型与耗时
+    function formatModelChoice(choice, ms, defaultErr = "异常") {
+      const msSafe = Number.isFinite(ms) ? ms : 0;
+      if (!choice || choice === "error") return `${defaultErr} (${msSafe}ms)`;
+      return `${NAMES[choice] || choice} (${msSafe}ms)`;
+    }
+
+    // 渲染题目列表
+    function renderFilteredCases(filter) {
+      const container = document.querySelector("#case-list-container");
+      container.innerHTML = "";
+
+      let list = benchmarkLog;
+      if (filter === "diff") list = benchmarkLog.filter((x) => x.isDiff);
+      else if (filter === "jev-win") list = benchmarkLog.filter((x) => x.jev.correct && !x.laya.correct);
+      else if (filter === "laya-win") list = benchmarkLog.filter((x) => x.laya.correct && !x.jev.correct);
+      else if (filter === "both-wrong") list = benchmarkLog.filter((x) => !x.laya.correct && !x.jev.correct);
+
+      if (!list.length) {
+        container.innerHTML = `<div style="text-align:center;padding:24px;color:#8c8275;font-weight:700;">该筛选条件下无题目案例</div>`;
+        return;
+      }
+
+      for (const item of list) {
+        const card = document.createElement("div");
+        card.className = `case-item ${item.isDiff ? "diff-case" : ""}`;
+        const layaText = formatModelChoice(item.laya.choice, item.laya.ms, "异常");
+        const jevText = formatModelChoice(item.jev.choice, item.jev.ms, "网络异常");
+
+        card.innerHTML = `
+          <div class="case-top">
+            <div class="case-meta">
+              <span class="case-id">#${item.id}</span>
+              <span class="q-category-tag tag-${item.category}">${item.category_zh}</span>
+              <span class="gold-indicator">标准答案: <b>${NAMES[item.gold]}</b></span>
+            </div>
+            <div class="case-choices">
+              <span>Laya: <span class="choice-badge ${item.laya.correct ? "ok" : "bad"}">${item.laya.correct ? "✓" : "✗"} ${layaText}</span></span>
+              <span>Jev: <span class="choice-badge ${item.jev.correct ? "ok" : "bad"}">${item.jev.correct ? "✓" : "✗"} ${jevText}</span></span>
+            </div>
+          </div>
+          <div class="case-prompt">
+            ${item.zh}
+            <div style="font-size:13px;color:#7a736a;font-style:italic;font-weight:500;">${item.text}</div>
+          </div>
+        `;
+        container.append(card);
+      }
+    }
+
+    // 交互事件绑定
+    btnStart.addEventListener("click", runBenchmark);
+    btnStop.addEventListener("click", () => {
+      shouldStop = true;
+      btnStop.textContent = "正在停止…";
+    });
+    btnShowReport.addEventListener("click", () => {
+      renderReport();
+      reportModal.classList.add("open");
+    });
+    btnCloseReport.addEventListener("click", () => {
+      reportModal.classList.remove("open");
+    });
+
+    document.querySelectorAll(".filter-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".filter-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderFilteredCases(tab.dataset.filter);
+      });
+    });
+
+    // 导出长图海报功能
+    const btnExportImage = document.querySelector("#btn-export-image");
+
+    function fillPosterData() {
+      const totalRounds = benchmarkLog.length || 0;
+      let layaHits = 0, jevHits = 0, layaTotalMs = 0, jevTotalMs = 0;
+      let jevWinCount = 0, layaWinCount = 0, tieCount = 0, bothBadCount = 0;
+
+      for (const item of benchmarkLog) {
+        if (item.laya.correct) layaHits++;
+        if (item.jev.correct) jevHits++;
+        layaTotalMs += Number.isFinite(item.laya.ms) ? item.laya.ms : 0;
+        jevTotalMs += Number.isFinite(item.jev.ms) ? item.jev.ms : 0;
+
+        if (item.laya.correct && item.jev.correct) tieCount++;
+        else if (!item.laya.correct && item.jev.correct) jevWinCount++;
+        else if (item.laya.correct && !item.jev.correct) layaWinCount++;
+        else bothBadCount++;
+      }
+
+      const lRate = totalRounds ? ((layaHits / totalRounds) * 100).toFixed(1) : "0.0";
+      const jRate = totalRounds ? ((jevHits / totalRounds) * 100).toFixed(1) : "0.0";
+      const lAvg = totalRounds ? Math.round(layaTotalMs / totalRounds) : 0;
+      const jAvg = totalRounds ? Math.round(jevTotalMs / totalRounds) : 0;
+      const diffRate = (parseFloat(jRate) - parseFloat(lRate)).toFixed(1);
+
+      // 1. 顶部紧凑数据横幅 (取代大号卡片)
+      const summaryStrip = document.querySelector("#poster-summary-strip");
+      if (summaryStrip) {
+        summaryStrip.innerHTML = `
+          <div class="poster-summary-item">
+            <span class="poster-summary-label">Laya 本地端侧 (ModernBERT)</span>
+            <div class="poster-summary-value" style="color:#cf222e;">
+              <span>${lRate}%</span>
+              <span class="poster-summary-sub">(${layaHits}/${totalRounds}题 · 均耗${lAvg}ms)</span>
+            </div>
+          </div>
+          <div class="poster-summary-item">
+            <span class="poster-summary-label">Jev 云端 API (System One)</span>
+            <div class="poster-summary-value" style="color:#0b6b2c;">
+              <span>${jRate}%</span>
+              <span class="poster-summary-sub">(${jevHits}/${totalRounds}题 · 均耗${jAvg}ms)</span>
+            </div>
+          </div>
+          <div class="poster-summary-item">
+            <span class="poster-summary-label">对决差距与分歧裁定</span>
+            <div class="poster-summary-value" style="color:#1f1d1a;">
+              <span>Jev领先 ${diffRate > 0 ? "+" + diffRate : diffRate}%</span>
+              <span class="poster-summary-sub">(Jev胜${jevWinCount} · Laya胜${layaWinCount} · 平局${tieCount}${bothBadCount ? " · 双错" + bothBadCount : ""})</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. 四大能力分类表格同步
+      const posterCatTbody = document.querySelector("#poster-cat-tbody");
+      if (posterCatTbody) {
+        posterCatTbody.innerHTML = document.querySelector("#cat-table-body").innerHTML;
+      }
+
+      // 3. 渲染全量实测对决逐题明细表 (单题不漏全部独立渲染)
+      const ledgerCountEl = document.querySelector("#poster-ledger-count");
+      if (ledgerCountEl) ledgerCountEl.textContent = totalRounds;
+
+      const ledgerTbody = document.querySelector("#poster-ledger-tbody");
+      ledgerTbody.innerHTML = "";
+
+      for (let i = 0; i < benchmarkLog.length; i++) {
+        const item = benchmarkLog[i];
+        const tr = document.createElement("tr");
+
+        let rowClass = "";
+        let verdictHtml = "";
+        if (item.laya.correct && item.jev.correct) {
+          verdictHtml = `<span class="verdict-chip both-ok">平局 (皆对)</span>`;
+        } else if (!item.laya.correct && item.jev.correct) {
+          rowClass = "row-diff";
+          verdictHtml = `<span class="verdict-chip win-jev">★ Jev 胜</span>`;
+        } else if (item.laya.correct && !item.jev.correct) {
+          rowClass = "row-diff";
+          verdictHtml = `<span class="verdict-chip win-laya">★ Laya 胜</span>`;
+        } else {
+          rowClass = "row-both-bad";
+          verdictHtml = `<span class="verdict-chip both-bad">双方皆错</span>`;
+        }
+
+        if (rowClass) tr.className = rowClass;
+
+        const catClassMap = {
+          feature: "cat-mini-feature",
+          negation: "cat-mini-negation",
+          distraction: "cat-mini-distraction",
+          conversational: "cat-mini-conversational",
+        };
+        const catClass = catClassMap[item.category] || "cat-mini-feature";
+
+        const layaChoiceName = NAMES[item.laya.choice] || (item.laya.choice === "error" ? "异常" : item.laya.choice || "未决");
+        const jevChoiceName = NAMES[item.jev.choice] || (item.jev.choice === "error" ? "网络异常" : item.jev.choice || "未决");
+        const layaMsSafe = Number.isFinite(item.laya.ms) ? item.laya.ms : 0;
+        const jevMsSafe = Number.isFinite(item.jev.ms) ? item.jev.ms : 0;
+
+        tr.innerHTML = `
+          <td class="col-idx">#${String(item.id).padStart(2, "0")}</td>
+          <td class="col-cat"><span class="cat-mini-chip ${catClass}">${item.category_zh || item.category}</span></td>
+          <td class="col-prompt">
+            <div class="prompt-zh">${item.zh}</div>
+            <div class="prompt-en">${item.text}</div>
+          </td>
+          <td class="col-gold"><b>${NAMES[item.gold] || item.gold}</b></td>
+          <td class="col-model-res">
+            <span class="ledger-badge ${item.laya.correct ? "ok" : "bad"}">
+              ${item.laya.correct ? "✓" : "✗"} ${layaChoiceName}
+              <small>${layaMsSafe}ms</small>
+            </span>
+          </td>
+          <td class="col-model-res">
+            <span class="ledger-badge ${item.jev.correct ? "ok" : "bad"}">
+              ${item.jev.correct ? "✓" : "✗"} ${jevChoiceName}
+              <small>${jevMsSafe}ms</small>
+            </span>
+          </td>
+          <td class="col-verdict">${verdictHtml}</td>
+        `;
+
+        ledgerTbody.append(tr);
+      }
+
+      // 4. 当前时间
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      document.querySelector("#poster-date").textContent = `评测时间: ${timeStr}`;
+    }
+
+    async function exportReportPoster() {
+      if (typeof html2canvas !== "function") {
+        alert("长图导出组件加载中，请稍候再试");
+        return;
+      }
+
+      btnExportImage.disabled = true;
+      const originalText = btnExportImage.innerHTML;
+      btnExportImage.innerHTML = `
+        <svg class="btn-svg" style="width:16px;height:16px"><use href="#icon-clock"/></svg>
+        <span>正在生成超清长图…</span>
+      `;
+
+      try {
+        fillPosterData();
+        const posterEl = document.querySelector("#export-poster");
+
+        // 临时显现以供渲染
+        posterEl.style.left = "0";
+        posterEl.style.top = "-99999px";
+
+        const canvas = await html2canvas(posterEl, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#f7f4ee",
+          logging: false,
+        });
+
+        posterEl.style.left = "-9999px";
+
+        const link = document.createElement("a");
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}`;
+        link.download = `Laya_vs_Jev_100题同题基准对决完整实测战报_${dateStr}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+
+        btnExportImage.innerHTML = `
+          <svg class="btn-svg" style="width:16px;height:16px"><use href="#icon-check"/></svg>
+          <span>已成功保存长图！</span>
+        `;
+        setTimeout(() => {
+          btnExportImage.innerHTML = originalText;
+          btnExportImage.disabled = false;
+        }, 3000);
+      } catch (err) {
+        console.error("生成长图失败:", err);
+        alert("生成长图失败: " + err.message);
+        btnExportImage.innerHTML = originalText;
+        btnExportImage.disabled = false;
+      }
+    }
+
+    btnExportImage.addEventListener("click", exportReportPoster);
+  </script>
+
+  <!-- 离屏超清导出海报容器 (专为社交媒体长图优化，1080px 宽度，Retina 2x 导出，数据单独渲染) -->
+  <div class="export-poster-wrap" id="export-poster">
+    <!-- 头部 Header -->
+    <div class="poster-header">
+      <div>
+        <div class="poster-title">软乎乎大模型评测实验室 · 100题同题基准对决完整实测档案</div>
+        <div class="poster-sub">端侧本地 Laya (ModernBERT-large) VS 云端 API Jev (System One) · 4大能力维度同题严谨盲测</div>
+      </div>
+      <div class="poster-tag">BENCHMARK REPORT</div>
+    </div>
+
+    <!-- 顶部精炼战报摘要横幅 (取代大卡片) -->
+    <div class="poster-summary-strip" id="poster-summary-strip"></div>
+
+    <!-- 红色警示框：说明本地与云端延迟不具可比性 -->
+    <div class="speed-warning-box">
+      <div class="warning-title">
+        <svg class="warning-svg"><use href="#icon-cross"/></svg>
+        【技术声明】响应耗时不可作为两款模型底层计算效率的对比依据！
+      </div>
+      <div class="warning-text">
+        本次评测中，<b>Laya</b> 部署于本地 Apple Silicon GPU（MLX 框架），耗时为纯本地模型推理时间（无任何网络开销）；而 <b>Jev</b> 是通过公网调用位于海外的 TypeSafe 官方 API，其整体耗时（约 700~1000ms）绝大部分由 <b>公网 TCP 建连、TLS 握手及跨国网络传输延迟 (RTT)</b> 导致，并非模型单步计算缓慢。<b>两者耗时差异主要源于“本地端侧 vs 远程云端”的网络架构物理差异，速度不具备直接可比性，请勿据此衡量两者的纯计算算力效率。</b>
+      </div>
+    </div>
+
+    <!-- 区块一：四大语义能力分项对比 -->
+    <div>
+      <div class="poster-section-head">
+        <div class="poster-section-title">
+          <svg style="width:19px;height:19px;color:#2a2622"><use href="#icon-target"/></svg>
+          一、四大语义能力分项对比
+        </div>
+        <div class="poster-section-sub">分维度考查属性特征、否定排除、背景干扰与口语闲聊指代</div>
+      </div>
+      <table class="cat-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">能力分类</th>
+            <th>测试样本</th>
+            <th>Laya 准确率</th>
+            <th>Jev 准确率</th>
+            <th>准确率差距 (Δ)</th>
+            <th>Laya 耗时 (本地)</th>
+            <th>Jev 耗时 (含网络)</th>
+            <th>时延比 (仅供参考)*</th>
+          </tr>
+        </thead>
+        <tbody id="poster-cat-tbody"></tbody>
+      </table>
+      <div class="table-footnote">
+        * 提示：Jev 耗时含海外公网传输 RTT，非同等物理网络环境下测量，两者的响应速度没有可比性，不能作为模型真实算力效率的对比依据。
+      </div>
+    </div>
+
+    <!-- 区块二：完整 100 道题全量实测对决逐题明细表 (单题不漏全量记录) -->
+    <div>
+      <div class="poster-section-head">
+        <div class="poster-section-title">
+          <svg style="width:19px;height:19px;color:#e07a1f"><use href="#icon-zap"/></svg>
+          二、全量实测对决逐题记录清单 (<span id="poster-ledger-count">100</span> 题全记录 · 单题不漏)
+        </div>
+        <div class="poster-section-sub">
+          图例：<span class="verdict-chip win-jev" style="margin-right:4px;">★ Jev 胜</span>
+          <span class="verdict-chip win-laya" style="margin-right:4px;">★ Laya 胜</span>
+          <span class="verdict-chip both-ok" style="margin-right:4px;">平局 (皆对)</span>
+          <span class="verdict-chip both-bad">双方皆错</span>
+        </div>
+      </div>
+
+      <table class="full-ledger-table">
+        <thead>
+          <tr>
+            <th class="col-idx">#</th>
+            <th class="col-cat">分类</th>
+            <th class="col-prompt">测试题目指令 (中英双语)</th>
+            <th class="col-gold">标准答案</th>
+            <th class="col-model-res">Laya (端侧本地)</th>
+            <th class="col-model-res">Jev (云端 API)</th>
+            <th class="col-verdict">裁定结果</th>
+          </tr>
+        </thead>
+        <tbody id="poster-ledger-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- 底部 Footer -->
+    <div class="poster-footer">
+      <span>测试环境: Apple Silicon MLX GPU · TypeSafe 官方海外 API</span>
+      <span id="poster-date">评测时间: 2026-09-23</span>
+      <span>软乎乎开源评测套件 · 真实数据·无Cherry-pick·可复现测试</span>
+    </div>
+  </div>
+</body>
+
+</html>
